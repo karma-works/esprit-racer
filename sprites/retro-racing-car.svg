@@ -1,0 +1,103 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 60" width="240" height="120">
+  <!-- Retro 8-bit/16-bit style purple sports car (Lamborghini Countach inspired) -->
+  
+  <!-- Car body shadow -->
+  <rect x="8" y="52" width="104" height="6" fill="#1a1a2e" opacity="0.5"/>
+  
+  <!-- Main car body - lower section -->
+  <polygon points="10,40 20,44 100,44 110,40 110,48 100,52 20,52 10,48" fill="#4a1a6b"/>
+  
+  <!-- Car body - middle section -->
+  <polygon points="15,32 25,36 95,36 105,32 110,40 100,44 20,44 10,40" fill="#6b2d91"/>
+  
+  <!-- Car body - upper section / cabin slope -->
+  <polygon points="35,20 45,16 75,16 85,20 95,36 25,36" fill="#7c3f9e"/>
+  
+  <!-- Windshield -->
+  <polygon points="38,22 46,18 74,18 82,22 88,32 32,32" fill="#1a3a5c"/>
+  
+  <!-- Windshield reflection -->
+  <polygon points="42,24 50,20 58,20 50,28" fill="#2a5a8c" opacity="0.6"/>
+  
+  <!-- Roof -->
+  <polygon points="45,16 75,16 75,14 45,14" fill="#5a2080"/>
+  
+  <!-- Engine vents (Countach style) -->
+  <rect x="20" y="38" width="15" height="3" fill="#3a1050"/>
+  <rect x="22" y="39" width="3" height="1" fill="#2a0840"/>
+  <rect x="27" y="39" width="3" height="1" fill="#2a0840"/>
+  <rect x="32" y="39" width="3" height="1" fill="#2a0840"/>
+  
+  <!-- Rear vents -->
+  <rect x="85" y="38" width="15" height="3" fill="#3a1050"/>
+  <rect x="87" y="39" width="3" height="1" fill="#2a0840"/>
+  <rect x="92" y="39" width="3" height="1" fill="#2a0840"/>
+  
+  <!-- Headlights (front) -->
+  <rect x="12" y="42" width="8" height="4" fill="#c0c0c0"/>
+  <rect x="13" y="43" width="6" height="2" fill="#ffff80"/>
+  <rect x="14" y="43" width="2" height="2" fill="#ffffaa"/>
+  
+  <!-- Tail lights (rear) -->
+  <rect x="100" y="42" width="8" height="4" fill="#c0c0c0"/>
+  <rect x="101" y="43" width="6" height="2" fill="#ff2020"/>
+  <rect x="102" y="43" width="2" height="2" fill="#ff6060"/>
+  
+  <!-- Front bumper -->
+  <polygon points="10,48 15,46 25,46 25,50 15,52 10,50" fill="#3a1050"/>
+  
+  <!-- Rear bumper -->
+  <polygon points="95,46 105,46 110,48 110,50 105,52 95,50" fill="#3a1050"/>
+  
+  <!-- Side details / body lines -->
+  <line x1="25" y1="40" x2="90" y2="40" stroke="#5a2080" stroke-width="1"/>
+  <line x1="28" y1="42" x2="88" y2="42" stroke="#3a1050" stroke-width="1"/>
+  
+  <!-- Driver silhouette (retro style) -->
+  <rect x="52" y="20" width="16" height="12" fill="#1a1a2e" opacity="0.7"/>
+  <ellipse cx="60" cy="18" rx="5" ry="4" fill="#1a1a2e" opacity="0.7"/>
+  
+  <!-- Side mirrors -->
+  <polygon points="35,28 30,30 30,32 35,30" fill="#5a2080"/>
+  <polygon points="85,28 90,30 90,32 85,30" fill="#5a2080"/>
+  
+  <!-- Front wheels -->
+  <rect x="16" y="48" width="18" height="10" fill="#1a1a1a"/>
+  <rect x="18" y="50" width="14" height="6" fill="#2a2a2a"/>
+  <rect x="20" y="51" width="3" height="4" fill="#3a3a3a"/>
+  <rect x="25" y="51" width="3" height="4" fill="#3a3a3a"/>
+  
+  <!-- Rear wheels -->
+  <rect x="86" y="48" width="18" height="10" fill="#1a1a1a"/>
+  <rect x="88" y="50" width="14" height="6" fill="#2a2a2a"/>
+  <rect x="90" y="51" width="3" height="4" fill="#3a3a3a"/>
+  <rect x="95" y="51" width="3" height="4" fill="#3a3a3a"/>
+  
+  <!-- Wheel wells / fenders -->
+  <path d="M16,48 Q25,44 34,48" fill="#4a1a6b"/>
+  <path d="M86,48 Q95,44 104,48" fill="#4a1a6b"/>
+  
+  <!-- Highlight on hood -->
+  <polygon points="20,36 30,34 50,34 45,36" fill="#8a4fae" opacity="0.5"/>
+  
+  <!-- Racing stripe (optional detail) -->
+  <rect x="50" y="36" width="20" height="2" fill="#c0c0c0" opacity="0.3"/>
+  
+  <!-- Pixel dithering effect for retro look -->
+  <g opacity="0.15">
+    <rect x="40" y="24" width="1" height="1" fill="#ffffff"/>
+    <rect x="48" y="26" width="1" height="1" fill="#ffffff"/>
+    <rect x="56" y="24" width="1" height="1" fill="#ffffff"/>
+    <rect x="64" y="28" width="1" height="1" fill="#ffffff"/>
+    <rect x="72" y="24" width="1" height="1" fill="#ffffff"/>
+    <rect x="44" y="30" width="1" height="1" fill="#ffffff"/>
+    <rect x="68" y="30" width="1" height="1" fill="#ffffff"/>
+  </g>
+  
+  <!-- Additional pixel detail on body -->
+  <g opacity="0.2">
+    <rect x="30" y="38" width="2" height="1" fill="#ffffff"/>
+    <rect x="88" y="38" width="2" height="1" fill="#ffffff"/>
+    <rect x="50" y="34" width="3" height="1" fill="#ffffff"/>
+  </g>
+</svg>
