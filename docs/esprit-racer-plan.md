@@ -1,6 +1,6 @@
 # Esprit Racer - Project Plan
 
-> Open source reimplementation of Lotus Challenge 3 as a modern web-based racing game.
+> Open source of a Lotus Challenge 3 racer reimagined, as a retro-modern web-based racing game.
 
 ## Project Overview
 
