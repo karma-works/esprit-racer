@@ -1,4 +1,4 @@
-import { BACKGROUND, KEY } from "./engine/constants";
+import { KEY } from "./engine/constants";
 import {
   createWorld,
   update,
@@ -12,6 +12,7 @@ import * as Segments from "./engine/segments";
 import {
   globalSpriteCache,
   preloadGameSprites,
+  getSpriteByName,
   type CachedSprite,
 } from "./assets/svg-loader";
 import {
@@ -22,7 +23,6 @@ import {
 import {
   createTimeChallengeState,
   type TimeChallengeState,
-  type GameScreen,
   updateTimer,
   startRace,
   pauseGame,
@@ -47,13 +47,10 @@ if (!ctx) {
 const world = createWorld();
 const step = 1 / world.config.fps;
 
-let background: HTMLImageElement | null = null;
-let sprites: HTMLImageElement | null = null;
 let svgBackground: CachedSprite | null = null;
 let svgPlayerCar: CachedSprite | null = null;
 let last = Util.timestamp();
 let gdt = 0;
-let useSvg = false;
 
 let gameState = createTimeChallengeState();
 let screens = createScreens(world.config.width, world.config.height);
@@ -66,27 +63,54 @@ const resolution = world.config.height / 480;
 let countdown = 0;
 let countdownTimer = 0;
 
-const loadImages = (names: string[]): Promise<HTMLImageElement[]> => {
-  return Promise.all(
-    names.map((name) => {
-      return new Promise<HTMLImageElement>((resolve, reject) => {
-        const img = document.createElement("img");
-        img.onload = () => resolve(img);
-        img.onerror = reject;
-        img.src = `images/${name}.png`;
-      });
-    }),
-  );
-};
-
 const loadSvgSprites = async (): Promise<void> => {
   await preloadGameSprites();
-  svgBackground = globalSpriteCache.get("level-1-background.svg", 1);
-  svgPlayerCar = globalSpriteCache.get("retro-racing-car.svg", 0.5);
+  svgBackground = globalSpriteCache.get("background-level-1.svg", 1);
+  svgPlayerCar = globalSpriteCache.get("player-car.svg", 0.5);
+};
+
+const getSpriteName = (sprite: { w: number; h: number }): string | null => {
+  const spriteMap: Record<string, { w: number; h: number; name: string }> = {
+    PALM_TREE: { w: 215, h: 540, name: "PALM_TREE" },
+    BILLBOARD08: { w: 385, h: 265, name: "BILLBOARD08" },
+    TREE1: { w: 360, h: 360, name: "TREE1" },
+    DEAD_TREE1: { w: 135, h: 332, name: "DEAD_TREE1" },
+    BILLBOARD09: { w: 328, h: 282, name: "BILLBOARD09" },
+    BOULDER3: { w: 320, h: 220, name: "BOULDER3" },
+    COLUMN: { w: 200, h: 315, name: "COLUMN" },
+    BILLBOARD01: { w: 300, h: 170, name: "BILLBOARD01" },
+    BILLBOARD06: { w: 298, h: 190, name: "BILLBOARD06" },
+    BILLBOARD05: { w: 298, h: 190, name: "BILLBOARD05" },
+    BILLBOARD07: { w: 298, h: 190, name: "BILLBOARD07" },
+    BOULDER2: { w: 298, h: 140, name: "BOULDER2" },
+    TREE2: { w: 282, h: 295, name: "TREE2" },
+    BILLBOARD04: { w: 268, h: 170, name: "BILLBOARD04" },
+    DEAD_TREE2: { w: 150, h: 260, name: "DEAD_TREE2" },
+    BOULDER1: { w: 168, h: 248, name: "BOULDER1" },
+    BUSH1: { w: 240, h: 155, name: "BUSH1" },
+    CACTUS: { w: 235, h: 118, name: "CACTUS" },
+    BUSH2: { w: 232, h: 152, name: "BUSH2" },
+    BILLBOARD03: { w: 230, h: 220, name: "BILLBOARD03" },
+    BILLBOARD02: { w: 215, h: 220, name: "BILLBOARD02" },
+    STUMP: { w: 195, h: 140, name: "STUMP" },
+    SEMI: { w: 122, h: 144, name: "SEMI" },
+    TRUCK: { w: 100, h: 78, name: "TRUCK" },
+    CAR03: { w: 88, h: 55, name: "CAR03" },
+    CAR02: { w: 80, h: 59, name: "CAR02" },
+    CAR04: { w: 80, h: 57, name: "CAR04" },
+    CAR01: { w: 80, h: 56, name: "CAR01" },
+  };
+
+  for (const [, data] of Object.entries(spriteMap)) {
+    if (data.w === sprite.w && data.h === sprite.h) {
+      return data.name;
+    }
+  }
+  return null;
 };
 
 const renderRacing = () => {
-  const { config, player, skyOffset, hillOffset, treeOffset } = world;
+  const { config, player, skyOffset } = world;
   const {
     width,
     height,
@@ -119,7 +143,7 @@ const renderRacing = () => {
 
   ctx.clearRect(0, 0, width, height);
 
-  if (useSvg && svgBackground) {
+  if (svgBackground) {
     SvgRender.svgBackground(
       ctx,
       svgBackground,
@@ -127,34 +151,6 @@ const renderRacing = () => {
       height,
       skyOffset,
       resolution * 0.001 * playerY,
-    );
-  } else if (background) {
-    Render.background(
-      ctx,
-      background,
-      width,
-      height,
-      BACKGROUND.SKY,
-      skyOffset,
-      resolution * 0.001 * playerY,
-    );
-    Render.background(
-      ctx,
-      background,
-      width,
-      height,
-      BACKGROUND.HILLS,
-      hillOffset,
-      resolution * 0.002 * playerY,
-    );
-    Render.background(
-      ctx,
-      background,
-      width,
-      height,
-      BACKGROUND.TREES,
-      treeOffset,
-      resolution * 0.003 * playerY,
     );
   }
 
@@ -216,123 +212,112 @@ const renderRacing = () => {
     maxy = segment.p1.screen.y;
   }
 
-  if (sprites) {
-    for (let n = drawDistance - 1; n > 0; n--) {
-      const segmentIndex = (baseSegment.index + n) % world.segments.length;
-      const segment = world.segments[segmentIndex];
-      if (!segment) continue;
+  for (let n = drawDistance - 1; n > 0; n--) {
+    const segmentIndex = (baseSegment.index + n) % world.segments.length;
+    const segment = world.segments[segmentIndex];
+    if (!segment) continue;
 
-      for (const car of segment.cars) {
-        const spriteScale = Util.interpolate(
-          segment.p1.screen.scale,
-          segment.p2.screen.scale,
+    for (const car of segment.cars) {
+      const spriteScale = Util.interpolate(
+        segment.p1.screen.scale,
+        segment.p2.screen.scale,
+        car.percent ?? 0,
+      );
+      const spriteX =
+        Util.interpolate(
+          segment.p1.screen.x,
+          segment.p2.screen.x,
           car.percent ?? 0,
-        );
-        const spriteX =
-          Util.interpolate(
-            segment.p1.screen.x,
-            segment.p2.screen.x,
-            car.percent ?? 0,
-          ) +
-          (spriteScale * car.offset * roadWidth * width) / 2;
-        const spriteY = Util.interpolate(
-          segment.p1.screen.y,
-          segment.p2.screen.y,
-          car.percent ?? 0,
-        );
-        Render.sprite(
-          ctx,
-          width,
-          height,
-          resolution,
-          roadWidth,
-          sprites,
-          car.sprite,
-          spriteScale,
-          spriteX,
-          spriteY,
-          -0.5,
-          -1,
-          segment.clip ?? 0,
-        );
-      }
+        ) +
+        (spriteScale * car.offset * roadWidth * width) / 2;
+      const spriteY = Util.interpolate(
+        segment.p1.screen.y,
+        segment.p2.screen.y,
+        car.percent ?? 0,
+      );
 
-      for (const sprite of segment.sprites) {
-        const spriteScale = segment.p1.screen.scale;
-        const spriteX =
-          segment.p1.screen.x +
-          (spriteScale * sprite.offset * roadWidth * width) / 2;
-        const spriteY = segment.p1.screen.y;
-        Render.sprite(
-          ctx,
-          width,
-          height,
-          resolution,
-          roadWidth,
-          sprites,
-          sprite.source,
-          spriteScale,
-          spriteX,
-          spriteY,
-          sprite.offset < 0 ? -1 : 0,
-          -1,
-          segment.clip ?? 0,
-        );
-      }
-
-      if (segment === playerSegment) {
-        const playerScale = cameraDepth / playerZ;
-        const playerScreenY =
-          height / 2 -
-          (playerScale *
-            Util.interpolate(
-              playerSegment.p1.camera.y,
-              playerSegment.p2.camera.y,
-              playerPercent,
-            ) *
-            height) /
-            2;
-        const speedPercent = player.speed / config.maxSpeed;
-        const bounce =
-          1.5 *
-          Math.random() *
-          speedPercent *
-          resolution *
-          (Math.random() > 0.5 ? 1 : -1);
-        const steer =
-          player.speed * (world.input.left ? -1 : world.input.right ? 1 : 0);
-
-        if (useSvg && svgPlayerCar) {
-          SvgRender.svgPlayer(
+      const spriteName = getSpriteName(car.sprite);
+      if (spriteName) {
+        const cachedSprite = getSpriteByName(spriteName, spriteScale);
+        if (cachedSprite) {
+          SvgRender.svgSprite(
             ctx,
-            svgPlayerCar,
+            cachedSprite,
             width,
-            height,
             roadWidth,
-            speedPercent,
-            playerScale,
-            width / 2,
-            playerScreenY,
-            steer,
-            bounce,
-          );
-        } else if (sprites) {
-          Render.player(
-            ctx,
-            width,
-            height,
-            resolution,
-            roadWidth,
-            sprites,
-            speedPercent,
-            playerScale,
-            width / 2,
-            playerScreenY,
-            steer,
-            playerSegment.p2.world.y - playerSegment.p1.world.y,
+            spriteScale,
+            spriteX,
+            spriteY,
+            -0.5,
+            -1,
+            segment.clip ?? 0,
           );
         }
       }
+    }
+
+    for (const sprite of segment.sprites) {
+      const spriteScale = segment.p1.screen.scale;
+      const spriteX =
+        segment.p1.screen.x +
+        (spriteScale * sprite.offset * roadWidth * width) / 2;
+      const spriteY = segment.p1.screen.y;
+
+      const spriteName = getSpriteName(sprite.source);
+      if (spriteName) {
+        const cachedSprite = getSpriteByName(spriteName, spriteScale);
+        if (cachedSprite) {
+          SvgRender.svgSprite(
+            ctx,
+            cachedSprite,
+            width,
+            roadWidth,
+            spriteScale,
+            spriteX,
+            spriteY,
+            sprite.offset < 0 ? -1 : 0,
+            -1,
+            segment.clip ?? 0,
+          );
+        }
+      }
+    }
+
+    if (segment === playerSegment && svgPlayerCar) {
+      const playerScale = cameraDepth / playerZ;
+      const playerScreenY =
+        height / 2 -
+        (playerScale *
+          Util.interpolate(
+            playerSegment.p1.camera.y,
+            playerSegment.p2.camera.y,
+            playerPercent,
+          ) *
+          height) /
+          2;
+      const speedPercent = player.speed / config.maxSpeed;
+      const bounce =
+        1.5 *
+        Math.random() *
+        speedPercent *
+        resolution *
+        (Math.random() > 0.5 ? 1 : -1);
+      const steer =
+        player.speed * (world.input.left ? -1 : world.input.right ? 1 : 0);
+
+      SvgRender.svgPlayer(
+        ctx,
+        svgPlayerCar,
+        width,
+        height,
+        roadWidth,
+        speedPercent,
+        playerScale,
+        width / 2,
+        playerScreenY,
+        steer,
+        bounce,
+      );
     }
   }
 
@@ -502,19 +487,9 @@ canvas.height = world.config.height;
 const init = async () => {
   try {
     await loadSvgSprites();
-    useSvg = true;
     console.log("SVG sprites loaded successfully");
   } catch (err) {
-    console.warn("Failed to load SVG sprites, falling back to PNG:", err);
-    useSvg = false;
-  }
-
-  try {
-    const [bg, sp] = await loadImages(["background", "sprites"]);
-    background = bg ?? null;
-    sprites = sp ?? null;
-  } catch (err) {
-    console.warn("Failed to load PNG images:", err);
+    console.error("Failed to load SVG sprites:", err);
   }
 
   try {

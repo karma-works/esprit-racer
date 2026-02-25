@@ -1,0 +1,165 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 350" width="100%" height="100%">
+  <defs>
+    <filter id="outline">
+      <feMorphology in="SourceAlpha" result="DILATED" operator="dilate" radius="2.5"></feMorphology>
+      <feFlood flood-color="#0B0014" result="BLACK"></feFlood>
+      <feComposite in="BLACK" in2="DILATED" operator="in" result="OUTLINE"></feComposite>
+      <feMerge>
+        <feMergeNode in="OUTLINE" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+    
+    <pattern id="dither-dark" width="4" height="4" patternUnits="userSpaceOnUse">
+      <rect width="2" height="2" fill="#1A0526" opacity="0.55"/>
+      <rect x="2" y="2" width="2" height="2" fill="#1A0526" opacity="0.55"/>
+    </pattern>
+
+    <pattern id="dither-light" width="4" height="4" patternUnits="userSpaceOnUse">
+      <rect width="2" height="2" fill="#E0B0FF" opacity="0.45"/>
+      <rect x="2" y="2" width="2" height="2" fill="#E0B0FF" opacity="0.45"/>
+    </pattern>
+    
+    <pattern id="tire-tread" width="10" height="10" patternUnits="userSpaceOnUse">
+      <rect width="10" height="2" fill="#000000" opacity="0.8"/>
+    </pattern>
+  </defs>
+
+  <!-- Ground Shadow -->
+  <ellipse cx="250" cy="310" rx="230" ry="25" fill="#000000" opacity="0.65"/>
+
+  <!-- Main Car Group with Outline and Pixelated Edges -->
+  <g filter="url(#outline)" shape-rendering="crispEdges">
+    
+    <!-- TIRES -->
+    <!-- Left Tire -->
+    <polygon points="20,200 90,200 90,310 5,310" fill="#111111"/>
+    <polygon points="25,200 85,200 85,310 10,310" fill="url(#tire-tread)"/>
+    <polygon points="5,310 20,200 25,200 10,310" fill="#222222"/>
+    
+    <!-- Right Tire -->
+    <polygon points="410,200 480,200 495,310 410,310" fill="#111111"/>
+    <polygon points="415,200 475,200 490,310 415,310" fill="url(#tire-tread)"/>
+    <polygon points="495,310 480,200 475,200 490,310" fill="#222222"/>
+
+    <!-- UNDERCARRIAGE & DIFFUSER -->
+    <polygon points="50,280 450,280 430,305 70,305" fill="#1A1A1A"/>
+    <polygon points="180,280 320,280 310,315 190,315" fill="#262626"/>
+    <!-- Diffuser Fins -->
+    <polygon points="205,280 210,280 212,315 207,315" fill="#0B0014"/>
+    <polygon points="248,280 252,280 252,315 248,315" fill="#0B0014"/>
+    <polygon points="290,280 295,280 293,315 288,315" fill="#0B0014"/>
+
+    <!-- EXHAUST PIPES -->
+    <!-- Left Quad -->
+    <rect x="130" y="275" width="20" height="14" rx="2" fill="#888888"/>
+    <rect x="155" y="275" width="20" height="14" rx="2" fill="#888888"/>
+    <rect x="133" y="278" width="14" height="8" rx="1" fill="#0B0014"/>
+    <rect x="158" y="278" width="14" height="8" rx="1" fill="#0B0014"/>
+    <!-- Right Quad -->
+    <rect x="325" y="275" width="20" height="14" rx="2" fill="#888888"/>
+    <rect x="350" y="275" width="20" height="14" rx="2" fill="#888888"/>
+    <rect x="328" y="278" width="14" height="8" rx="1" fill="#0B0014"/>
+    <rect x="353" y="278" width="14" height="8" rx="1" fill="#0B0014"/>
+
+    <!-- LOWER BUMPER (Fascia Tier 3) -->
+    <polygon points="40,240 460,240 450,280 50,280" fill="#2D0B3D"/>
+    <polygon points="40,240 460,240 450,280 50,280" fill="url(#dither-dark)"/>
+
+    <!-- TAILLIGHT HOUSING (Fascia Tier 2) -->
+    <polygon points="30,200 470,200 460,240 40,240" fill="#111111"/>
+    
+    <!-- LICENSE PLATE -->
+    <polygon points="200,205 300,205 295,235 205,235" fill="#222222"/>
+    <polygon points="220,210 280,210 278,225 222,225" fill="#FACC15"/>
+    <path d="M 226,215 L 274,215 M 225,220 L 275,220" stroke="#B45309" stroke-width="2" stroke-dasharray="4 2 8 2 6"/>
+
+    <!-- LEFT TAILLIGHTS -->
+    <polygon points="45,205 80,205 82,235 50,235" fill="#F59E0B"/>
+    <polygon points="80,205 145,205 146,235 82,235" fill="#DC2626"/>
+    <polygon points="145,205 180,205 180,235 146,235" fill="#E5E7EB"/>
+    
+    <!-- RIGHT TAILLIGHTS -->
+    <polygon points="320,205 355,205 354,235 320,235" fill="#E5E7EB"/>
+    <polygon points="355,205 420,205 418,235 354,235" fill="#DC2626"/>
+    <polygon points="420,205 455,205 450,235 418,235" fill="#F59E0B"/>
+
+    <!-- TAILLIGHT LOUVERS / GRILL -->
+    <path d="M 48,215 L 178,215 M 49,225 L 179,225 M 322,215 L 452,215 M 321,225 L 451,225" stroke="#111111" stroke-width="2"/>
+    <!-- Taillight Specular Highlights -->
+    <rect x="52" y="208" width="12" height="4" fill="#FFFFFF" opacity="0.7"/>
+    <rect x="436" y="208" width="12" height="4" fill="#FFFFFF" opacity="0.7"/>
+
+    <!-- MID FASCIA (Fascia Tier 1) -->
+    <polygon points="40,180 460,180 470,200 30,200" fill="#741B9C"/>
+    <!-- Highlight Line -->
+    <polygon points="40,180 460,180 458,183 42,183" fill="#C95BFC"/>
+
+    <!-- SIDE SHOULDERS (Wide Fenders) -->
+    <polygon points="90,160 120,160 100,180 40,180" fill="#4B1066"/>
+    <polygon points="380,160 410,160 460,180 400,180" fill="#4B1066"/>
+    <polygon points="90,160 120,160 100,180 40,180" fill="url(#dither-dark)"/>
+    <polygon points="380,160 410,160 460,180 400,180" fill="url(#dither-dark)"/>
+    <!-- Shoulder Edge Highlights -->
+    <polygon points="118,160 121,160 101,180 98,180" fill="#C95BFC"/>
+    <polygon points="379,160 382,160 402,180 399,180" fill="#C95BFC"/>
+
+    <!-- ENGINE DECK -->
+    <polygon points="120,160 380,160 400,180 100,180" fill="#741B9C"/>
+    <polygon points="120,160 380,160 400,180 100,180" fill="url(#dither-dark)"/>
+    <!-- Deck Vents/Louvers -->
+    <path d="M 130,164 L 370,164 M 125,169 L 375,169 M 120,174 L 380,174" stroke="#2D0B3D" stroke-width="3"/>
+
+    <!-- CABIN C-PILLARS -->
+    <polygon points="170,75 150,75 90,160 120,160" fill="#9B28D0"/>
+    <polygon points="330,75 350,75 410,160 380,160" fill="#9B28D0"/>
+    <polygon points="170,75 150,75 90,160 120,160" fill="url(#dither-light)"/>
+    <polygon points="330,75 350,75 410,160 380,160" fill="url(#dither-light)"/>
+
+    <!-- REAR WINDOW (Base) -->
+    <polygon points="170,75 330,75 380,160 120,160" fill="#0F172A"/>
+    <!-- Window Reflections (Retro Cyan/Blue) -->
+    <polygon points="180,75 220,75 200,160 140,160" fill="#1D4ED8"/>
+    <polygon points="240,75 260,75 250,160 210,160" fill="#3B82F6"/>
+    <polygon points="270,75 275,75 270,160 260,160" fill="#93C5FD"/>
+
+    <!-- REAR WINDOW LOUVERS (Iconic Countach Slat Design) -->
+    <polygon points="165,85 335,85 340,93 160,93" fill="#111111"/>
+    <polygon points="155,104 345,104 350,113 150,113" fill="#111111"/>
+    <polygon points="145,125 355,125 360,135 140,135" fill="#111111"/>
+    <polygon points="135,148 365,148 370,158 130,158" fill="#111111"/>
+
+    <!-- ROOF -->
+    <polygon points="180,60 320,60 330,75 170,75" fill="#C95BFC"/>
+    <polygon points="180,60 320,60 330,75 170,75" fill="url(#dither-light)"/>
+    <polygon points="180,60 320,60 318,63 182,63" fill="#FFFFFF" opacity="0.6"/>
+
+    <!-- SIDE MIRRORS -->
+    <polygon points="105,120 70,115 75,100 100,105" fill="#741B9C"/>
+    <polygon points="395,120 430,115 425,100 400,105" fill="#741B9C"/>
+
+    <!-- SPOILER WING & STRUTS -->
+    <!-- Struts -->
+    <polygon points="120,95 140,95 160,165 140,165" fill="#2D0B3D"/>
+    <polygon points="360,95 380,95 340,165 360,165" fill="#2D0B3D"/>
+    
+    <!-- Wing Base Thickness -->
+    <polygon points="10,90 490,90 485,95 15,95" fill="#4B1066"/>
+    <!-- Wing Top Surface -->
+    <polygon points="30,75 470,75 490,90 10,90" fill="#C95BFC"/>
+    <polygon points="30,75 470,75 490,90 10,90" fill="url(#dither-light)"/>
+    <!-- Wing Front Edge Highlight -->
+    <polygon points="10,90 490,90 488,92 12,92" fill="#E0B0FF"/>
+
+    <!-- Wing Endplates -->
+    <polygon points="30,50 10,65 10,90 30,75" fill="#9B28D0"/>
+    <polygon points="470,50 490,65 490,90 470,75" fill="#9B28D0"/>
+    <polygon points="30,50 10,65 10,90 30,75" fill="url(#dither-dark)"/>
+    <polygon points="470,50 490,65 490,90 470,75" fill="url(#dither-dark)"/>
+    
+    <!-- Endplate Highlights -->
+    <polygon points="30,50 10,65 12,65 32,50" fill="#E0B0FF"/>
+    <polygon points="470,50 490,65 488,65 468,50" fill="#E0B0FF"/>
+
+  </g>
+</svg>

@@ -1,0 +1,395 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%" style="background-color: #000; user-select: none;">
+    <defs>
+        <!-- Fonts and Global Styles -->
+        <style>
+            @import url('https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&amp;family=Oswald:wght@700&amp;display=swap');
+            
+            .title-text {
+                font-family: 'Oswald', Impact, sans-serif;
+                font-size: 52px;
+                font-weight: 900;
+                letter-spacing: 4px;
+                text-anchor: middle;
+            }
+            .tech-text {
+                font-family: 'Courier Prime', Courier, monospace;
+            }
+            .display-text {
+                font-family: 'Impact', sans-serif;
+                fill: #ff8c00;
+            }
+            .small-label {
+                font-family: 'Courier Prime', Courier, monospace;
+                font-size: 10px;
+                fill: #ff8c00;
+                opacity: 0.8;
+                font-weight: bold;
+            }
+        </style>
+
+        <!-- Filters -->
+        <filter id="drop-shadow" x="-10%" y="-10%" width="130%" height="130%">
+            <feDropShadow dx="3" dy="4" stdDeviation="0" flood-color="#000" flood-opacity="0.8"/>
+        </filter>
+        <filter id="glow-orange" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur stdDeviation="2" result="blur" />
+            <feMerge>
+                <feMergeNode in="blur"/>
+                <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+        </filter>
+        <filter id="inner-shadow">
+            <feOffset dx="0" dy="3"/>
+            <feGaussianBlur stdDeviation="2" result="offset-blur"/>
+            <feComposite operator="out" in="SourceGraphic" in2="offset-blur" result="inverse"/>
+            <feFlood flood-color="black" flood-opacity="0.9" result="color"/>
+            <feComposite operator="in" in="color" in2="inverse" result="shadow"/>
+            <feComposite operator="over" in="shadow" in2="SourceGraphic"/>
+        </filter>
+
+        <!-- Gradients -->
+        <linearGradient id="metal-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#ffffff"/>
+            <stop offset="30%" stop-color="#d4d4d4"/>
+            <stop offset="50%" stop-color="#888888"/>
+            <stop offset="51%" stop-color="#555555"/>
+            <stop offset="100%" stop-color="#bbbbbb"/>
+        </linearGradient>
+        <linearGradient id="wood-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#6b3e1b"/>
+            <stop offset="40%" stop-color="#8b4513"/>
+            <stop offset="60%" stop-color="#5c2e00"/>
+            <stop offset="100%" stop-color="#3d1b00"/>
+        </linearGradient>
+        <linearGradient id="knob-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#555"/>
+            <stop offset="30%" stop-color="#222"/>
+            <stop offset="70%" stop-color="#111"/>
+            <stop offset="100%" stop-color="#000"/>
+        </linearGradient>
+        <linearGradient id="eq-grad" x1="0%" y1="100%" x2="0%" y2="0%">
+            <stop offset="0%" stop-color="#ff5500"/>
+            <stop offset="100%" stop-color="#ffae00"/>
+        </linearGradient>
+
+        <!-- Dithering Patterns for 16-bit look -->
+        <pattern id="dither-beige" width="4" height="4" patternUnits="userSpaceOnUse">
+            <rect width="2" height="2" fill="#c4a582" />
+            <rect x="2" y="2" width="2" height="2" fill="#c4a582" />
+        </pattern>
+        <pattern id="dither-dark" width="4" height="4" patternUnits="userSpaceOnUse">
+            <rect width="2" height="2" fill="#000" opacity="0.3" />
+            <rect x="2" y="2" width="2" height="2" fill="#000" opacity="0.3" />
+        </pattern>
+        <pattern id="led-scanlines" width="4" height="4" patternUnits="userSpaceOnUse">
+            <rect width="4" height="2" fill="#000" opacity="0.85" />
+        </pattern>
+        
+        <!-- Reusable Keypad Button -->
+        <g id="keypad-btn">
+            <circle cx="0" cy="0" r="9" fill="#222" stroke="#111" stroke-width="2"/>
+            <circle cx="0" cy="0" r="7" fill="#333"/>
+        </g>
+    </defs>
+
+    <!-- ========================================== -->
+    <!-- BACKGROUND & DASHBOARD SCENE               -->
+    <!-- ========================================== -->
+    
+    <!-- Dashboard Base (Beige Plastic) -->
+    <rect width="100%" height="100%" fill="#d2b48c" />
+    <rect width="100%" height="100%" fill="url(#dither-beige)" />
+
+    <!-- Dashboard Contours / Shading -->
+    <path d="M 0,130 Q 400,160 800,130 L 800,600 L 0,600 Z" fill="#b0926e" opacity="0.5" />
+    <path d="M 0,130 Q 400,160 800,130 L 800,140 Q 400,170 0,140 Z" fill="#8c7254" />
+
+    <!-- Air Vent (Top Left) -->
+    <g transform="translate(40, 40)" filter="url(#drop-shadow)">
+        <rect width="120" height="50" fill="#151515" rx="4" />
+        <rect x="5" y="8" width="110" height="6" fill="#050505" />
+        <rect x="5" y="22" width="110" height="6" fill="#050505" />
+        <rect x="5" y="36" width="110" height="6" fill="#050505" />
+        <rect width="120" height="50" fill="url(#dither-dark)" rx="4" pointer-events="none"/>
+    </g>
+
+    <!-- Wood-grain Trim Panel (Top Right) -->
+    <g filter="url(#drop-shadow)">
+        <path d="M 550,0 L 800,0 L 800,150 Q 650,140 550,0 Z" fill="url(#wood-grad)" />
+        <path d="M 550,0 L 800,0 L 800,150 Q 650,140 550,0 Z" fill="url(#dither-dark)" opacity="0.6" />
+        <!-- Trim highlight -->
+        <path d="M 550,0 Q 650,140 800,150" fill="none" stroke="#a06030" stroke-width="3" />
+    </g>
+
+    <!-- Rear Window Defroster Button (Top Right next to wood) -->
+    <g transform="translate(680, 50)" filter="url(#drop-shadow)">
+        <rect width="46" height="46" fill="#1a1a1a" rx="4" stroke="#0a0a0a" stroke-width="3"/>
+        <rect x="2" y="2" width="42" height="42" fill="#2a2a2a" rx="2" />
+        <!-- White Symbol -->
+        <rect x="8" y="10" width="30" height="20" fill="none" stroke="#fff" stroke-width="2"/>
+        <path d="M 14,36 Q 16,31 14,26 T 14,14" fill="none" stroke="#fff" stroke-width="2"/>
+        <path d="M 23,36 Q 25,31 23,26 T 23,14" fill="none" stroke="#fff" stroke-width="2"/>
+        <path d="M 32,36 Q 34,31 32,26 T 32,14" fill="none" stroke="#fff" stroke-width="2"/>
+    </g>
+
+    <!-- ========================================== -->
+    <!-- TITLE TEXT OVERLAY                         -->
+    <!-- ========================================== -->
+    
+    <!-- Shadow & 3D Extrusion -->
+    <text x="405" y="95" class="title-text" fill="#000" filter="url(#drop-shadow)">SELECT A TRACK</text>
+    <text x="403" y="93" class="title-text" fill="#333">SELECT A TRACK</text>
+    <text x="401" y="91" class="title-text" fill="#777">SELECT A TRACK</text>
+    <!-- Metallic Face -->
+    <text x="400" y="89" class="title-text" fill="url(#metal-grad)" stroke="#111" stroke-width="1.5">SELECT A TRACK</text>
+
+    <!-- ========================================== -->
+    <!-- CENTER CONSOLE & STEREO UNITS              -->
+    <!-- ========================================== -->
+
+    <!-- Center Console Gap/Bezel -->
+    <rect x="90" y="150" width="620" height="430" rx="12" fill="#0d0d0d" stroke="#332a22" stroke-width="4" filter="url(#drop-shadow)"/>
+    <!-- Stereo Bezel Inner Edge -->
+    <rect x="100" y="160" width="600" height="410" rx="8" fill="#1a1a1a" />
+    
+    <!-- Top & Left Bezel Highlight (3D Pop) -->
+    <path d="M 100,168 Q 100,160 108,160 L 692,160" fill="none" stroke="#444" stroke-width="3"/>
+    <path d="M 100,168 L 100,562" fill="none" stroke="#444" stroke-width="3"/>
+
+
+    <!-- ========================================== -->
+    <!-- UNIT 1: MF CD TUNER MF1000                 -->
+    <!-- ========================================== -->
+    
+    <g transform="translate(105, 165)">
+        <!-- Main Chassis -->
+        <rect width="590" height="195" fill="#242628" rx="4" />
+        <rect width="590" height="195" fill="url(#dither-dark)" rx="4" pointer-events="none" />
+        
+        <!-- Chassis Seam / Bottom Shadow -->
+        <line x1="0" y1="194" x2="590" y2="194" stroke="#0a0a0a" stroke-width="2"/>
+
+        <!-- CD Slot Area -->
+        <rect x="160" y="15" width="340" height="10" fill="#050505" rx="4" filter="url(#inner-shadow)" />
+        <rect x="165" y="18" width="330" height="4" fill="#000" rx="2" />
+        
+        <!-- Eject Button -->
+        <g transform="translate(520, 13)">
+            <rect width="45" height="14" fill="#151515" rx="2" stroke="#333" stroke-width="1" />
+            <polygon points="22,3 28,9 16,9" fill="#ccc"/>
+            <line x1="16" y1="11" x2="28" y2="11" stroke="#ccc" stroke-width="2"/>
+        </g>
+
+        <!-- Branding Text & Power LED -->
+        <text x="330" y="50" class="tech-text" font-size="12" fill="#fff" font-weight="bold" letter-spacing="1">MF CD TUNER MF1000</text>
+        <circle cx="310" cy="46" r="3" fill="#ff3300" filter="url(#glow-orange)" />
+
+        <!-- VOLUME KNOB (Far Left) -->
+        <g transform="translate(85, 110)">
+            <!-- Outer Ring Shadow -->
+            <circle cx="0" cy="0" r="52" fill="#111" />
+            <!-- Bezel -->
+            <circle cx="0" cy="0" r="48" fill="#2a2a2a" stroke="#444" stroke-width="2"/>
+            <!-- Knob Base -->
+            <circle cx="-2" cy="-2" r="45" fill="url(#knob-grad)" />
+            <!-- Knob Face -->
+            <circle cx="-4" cy="-4" r="38" fill="#1a1a1a" stroke="#333" stroke-width="1"/>
+            <!-- Indent / Indicator -->
+            <circle cx="-30" cy="-20" r="5" fill="#ff8c00" />
+            <text x="-4" y="65" class="tech-text" font-size="11" fill="#888" text-anchor="middle" font-weight="bold">VOL / PWR</text>
+        </g>
+
+        <!-- TELEPHONE KEYPAD (12-key) -->
+        <g transform="translate(185, 75)">
+            <!-- Row 1 -->
+            <use href="#keypad-btn" x="0" y="0"/>   <text x="0" y="4" font-size="11" fill="#fff" text-anchor="middle" font-family="sans-serif">1</text>
+            <use href="#keypad-btn" x="30" y="0"/>  <text x="30" y="4" font-size="11" fill="#fff" text-anchor="middle" font-family="sans-serif">2</text>
+            <use href="#keypad-btn" x="60" y="0"/>  <text x="60" y="4" font-size="11" fill="#fff" text-anchor="middle" font-family="sans-serif">3</text>
+            <!-- Row 2 -->
+            <use href="#keypad-btn" x="0" y="25"/>  <text x="0" y="29" font-size="11" fill="#fff" text-anchor="middle" font-family="sans-serif">4</text>
+            <use href="#keypad-btn" x="30" y="25"/> <text x="30" y="29" font-size="11" fill="#fff" text-anchor="middle" font-family="sans-serif">5</text>
+            <use href="#keypad-btn" x="60" y="25"/> <text x="60" y="29" font-size="11" fill="#fff" text-anchor="middle" font-family="sans-serif">6</text>
+            <!-- Row 3 -->
+            <use href="#keypad-btn" x="0" y="50"/>  <text x="0" y="54" font-size="11" fill="#fff" text-anchor="middle" font-family="sans-serif">7</text>
+            <use href="#keypad-btn" x="30" y="50"/> <text x="30" y="54" font-size="11" fill="#fff" text-anchor="middle" font-family="sans-serif">8</text>
+            <use href="#keypad-btn" x="60" y="50"/> <text x="60" y="54" font-size="11" fill="#fff" text-anchor="middle" font-family="sans-serif">9</text>
+            <!-- Row 4 -->
+            <use href="#keypad-btn" x="0" y="75"/>  <text x="0" y="80" font-size="14" fill="#fff" text-anchor="middle" font-family="sans-serif">*</text>
+            <use href="#keypad-btn" x="30" y="75"/> <text x="30" y="79" font-size="11" fill="#fff" text-anchor="middle" font-family="sans-serif">0</text>
+            <use href="#keypad-btn" x="60" y="75"/> <text x="60" y="79" font-size="12" fill="#fff" text-anchor="middle" font-family="sans-serif">#</text>
+        </g>
+
+        <!-- CENTRAL DISPLAY (Orange Backlit) -->
+        <g transform="translate(280, 65)">
+            <!-- Bezel & Screen Base -->
+            <rect width="180" height="85" fill="#080400" rx="4" stroke="#111" stroke-width="4" filter="url(#inner-shadow)" />
+            
+            <!-- Digital Text Content (Glowing) -->
+            <g filter="url(#glow-orange)">
+                <!-- Track Number -->
+                <text x="20" y="55" class="display-text" font-size="54">04</text>
+                <!-- Time -->
+                <text x="85" y="55" class="display-text" font-size="40">00:06</text>
+            </g>
+
+            <!-- Small Labels -->
+            <text x="40" y="75" class="small-label" text-anchor="middle">TRACK</text>
+            <text x="130" y="75" class="small-label" text-anchor="middle">TIME</text>
+
+            <!-- Screen Scanlines & Glare Overlay for Realism -->
+            <rect width="180" height="85" fill="url(#led-scanlines)" rx="4" pointer-events="none"/>
+            <polygon points="2,2 178,2 178,35 2,75" fill="#fff" opacity="0.04" pointer-events="none" />
+        </g>
+
+        <!-- PLAYBACK CONTROLS (Right Side) -->
+        <g transform="translate(485, 75)">
+            <!-- Row 1: Rewind, Play, Fast Forward -->
+            <!-- Rewind -->
+            <g transform="translate(0, 0)">
+                <rect width="28" height="20" fill="#1c1c1c" rx="2" stroke="#444" stroke-width="1" />
+                <polygon points="11,10 17,5 17,15" fill="#fff"/>
+                <polygon points="17,10 23,5 23,15" fill="#fff"/>
+            </g>
+            <!-- Play -->
+            <g transform="translate(35, 0)">
+                <rect width="28" height="20" fill="#1c1c1c" rx="2" stroke="#444" stroke-width="1" />
+                <polygon points="11,5 21,10 11,15" fill="#39ff14" filter="url(#glow-orange)"/> <!-- Subtle green pop -->
+            </g>
+            <!-- Fast Forward -->
+            <g transform="translate(70, 0)">
+                <rect width="28" height="20" fill="#1c1c1c" rx="2" stroke="#444" stroke-width="1" />
+                <polygon points="17,10 11,5 11,15" fill="#fff"/>
+                <polygon points="23,10 17,5 17,15" fill="#fff"/>
+            </g>
+
+            <!-- Row 2: Pause, Stop -->
+            <!-- Pause -->
+            <g transform="translate(18, 30)">
+                <rect width="28" height="20" fill="#1c1c1c" rx="2" stroke="#444" stroke-width="1" />
+                <rect x="10" y="6" width="3" height="8" fill="#fff"/>
+                <rect x="16" y="6" width="3" height="8" fill="#fff"/>
+            </g>
+            <!-- Stop -->
+            <g transform="translate(53, 30)">
+                <rect width="28" height="20" fill="#1c1c1c" rx="2" stroke="#444" stroke-width="1" />
+                <rect x="10" y="6" width="8" height="8" fill="#ff3300"/>
+            </g>
+        </g>
+    </g>
+
+
+    <!-- ========================================== -->
+    <!-- UNIT 2: MF 1001 (EQ / Amp)                 -->
+    <!-- ========================================== -->
+
+    <g transform="translate(105, 365)">
+        <!-- Main Chassis -->
+        <rect width="590" height="195" fill="#1e2022" rx="4" />
+        <rect width="590" height="195" fill="url(#dither-dark)" rx="4" opacity="0.6" pointer-events="none" />
+        
+        <!-- Branding Text -->
+        <text x="30" y="30" class="tech-text" font-size="14" fill="#999" font-weight="bold">MF 1001</text>
+        <line x1="30" y1="38" x2="85" y2="38" stroke="#ff8c00" stroke-width="2"/>
+
+        <!-- SLIDERS (Left of Visualizer) -->
+        <g transform="translate(110, 50)">
+            <!-- Slider 1 -->
+            <g transform="translate(0, 0)">
+                <!-- Track -->
+                <rect x="12" y="0" width="6" height="80" fill="#000" rx="3" filter="url(#inner-shadow)"/>
+                <!-- Thumb/Knob -->
+                <rect x="0" y="20" width="30" height="14" fill="#333" rx="2" stroke="#555" stroke-width="1" filter="url(#drop-shadow)"/>
+                <line x1="4" y1="27" x2="26" y2="27" stroke="#000" stroke-width="2"/>
+            </g>
+            <!-- Slider 2 -->
+            <g transform="translate(45, 0)">
+                <!-- Track -->
+                <rect x="12" y="0" width="6" height="80" fill="#000" rx="3" filter="url(#inner-shadow)"/>
+                <!-- Thumb/Knob -->
+                <rect x="0" y="50" width="30" height="14" fill="#333" rx="2" stroke="#555" stroke-width="1" filter="url(#drop-shadow)"/>
+                <line x1="4" y1="57" x2="26" y2="57" stroke="#000" stroke-width="2"/>
+            </g>
+        </g>
+
+        <!-- BUTTONS "B", "1", "2", "3" (Bottom Left) -->
+        <g transform="translate(80, 155)">
+            <!-- B -->
+            <g transform="translate(0, 0)">
+                <rect width="26" height="18" fill="#111" rx="2" stroke="#444" stroke-width="1" />
+                <text x="13" y="13" class="tech-text" font-size="12" fill="#fff" text-anchor="middle" font-weight="bold">B</text>
+            </g>
+            <!-- 1 -->
+            <g transform="translate(35, 0)">
+                <rect width="26" height="18" fill="#111" rx="2" stroke="#444" stroke-width="1" />
+                <text x="13" y="13" class="tech-text" font-size="12" fill="#fff" text-anchor="middle" font-weight="bold">1</text>
+            </g>
+            <!-- 2 -->
+            <g transform="translate(70, 0)">
+                <rect width="26" height="18" fill="#111" rx="2" stroke="#444" stroke-width="1" />
+                <text x="13" y="13" class="tech-text" font-size="12" fill="#fff" text-anchor="middle" font-weight="bold">2</text>
+            </g>
+            <!-- 3 -->
+            <g transform="translate(105, 0)">
+                <rect width="26" height="18" fill="#111" rx="2" stroke="#444" stroke-width="1" />
+                <text x="13" y="13" class="tech-text" font-size="12" fill="#fff" text-anchor="middle" font-weight="bold">3</text>
+            </g>
+        </g>
+
+        <!-- CENTRAL VISUALIZER / EQ -->
+        <g transform="translate(240, 45)">
+            <!-- Bezel & Screen Base -->
+            <rect width="220" height="100" fill="#080400" rx="4" stroke="#111" stroke-width="4" filter="url(#inner-shadow)" />
+            
+            <!-- EQ Bars (Orange, varying heights) -->
+            <g fill="url(#eq-grad)" filter="url(#glow-orange)">
+                <!-- Width 12, Gap 4 -->
+                <rect x="10"  y="60" width="12" height="30" />
+                <rect x="26"  y="40" width="12" height="50" />
+                <rect x="42"  y="20" width="12" height="70" />
+                <rect x="58"  y="50" width="12" height="40" />
+                <rect x="74"  y="15" width="12" height="75" />
+                <rect x="90"  y="35" width="12" height="55" />
+                <rect x="106" y="65" width="12" height="25" />
+                <rect x="122" y="45" width="12" height="45" />
+                <rect x="138" y="25" width="12" height="65" />
+                <rect x="154" y="55" width="12" height="35" />
+                <rect x="170" y="30" width="12" height="60" />
+                <rect x="186" y="70" width="12" height="20" />
+            </g>
+
+            <!-- Screen Scanlines & Glare -->
+            <rect width="220" height="100" fill="url(#led-scanlines)" rx="4" pointer-events="none"/>
+            <polygon points="2,2 218,2 218,40 2,85" fill="#fff" opacity="0.04" pointer-events="none" />
+        </g>
+
+        <!-- CASSETTE / SECONDARY STORAGE & TOGGLES (Far Right) -->
+        <g transform="translate(485, 45)">
+            <!-- Storage Compartment Border -->
+            <rect width="85" height="100" fill="#151719" rx="4" stroke="#0a0a0a" stroke-width="3" filter="url(#inner-shadow)" />
+            
+            <!-- Large Toggle Switch 1 (Up) -->
+            <g transform="translate(15, 15)">
+                <!-- Slot base -->
+                <rect width="20" height="45" fill="#000" rx="3" />
+                <!-- Switch body -->
+                <rect x="2" y="2" width="16" height="22" fill="#444" rx="2" stroke="#666" stroke-width="1" filter="url(#drop-shadow)"/>
+                <!-- Arrow Icon -->
+                <polygon points="10,6 15,16 5,16" fill="#ff8c00"/>
+            </g>
+            
+            <!-- Large Toggle Switch 2 (Down) -->
+            <g transform="translate(50, 15)">
+                <!-- Slot base -->
+                <rect width="20" height="45" fill="#000" rx="3" />
+                <!-- Switch body -->
+                <rect x="2" y="21" width="16" height="22" fill="#444" rx="2" stroke="#666" stroke-width="1" filter="url(#drop-shadow)"/>
+                <!-- Arrow Icon -->
+                <polygon points="10,38 15,28 5,28" fill="#ff8c00"/>
+            </g>
+
+            <!-- Bottom decorative line -->
+            <line x1="10" y1="85" x2="75" y2="85" stroke="#333" stroke-width="2"/>
+        </g>
+    </g>
+
+</svg>
