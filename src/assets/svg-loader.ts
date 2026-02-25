@@ -62,6 +62,7 @@ class SpriteCacheImpl implements SpriteCache {
   private cache = new Map<string, Map<number, CachedSprite>>();
   private config: SpriteLoaderConfig;
   private svgCache = new Map<string, string>();
+  private pendingRenders = new Map<string, Promise<CachedSprite>>();
 
   constructor(config: Partial<SpriteLoaderConfig> = {}) {
     this.config = { ...DEFAULT_CONFIG, ...config };
@@ -85,7 +86,6 @@ class SpriteCacheImpl implements SpriteCache {
   async renderSVGToCanvas(
     svgText: string,
     scale: number,
-    pixelRatio: number = window.devicePixelRatio || 1,
   ): Promise<CachedSprite> {
     return new Promise((resolve, reject) => {
       const img = new Image();
@@ -95,8 +95,8 @@ class SpriteCacheImpl implements SpriteCache {
       const url = URL.createObjectURL(svgBlob);
 
       img.onload = () => {
-        const width = Math.ceil(img.naturalWidth * scale * pixelRatio);
-        const height = Math.ceil(img.naturalHeight * scale * pixelRatio);
+        const width = Math.ceil(img.naturalWidth * scale);
+        const height = Math.ceil(img.naturalHeight * scale);
 
         const canvas = document.createElement("canvas");
         canvas.width = width;
@@ -144,6 +144,33 @@ class SpriteCacheImpl implements SpriteCache {
         }
       }),
     );
+  }
+
+  async getOrRender(
+    svgPath: string,
+    scale: number,
+  ): Promise<CachedSprite | null> {
+    const cached = this.get(svgPath, scale);
+    if (cached) return cached;
+
+    const fullPath = svgPath.startsWith("/")
+      ? svgPath
+      : this.config.basePath + svgPath;
+
+    if (!this.svgCache.has(fullPath)) {
+      return null;
+    }
+
+    const svgText = this.svgCache.get(fullPath)!;
+    const roundedScale = Math.ceil(scale * 2) / 2;
+    const rendered = await this.renderSVGToCanvas(svgText, roundedScale);
+
+    if (!this.cache.has(svgPath)) {
+      this.cache.set(svgPath, new Map());
+    }
+    this.cache.get(svgPath)!.set(roundedScale, rendered);
+
+    return rendered;
   }
 
   get(svgPath: string, scale: number): CachedSprite | null {
@@ -202,36 +229,39 @@ export const getSpriteByName = (
 };
 
 export const preloadGameSprites = async (): Promise<void> => {
+  const baseScales = [0.5, 1, 1.5, 2, 3];
+  const largeScales = [0.5, 1, 1.5, 2, 3, 4];
+
   const sprites = [
-    { path: "player-car.svg", scales: [0.1, 0.2, 0.3, 0.5, 0.75, 1] },
-    { path: "background-level-1.svg", scales: [0.5, 1, 1.5, 2] },
-    { path: "background.svg", scales: [0.5, 1, 1.5, 2] },
+    { path: "player-car.svg", scales: largeScales },
+    { path: "background-level-1.svg", scales: [1, 2] },
+    { path: "background.svg", scales: [1, 2] },
     { path: "main-menu.svg", scales: [0.5, 1] },
-    { path: "palm-tree.svg", scales: [0.1, 0.2, 0.3, 0.5] },
-    { path: "tree-deciduous.svg", scales: [0.1, 0.2, 0.3, 0.5] },
-    { path: "tree-blossom.svg", scales: [0.1, 0.2, 0.3, 0.5] },
-    { path: "tree-twisting.svg", scales: [0.1, 0.2, 0.3, 0.5] },
-    { path: "dead-tree.svg", scales: [0.1, 0.2, 0.3, 0.5] },
-    { path: "bush-fern.svg", scales: [0.1, 0.2, 0.3, 0.5] },
-    { path: "bush-flowering.svg", scales: [0.1, 0.2, 0.3, 0.5] },
-    { path: "cactus.svg", scales: [0.1, 0.2, 0.3, 0.5] },
-    { path: "stump.svg", scales: [0.1, 0.2, 0.3, 0.5] },
-    { path: "column.svg", scales: [0.1, 0.2, 0.3, 0.5] },
-    { path: "rocks-flat.svg", scales: [0.1, 0.2, 0.3, 0.5] },
-    { path: "billboard-snakes.svg", scales: [0.1, 0.2, 0.3, 0.5] },
-    { path: "billboard-redmond.svg", scales: [0.1, 0.2, 0.3, 0.5] },
-    { path: "billboard-liquidplanner.svg", scales: [0.1, 0.2, 0.3, 0.5] },
-    { path: "billboard-sega.svg", scales: [0.1, 0.2, 0.3, 0.5] },
-    { path: "billboard-danke.svg", scales: [0.1, 0.2, 0.3, 0.5] },
-    { path: "billboard-rim.svg", scales: [0.1, 0.2, 0.3, 0.5] },
-    { path: "billboard-codeincomplete.svg", scales: [0.1, 0.2, 0.3, 0.5] },
-    { path: "billboard-icecream.svg", scales: [0.1, 0.2, 0.3, 0.5] },
-    { path: "car-red.svg", scales: [0.1, 0.2, 0.3, 0.5, 0.75] },
-    { path: "car-pink.svg", scales: [0.1, 0.2, 0.3, 0.5, 0.75] },
-    { path: "car-blue.svg", scales: [0.1, 0.2, 0.3, 0.5, 0.75] },
-    { path: "car-brown.svg", scales: [0.1, 0.2, 0.3, 0.5, 0.75] },
-    { path: "truck-semi.svg", scales: [0.1, 0.2, 0.3, 0.5, 0.75] },
-    { path: "truck-jeep.svg", scales: [0.1, 0.2, 0.3, 0.5, 0.75] },
+    { path: "palm-tree.svg", scales: largeScales },
+    { path: "tree-deciduous.svg", scales: largeScales },
+    { path: "tree-blossom.svg", scales: largeScales },
+    { path: "tree-twisting.svg", scales: largeScales },
+    { path: "dead-tree.svg", scales: largeScales },
+    { path: "bush-fern.svg", scales: baseScales },
+    { path: "bush-flowering.svg", scales: baseScales },
+    { path: "cactus.svg", scales: baseScales },
+    { path: "stump.svg", scales: baseScales },
+    { path: "column.svg", scales: largeScales },
+    { path: "rocks-flat.svg", scales: baseScales },
+    { path: "billboard-snakes.svg", scales: largeScales },
+    { path: "billboard-redmond.svg", scales: largeScales },
+    { path: "billboard-liquidplanner.svg", scales: largeScales },
+    { path: "billboard-sega.svg", scales: largeScales },
+    { path: "billboard-danke.svg", scales: largeScales },
+    { path: "billboard-rim.svg", scales: baseScales },
+    { path: "billboard-codeincomplete.svg", scales: baseScales },
+    { path: "billboard-icecream.svg", scales: baseScales },
+    { path: "car-red.svg", scales: largeScales },
+    { path: "car-pink.svg", scales: largeScales },
+    { path: "car-blue.svg", scales: largeScales },
+    { path: "car-brown.svg", scales: largeScales },
+    { path: "truck-semi.svg", scales: largeScales },
+    { path: "truck-jeep.svg", scales: largeScales },
   ];
 
   await Promise.all(

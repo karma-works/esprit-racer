@@ -69,44 +69,49 @@ const loadSvgSprites = async (): Promise<void> => {
   svgPlayerCar = globalSpriteCache.get("player-car.svg", 0.5);
 };
 
-const getSpriteName = (sprite: { w: number; h: number }): string | null => {
-  const spriteMap: Record<string, { w: number; h: number; name: string }> = {
-    PALM_TREE: { w: 215, h: 540, name: "PALM_TREE" },
-    BILLBOARD08: { w: 385, h: 265, name: "BILLBOARD08" },
-    TREE1: { w: 360, h: 360, name: "TREE1" },
-    DEAD_TREE1: { w: 135, h: 332, name: "DEAD_TREE1" },
-    BILLBOARD09: { w: 328, h: 282, name: "BILLBOARD09" },
-    BOULDER3: { w: 320, h: 220, name: "BOULDER3" },
-    COLUMN: { w: 200, h: 315, name: "COLUMN" },
-    BILLBOARD01: { w: 300, h: 170, name: "BILLBOARD01" },
-    BILLBOARD06: { w: 298, h: 190, name: "BILLBOARD06" },
-    BILLBOARD05: { w: 298, h: 190, name: "BILLBOARD05" },
-    BILLBOARD07: { w: 298, h: 190, name: "BILLBOARD07" },
-    BOULDER2: { w: 298, h: 140, name: "BOULDER2" },
-    TREE2: { w: 282, h: 295, name: "TREE2" },
-    BILLBOARD04: { w: 268, h: 170, name: "BILLBOARD04" },
-    DEAD_TREE2: { w: 150, h: 260, name: "DEAD_TREE2" },
-    BOULDER1: { w: 168, h: 248, name: "BOULDER1" },
-    BUSH1: { w: 240, h: 155, name: "BUSH1" },
-    CACTUS: { w: 235, h: 118, name: "CACTUS" },
-    BUSH2: { w: 232, h: 152, name: "BUSH2" },
-    BILLBOARD03: { w: 230, h: 220, name: "BILLBOARD03" },
-    BILLBOARD02: { w: 215, h: 220, name: "BILLBOARD02" },
-    STUMP: { w: 195, h: 140, name: "STUMP" },
-    SEMI: { w: 122, h: 144, name: "SEMI" },
-    TRUCK: { w: 100, h: 78, name: "TRUCK" },
-    CAR03: { w: 88, h: 55, name: "CAR03" },
-    CAR02: { w: 80, h: 59, name: "CAR02" },
-    CAR04: { w: 80, h: 57, name: "CAR04" },
-    CAR01: { w: 80, h: 56, name: "CAR01" },
-  };
+const SPRITE_NAME_MAP = new Map<string, string>([
+  ["215_540_5", "PALM_TREE"],
+  ["385_265_230", "BILLBOARD08"],
+  ["360_360_625", "TREE1"],
+  ["135_332_5", "DEAD_TREE1"],
+  ["328_282_150", "BILLBOARD09"],
+  ["320_220_230", "BOULDER3"],
+  ["200_315_995", "COLUMN"],
+  ["300_170_625", "BILLBOARD01"],
+  ["298_190_488", "BILLBOARD06"],
+  ["298_190_5", "BILLBOARD05"],
+  ["298_190_313", "BILLBOARD07"],
+  ["298_140_621", "BOULDER2"],
+  ["282_295_1205", "TREE2"],
+  ["268_170_1205", "BILLBOARD04"],
+  ["150_260_1205", "DEAD_TREE2"],
+  ["168_248_1205", "BOULDER1"],
+  ["240_155_5", "BUSH1"],
+  ["235_118_929", "CACTUS"],
+  ["232_152_255", "BUSH2"],
+  ["230_220_5", "BILLBOARD03"],
+  ["215_220_245", "BILLBOARD02"],
+  ["195_140_995", "STUMP"],
+  ["122_144_1365", "SEMI"],
+  ["100_78_1365", "TRUCK"],
+  ["88_55_1383", "CAR03"],
+  ["80_59_1383", "CAR02"],
+  ["80_57_1383", "CAR04"],
+  ["80_56_1205", "CAR01"],
+]);
 
-  for (const [, data] of Object.entries(spriteMap)) {
-    if (data.w === sprite.w && data.h === sprite.h) {
-      return data.name;
-    }
+const getSpriteName = (sprite: {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+}): string | null => {
+  const key = `${sprite.w}_${sprite.h}_${sprite.x}`;
+  const result = SPRITE_NAME_MAP.get(key);
+  if (!result) {
+    console.warn(`Unknown sprite: ${key}`, sprite);
   }
-  return null;
+  return result ?? null;
 };
 
 const renderRacing = () => {
