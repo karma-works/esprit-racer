@@ -131,12 +131,12 @@
 
 **Tasks**:
 
-- [ ] **Clone JavaScript Racer**
+- [x] **Clone JavaScript Racer**
   - Clone https://github.com/jakesgordon/javascript-racer
   - Integrate source files into `src/engine/`
   - Set up initial project structure
 
-- [ ] **Project Scaffold**
+- [x] **Project Scaffold**
   - Initialize pnpm project (`pnpm init`)
   - Configure Vite with TypeScript
   - Create `tsconfig.json` with strict mode:
@@ -154,7 +154,7 @@
   - Set up Vitest for testing
   - Create folder structure
 
-- [ ] **Test Coverage (Target: 80%+)**
+- [x] **Test Coverage (Target: 80%+)**
   - Write fixture tests for existing engine functions
   - Run coverage: `vitest run --coverage`
   - Add tests until 80% threshold reached
@@ -164,7 +164,7 @@
     - Road rendering calculations
     - Physics/position updates
 
-- [ ] **TypeScript Migration**
+- [x] **TypeScript Migration**
   - Convert JS modules to TS
   - Add type definitions throughout
   - Refactor to satisfy strict mode
@@ -401,5 +401,5 @@ pnpm tsc --noEmit
 ---
 
 _Plan created: 2026-02-24_
-_Last updated: 2026-02-24_
-_Status: Draft - Pending Approval_
+_Last updated: 2026-02-25_
+_Status: In Progress - Phase 1.1 Complete_

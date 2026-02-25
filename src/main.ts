@@ -33,6 +33,7 @@ let last = Util.timestamp();
 let gdt = 0;
 
 const cameraDepth = 1 / Math.tan(((100 / 2) * Math.PI) / 180);
+const cameraHeight = 1000;
 const playerZ = world.player.z;
 const resolution = world.config.height / 480;
 
@@ -125,7 +126,7 @@ const render = () => {
     Util.project(
       segment.p1,
       player.x * roadWidth - x,
-      playerY + config.lanes * 100,
+      playerY + cameraHeight,
       player.position - (segment.looped ? world.trackLength : 0),
       cameraDepth,
       width,
@@ -135,7 +136,7 @@ const render = () => {
     Util.project(
       segment.p2,
       player.x * roadWidth - x - dx,
-      playerY + config.lanes * 100,
+      playerY + cameraHeight,
       player.position - (segment.looped ? world.trackLength : 0),
       cameraDepth,
       width,
