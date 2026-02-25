@@ -7,8 +7,14 @@ import {
   formatTime,
 } from "./engine/world";
 import * as Render from "./engine/renderer/canvas";
+import * as SvgRender from "./engine/renderer/sprite";
 import * as Util from "./engine/utils/math";
 import * as Segments from "./engine/segments";
+import {
+  globalSpriteCache,
+  preloadGameSprites,
+  type CachedSprite,
+} from "./assets/svg-loader";
 
 const canvas = document.getElementById("canvas") as HTMLCanvasElement | null;
 const speedEl = document.getElementById("speed-value");
@@ -29,8 +35,11 @@ const step = 1 / world.config.fps;
 
 let background: HTMLImageElement | null = null;
 let sprites: HTMLImageElement | null = null;
+let svgBackground: CachedSprite | null = null;
+let svgPlayerCar: CachedSprite | null = null;
 let last = Util.timestamp();
 let gdt = 0;
+let useSvg = false;
 
 const cameraDepth = 1 / Math.tan(((100 / 2) * Math.PI) / 180);
 const cameraHeight = 1000;
@@ -48,6 +57,12 @@ const loadImages = (names: string[]): Promise<HTMLImageElement[]> => {
       });
     }),
   );
+};
+
+const loadSvgSprites = async (): Promise<void> => {
+  await preloadGameSprites();
+  svgBackground = globalSpriteCache.get("level-1-background.svg", 1);
+  svgPlayerCar = globalSpriteCache.get("retro-racing-car.svg", 0.5);
 };
 
 const render = () => {
@@ -84,7 +99,16 @@ const render = () => {
 
   ctx.clearRect(0, 0, width, height);
 
-  if (background) {
+  if (useSvg && svgBackground) {
+    SvgRender.svgBackground(
+      ctx,
+      svgBackground,
+      width,
+      height,
+      skyOffset,
+      resolution * 0.001 * playerY,
+    );
+  } else if (background) {
     Render.background(
       ctx,
       background,
@@ -236,29 +260,58 @@ const render = () => {
         );
       }
 
-      if (segment === playerSegment && sprites) {
-        Render.player(
-          ctx,
-          width,
-          height,
-          resolution,
-          roadWidth,
-          sprites,
-          player.speed / config.maxSpeed,
-          cameraDepth / playerZ,
-          width / 2,
+      if (segment === playerSegment) {
+        const playerScale = cameraDepth / playerZ;
+        const playerScreenY =
           height / 2 -
-            ((cameraDepth / playerZ) *
-              Util.interpolate(
-                playerSegment.p1.camera.y,
-                playerSegment.p2.camera.y,
-                playerPercent,
-              ) *
-              height) /
-              2,
-          player.speed * (world.input.left ? -1 : world.input.right ? 1 : 0),
-          playerSegment.p2.world.y - playerSegment.p1.world.y,
-        );
+          (playerScale *
+            Util.interpolate(
+              playerSegment.p1.camera.y,
+              playerSegment.p2.camera.y,
+              playerPercent,
+            ) *
+            height) /
+            2;
+        const speedPercent = player.speed / config.maxSpeed;
+        const bounce =
+          1.5 *
+          Math.random() *
+          speedPercent *
+          resolution *
+          (Math.random() > 0.5 ? 1 : -1);
+        const steer =
+          player.speed * (world.input.left ? -1 : world.input.right ? 1 : 0);
+
+        if (useSvg && svgPlayerCar) {
+          SvgRender.svgPlayer(
+            ctx,
+            svgPlayerCar,
+            width,
+            height,
+            roadWidth,
+            speedPercent,
+            playerScale,
+            width / 2,
+            playerScreenY,
+            steer,
+            bounce,
+          );
+        } else if (sprites) {
+          Render.player(
+            ctx,
+            width,
+            height,
+            resolution,
+            roadWidth,
+            sprites,
+            speedPercent,
+            playerScale,
+            width / 2,
+            playerScreenY,
+            steer,
+            playerSegment.p2.world.y - playerSegment.p1.world.y,
+          );
+        }
       }
     }
   }
@@ -292,13 +345,25 @@ document.addEventListener("keyup", (ev) => handleKeyUp(world, ev.keyCode));
 canvas.width = world.config.width;
 canvas.height = world.config.height;
 
-loadImages(["background", "sprites"])
-  .then(([bg, sp]) => {
+const init = async () => {
+  try {
+    await loadSvgSprites();
+    useSvg = true;
+    console.log("SVG sprites loaded successfully");
+  } catch (err) {
+    console.warn("Failed to load SVG sprites, falling back to PNG:", err);
+    useSvg = false;
+  }
+
+  try {
+    const [bg, sp] = await loadImages(["background", "sprites"]);
     background = bg ?? null;
     sprites = sp ?? null;
-    frame();
-  })
-  .catch((err) => {
-    console.error("Failed to load images:", err);
-    frame();
-  });
+  } catch (err) {
+    console.warn("Failed to load PNG images:", err);
+  }
+
+  frame();
+};
+
+init();

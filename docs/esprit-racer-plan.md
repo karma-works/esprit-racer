@@ -179,14 +179,14 @@
 
 **Tasks**:
 
-- [ ] **SVG Rendering System**
+- [x] **SVG Rendering System**
   - Create `SpriteRenderer` interface
   - Implement SVG loader (`src/assets/svg-loader.ts`)
   - Build Off-screen Canvas caching system
   - Modify `render.sprite()` to accept SVG sources
   - Cache rendered SVGs at multiple scales for performance
 
-- [ ] **Integrate Existing Sprites**
+- [x] **Integrate Existing Sprites**
   - Load `sprites/level-1-background.svg` as track background
   - Load `sprites/retro-racing-car.svg` as player car
   - Integrate `sprites/main-menu.svg` for menu system
@@ -204,8 +204,8 @@
 
 **Tasks**:
 
-- [ ] **MOD Player Setup**
-  - Install Protracker.js: `pnpm add protracker`
+- [x] **MOD Player Setup**
+  - Install @pinkkis/pasuuna-player: `pnpm add @pinkkis/pasuuna-player`
   - Create `src/audio/mod-player.ts`
   - Load `sound/racing_kirby.mod`
   - Implement play/pause/stop controls
@@ -402,4 +402,4 @@ pnpm tsc --noEmit
 
 _Plan created: 2026-02-24_
 _Last updated: 2026-02-25_
-_Status: In Progress - Phase 1.1 Complete_
+_Status: In Progress - Phase 1.4 Time Challenge Mode_

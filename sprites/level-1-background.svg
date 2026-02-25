@@ -1,179 +1,412 @@
-<svg viewBox="0 0 800 600" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
-  <defs>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   viewBox="0 0 800 600"
+   width="100%"
+   height="100%"
+   version="1.1"
+   id="svg77"
+   sodipodi:docname="level-1-background.svg"
+   inkscape:version="1.4.3 (0d15f75, 2025-12-25)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview77"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="1.1"
+     inkscape:cx="400"
+     inkscape:cy="300.45455"
+     inkscape:window-width="2260"
+     inkscape:window-height="1186"
+     inkscape:window-x="311"
+     inkscape:window-y="33"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="svg77" />
+  <defs
+     id="defs33">
     <!-- Heavy dithering patterns for sky gradients -->
-    <pattern id="ditherSky1" width="4" height="4" patternUnits="userSpaceOnUse">
-      <rect width="2" height="2" fill="#42454a"/>
-      <rect x="2" y="2" width="2" height="2" fill="#42454a"/>
+    <pattern
+       id="ditherSky1"
+       width="4"
+       height="4"
+       patternUnits="userSpaceOnUse">
+      <rect
+         width="2"
+         height="2"
+         fill="#42454a"
+         id="rect1" />
+      <rect
+         x="2"
+         y="2"
+         width="2"
+         height="2"
+         fill="#42454a"
+         id="rect2" />
     </pattern>
-    <pattern id="ditherSky2" width="4" height="4" patternUnits="userSpaceOnUse">
-      <rect width="2" height="2" fill="#53565c"/>
-      <rect x="2" y="2" width="2" height="2" fill="#53565c"/>
+    <pattern
+       id="ditherSky2"
+       width="4"
+       height="4"
+       patternUnits="userSpaceOnUse">
+      <rect
+         width="2"
+         height="2"
+         fill="#53565c"
+         id="rect3" />
+      <rect
+         x="2"
+         y="2"
+         width="2"
+         height="2"
+         fill="#53565c"
+         id="rect4" />
     </pattern>
-    <pattern id="ditherSky3" width="4" height="4" patternUnits="userSpaceOnUse">
-      <rect width="2" height="2" fill="#6a6e75"/>
-      <rect x="2" y="2" width="2" height="2" fill="#6a6e75"/>
+    <pattern
+       id="ditherSky3"
+       width="4"
+       height="4"
+       patternUnits="userSpaceOnUse">
+      <rect
+         width="2"
+         height="2"
+         fill="#6a6e75"
+         id="rect5" />
+      <rect
+         x="2"
+         y="2"
+         width="2"
+         height="2"
+         fill="#6a6e75"
+         id="rect6" />
     </pattern>
-
     <!-- Scanline pattern for global retro CTR effect -->
-    <pattern id="scanlines" width="4" height="4" patternUnits="userSpaceOnUse">
-      <rect y="2" width="4" height="2" fill="#000" opacity="0.18" />
+    <pattern
+       id="scanlines"
+       width="4"
+       height="4"
+       patternUnits="userSpaceOnUse">
+      <rect
+         y="2"
+         width="4"
+         height="2"
+         fill="#000"
+         opacity="0.18"
+         id="rect7" />
     </pattern>
-
     <!-- Checkered pattern for the red banner -->
-    <pattern id="checker" width="8" height="8" patternUnits="userSpaceOnUse">
-      <rect width="4" height="4" fill="#cfd1d6"/>
-      <rect x="4" y="4" width="4" height="4" fill="#cfd1d6"/>
-      <rect x="4" width="4" height="4" fill="#111"/>
-      <rect y="4" width="4" height="4" fill="#111"/>
+    <pattern
+       id="checker"
+       width="8"
+       height="8"
+       patternUnits="userSpaceOnUse">
+      <rect
+         width="4"
+         height="4"
+         fill="#cfd1d6"
+         id="rect8" />
+      <rect
+         x="4"
+         y="4"
+         width="4"
+         height="4"
+         fill="#cfd1d6"
+         id="rect9" />
+      <rect
+         x="4"
+         width="4"
+         height="4"
+         fill="#111"
+         id="rect10" />
+      <rect
+         y="4"
+         width="4"
+         height="4"
+         fill="#111"
+         id="rect11" />
     </pattern>
-
     <!-- Road Clip Path -->
-    <clipPath id="roadClip">
-      <polygon points="350,300 450,300 750,600 50,600" />
+    <clipPath
+       id="roadClip">
+      <polygon
+         points="350,300 450,300 750,600 50,600"
+         id="polygon11" />
     </clipPath>
-
     <!-- Dash Striping Clip Path for Pseudo-3D Depth -->
-    <clipPath id="dashClip">
-      <rect x="0" y="300" width="800" height="2"/>
-      <rect x="0" y="304" width="800" height="3"/>
-      <rect x="0" y="310" width="800" height="4"/>
-      <rect x="0" y="318" width="800" height="6"/>
-      <rect x="0" y="330" width="800" height="9"/>
-      <rect x="0" y="348" width="800" height="14"/>
-      <rect x="0" y="376" width="800" height="22"/>
-      <rect x="0" y="420" width="800" height="35"/>
-      <rect x="0" y="490" width="800" height="55"/>
+    <clipPath
+       id="dashClip">
+      <rect
+         x="0"
+         y="300"
+         width="800"
+         height="2"
+         id="rect12" />
+      <rect
+         x="0"
+         y="304"
+         width="800"
+         height="3"
+         id="rect13" />
+      <rect
+         x="0"
+         y="310"
+         width="800"
+         height="4"
+         id="rect14" />
+      <rect
+         x="0"
+         y="318"
+         width="800"
+         height="6"
+         id="rect15" />
+      <rect
+         x="0"
+         y="330"
+         width="800"
+         height="9"
+         id="rect16" />
+      <rect
+         x="0"
+         y="348"
+         width="800"
+         height="14"
+         id="rect17" />
+      <rect
+         x="0"
+         y="376"
+         width="800"
+         height="22"
+         id="rect18" />
+      <rect
+         x="0"
+         y="420"
+         width="800"
+         height="35"
+         id="rect19" />
+      <rect
+         x="0"
+         y="490"
+         width="800"
+         height="55"
+         id="rect20" />
     </clipPath>
-
     <!-- 16-bit Scaleable Craggy Rock Sprite -->
-    <g id="rock">
+    <g
+       id="rock">
       <!-- Base shape -->
-      <polygon points="20,150 80,150 90,90 75,40 50,10 30,30 15,80" fill="#6c7078" />
+      <polygon
+         points="20,150 80,150 90,90 75,40 50,10 30,30 15,80"
+         fill="#6c7078"
+         id="polygon20" />
       <!-- Dark Shadow (Right) -->
-      <polygon points="50,10 75,40 90,90 80,150 60,150 70,90 55,40" fill="#44474d" />
+      <polygon
+         points="50,10 75,40 90,90 80,150 60,150 70,90 55,40"
+         fill="#44474d"
+         id="polygon21" />
       <!-- Bright Highlight (Left) -->
-      <polygon points="50,10 30,30 15,80 20,150 40,150 25,80 40,30" fill="#9397a1" />
+      <polygon
+         points="50,10 30,30 15,80 20,150 40,150 25,80 40,30"
+         fill="#9397a1"
+         id="polygon22" />
       <!-- Inner blocky details -->
-      <polygon points="40,60 55,60 50,80 35,80" fill="#44474d" />
-      <polygon points="60,100 75,100 70,120 55,120" fill="#9397a1" />
-      <polygon points="25,120 40,120 35,140 20,140" fill="#585c63" />
+      <polygon
+         points="40,60 55,60 50,80 35,80"
+         fill="#44474d"
+         id="polygon23" />
+      <polygon
+         points="60,100 75,100 70,120 55,120"
+         fill="#9397a1"
+         id="polygon24" />
+      <polygon
+         points="25,120 40,120 35,140 20,140"
+         fill="#585c63"
+         id="polygon25" />
     </g>
-
     <!-- Ground/Road Band Definitions for easy rendering -->
-    <g id="bands">
-      <rect x="0" y="300" width="800" height="2"/>
-      <rect x="0" y="304" width="800" height="3"/>
-      <rect x="0" y="310" width="800" height="4"/>
-      <rect x="0" y="318" width="800" height="6"/>
-      <rect x="0" y="330" width="800" height="9"/>
-      <rect x="0" y="348" width="800" height="14"/>
-      <rect x="0" y="376" width="800" height="22"/>
-      <rect x="0" y="420" width="800" height="35"/>
-      <rect x="0" y="490" width="800" height="55"/>
+    <g
+       id="bands">
+      <rect
+         x="0"
+         y="300"
+         width="800"
+         height="2"
+         id="rect25" />
+      <rect
+         x="0"
+         y="304"
+         width="800"
+         height="3"
+         id="rect26" />
+      <rect
+         x="0"
+         y="310"
+         width="800"
+         height="4"
+         id="rect27" />
+      <rect
+         x="0"
+         y="318"
+         width="800"
+         height="6"
+         id="rect28" />
+      <rect
+         x="0"
+         y="330"
+         width="800"
+         height="9"
+         id="rect29" />
+      <rect
+         x="0"
+         y="348"
+         width="800"
+         height="14"
+         id="rect30" />
+      <rect
+         x="0"
+         y="376"
+         width="800"
+         height="22"
+         id="rect31" />
+      <rect
+         x="0"
+         y="420"
+         width="800"
+         height="35"
+         id="rect32" />
+      <rect
+         x="0"
+         y="490"
+         width="800"
+         height="55"
+         id="rect33" />
     </g>
   </defs>
-
   <!-- ================= SKY ================= -->
   <!-- Base sky layers (dim, overcast) -->
-  <rect x="0" y="0" width="800" height="100" fill="#42454a" />
-  <rect x="0" y="100" width="800" height="80" fill="#53565c" />
-  <rect x="0" y="180" width="800" height="60" fill="#6a6e75" />
-  <rect x="0" y="240" width="800" height="60" fill="#83878f" />
-  
+  <rect
+     x="0"
+     y="0"
+     width="800"
+     height="100"
+     fill="#42454a"
+     id="rect34" />
+  <rect
+     x="0"
+     y="100"
+     width="800"
+     height="80"
+     fill="#53565c"
+     id="rect35" />
+  <rect
+     x="0"
+     y="180"
+     width="800"
+     height="60"
+     fill="#6a6e75"
+     id="rect36" />
+  <rect
+     x="0"
+     y="240"
+     width="800"
+     height="60"
+     fill="#83878f"
+     id="rect37" />
   <!-- Dither transitions for gradient simulation -->
-  <rect x="0" y="100" width="800" height="30" fill="url(#ditherSky1)" />
-  <rect x="0" y="180" width="800" height="30" fill="url(#ditherSky2)" />
-  <rect x="0" y="240" width="800" height="30" fill="url(#ditherSky3)" />
-
+  <rect
+     x="0"
+     y="100"
+     width="800"
+     height="30"
+     fill="url(#ditherSky1)"
+     id="rect38" />
+  <rect
+     x="0"
+     y="180"
+     width="800"
+     height="30"
+     fill="url(#ditherSky2)"
+     id="rect39" />
+  <rect
+     x="0"
+     y="240"
+     width="800"
+     height="30"
+     fill="url(#ditherSky3)"
+     id="rect40"
+     inkscape:label="rect40" />
   <!-- Fog/Haze at Horizon -->
-  <rect x="0" y="285" width="800" height="15" fill="#8c9099" opacity="0.6" />
-
   <!-- ================= MOUNTAINS ================= -->
   <!-- Distant Layer -->
-  <polygon points="0,300 80,230 150,250 220,210 300,240 400,200 500,250 600,220 700,270 800,230 800,300 0,300" fill="#535a58"/>
+  <polygon
+     points="0,300 80,230 150,250 220,210 300,240 400,200 500,250 600,220 700,270 800,230 800,300 0,300"
+     fill="#535a58"
+     id="polygon41" />
   <!-- Mid Layer -->
-  <polygon points="0,300 100,240 180,260 250,230 350,280 400,280 480,220 580,260 650,210 800,280 800,300 0,300" fill="#3a453e"/>
+  <polygon
+     points="0,300 100,240 180,260 250,230 350,280 400,280 480,220 580,260 650,210 800,280 800,300 0,300"
+     fill="#3a453e"
+     id="polygon42" />
   <!-- Foreground Layer -->
-  <polygon points="0,300 50,260 120,280 200,240 300,290 450,290 520,250 600,280 700,230 800,290 800,300 0,300" fill="#28332c"/>
-
+  <polygon
+     points="0,300 50,260 120,280 200,240 300,290 450,290 520,250 600,280 700,230 800,290 800,300 0,300"
+     fill="#28332c"
+     id="polygon43" />
   <!-- ================= GROUND & ROAD ================= -->
   <!-- Base Light Ground -->
-  <rect x="0" y="300" width="800" height="300" fill="#2d4c2b" />
   <!-- Dark Ground Stripes (Creates illusion of speed/depth) -->
-  <use href="#bands" fill="#243d22" />
-
   <!-- Base Light Road -->
-  <polygon points="350,300 450,300 750,600 50,600" fill="#4d4d54" />
-  
   <!-- Dark Road Stripes (Clipped exactly to the road) -->
-  <use href="#bands" fill="#3c3c42" clip-path="url(#roadClip)" />
-
   <!-- Road Dashed Lane Lines -->
   <!-- Left Lane Divider -->
-  <polygon points="382,300 384,300 290,600 276,600" fill="#a4a7af" clip-path="url(#dashClip)" />
   <!-- Right Lane Divider -->
-  <polygon points="415,300 418,300 523,600 509,600" fill="#a4a7af" clip-path="url(#dashClip)" />
-
-
   <!-- ================= RED BANNER/BRIDGE (DISTANCE) ================= -->
   <!-- Bridge Supports -->
-  <rect x="339" y="260" width="8" height="40" fill="#4a0d0d" />
-  <rect x="340" y="260" width="6" height="40" fill="#7a1c1c" />
-  <rect x="453" y="260" width="8" height="40" fill="#4a0d0d" />
-  <rect x="454" y="260" width="6" height="40" fill="#7a1c1c" />
-
   <!-- Main Banner Background -->
-  <rect x="330" y="250" width="140" height="20" fill="#4a0d0d" />
-  <rect x="330" y="250" width="140" height="18" fill="#a82323" />
-  
   <!-- Checkered Flags on Banner Edges -->
-  <rect x="332" y="252" width="24" height="16" fill="url(#checker)" />
-  <rect x="444" y="252" width="24" height="16" fill="url(#checker)" />
-
   <!-- Pixelated Banner Text/Graphics -->
-  <g fill="#cfd1d6">
-    <!-- Abstract 8-bit text blocks "RACE" -->
-    <!-- R -->
-    <rect x="368" y="254" width="8" height="2" />
-    <rect x="368" y="256" width="2" height="6" />
-    <rect x="374" y="256" width="2" height="2" />
-    <rect x="368" y="258" width="6" height="2" />
-    <rect x="372" y="260" width="2" height="2" />
-    <!-- A -->
-    <rect x="382" y="254" width="6" height="2" />
-    <rect x="380" y="256" width="2" height="6" />
-    <rect x="388" y="256" width="2" height="6" />
-    <rect x="382" y="258" width="6" height="2" />
-    <!-- C -->
-    <rect x="396" y="254" width="6" height="2" />
-    <rect x="394" y="256" width="2" height="4" />
-    <rect x="396" y="260" width="6" height="2" />
-    <!-- E -->
-    <rect x="408" y="254" width="8" height="2" />
-    <rect x="408" y="256" width="2" height="6" />
-    <rect x="410" y="257" width="4" height="2" />
-    <rect x="408" y="260" width="8" height="2" />
-    <!-- Motif lines -->
-    <rect x="424" y="256" width="12" height="2" opacity="0.6"/>
-    <rect x="424" y="259" width="12" height="2" opacity="0.6"/>
-  </g>
-
-
   <!-- ================= ROADSIDE HAZARDS (SCALING ROCKS) ================= -->
   <!-- 
        A repeating row of large gray rock formations on the left side.
        Uses sprite scaling via transform scale() to create a prominent pseudo-3D effect.
   -->
-  <use href="#rock" transform="translate(325, 277.5) scale(0.15)" />
-  <use href="#rock" transform="translate(305, 272.5) scale(0.25)" />
-  <use href="#rock" transform="translate(270, 270) scale(0.4)" />
-  <use href="#rock" transform="translate(210, 260) scale(0.7)" />
-  <use href="#rock" transform="translate(110, 250) scale(1.2)" />
-  <use href="#rock" transform="translate(-50, 210) scale(2.2)" />
-  <use href="#rock" transform="translate(-300, 150) scale(4.0)" />
-
-
   <!-- ================= RETRO FILTER & OVERLAYS ================= -->
   <!-- Global CRT/Scanline Filter overlay over everything -->
-  <rect x="0" y="0" width="800" height="600" fill="url(#scanlines)" pointer-events="none" />
+  <path
+     style="fill:#000000;fill-opacity:0.145098;stroke-width:0.909091"
+     d="M 0,421.36364 V 300 H 400 800 V 421.36364 542.72727 H 400 0 Z"
+     id="path77" />
+  <path
+     style="fill:#000000;fill-opacity:0.145098;stroke-width:0.909091"
+     d="M 0,421.36364 V 300 H 400 800 V 421.36364 542.72727 H 400 0 Z"
+     id="path78" />
+  <path
+     style="fill:#000000;fill-opacity:0.145098;stroke-width:0.909091"
+     d="M 0,421.36364 V 300 H 400 800 V 421.36364 542.72727 H 400 0 Z"
+     id="path79" />
+  <path
+     style="fill:#000000;fill-opacity:0.145098;stroke-width:0.909091"
+     d="M 0,421.36364 V 300 H 400 800 V 421.36364 542.72727 H 400 0 Z"
+     id="path80" />
+  <path
+     style="fill:#222c26;fill-opacity:1;stroke-width:0.909091"
+     d="M 0,421.36364 V 300 H 400 800 V 421.36364 542.72727 H 400 0 Z"
+     id="path83" />
+  <path
+     style="fill:#222c26;fill-opacity:1;stroke-width:0.909091"
+     d="M 0.01028827,421.59091 0.02057655,300.45455 24.508448,280.90909 c 13.468329,-10.75 25.098727,-19.67309 25.845327,-19.82909 0.7466,-0.15599 16.779582,4.10719 35.628849,9.47374 l 34.271396,9.75738 39.87737,-19.92221 39.87737,-19.92221 49.54328,24.76665 L 299.09531,290 h 75.80401 75.80402 l 34.18116,-19.54545 c 18.79965,-10.75 34.69822,-19.55064 35.33015,-19.55698 0.63194,-0.006 18.87241,6.6233 40.53439,14.73253 l 39.3854,14.74404 49.93101,-24.95231 c 40.5579,-20.26821 50.23,-24.7715 51.5237,-23.98915 0.87597,0.52974 23.37676,13.97059 50.00176,29.86857 L 800,290.20666 v 126.26031 126.2603 H 400 0 Z"
+     id="path86" />
+  <path
+     style="fill:#222c26;fill-opacity:1;stroke-width:0.909091"
+     d="M 0,421.58885 V 300.45041 L 24.514765,280.90702 C 37.997886,270.15816 49.632914,261.236 50.370381,261.08 c 0.737467,-0.15599 16.762976,4.10719 35.612243,9.47374 l 34.271396,9.75738 39.87737,-19.92221 39.87737,-19.92221 49.54328,24.76665 L 299.09531,290 H 374.74265 450.39 l 34.28063,-19.54545 c 18.85435,-10.75 34.90349,-19.54546 35.66474,-19.54546 0.76127,0 19.05548,6.61564 40.65381,14.70143 l 39.26969,14.70143 49.8688,-24.92121 c 40.42145,-20.20003 50.17052,-24.73982 51.46148,-23.9637 0.87597,0.52663 23.37676,13.96864 50.00176,29.87113 L 800,290.2118 V 416.46954 542.72727 H 400 0 Z"
+     id="path87" />
+  <path
+     style="fill:#222c26;fill-opacity:1;stroke-width:0.990279"
+     d="M 0,457.07441 V 313.23973 l 23.545328,-22.21116 c 12.94993,-12.21615 24.355313,-22.8114 25.345294,-23.54501 2.050876,-1.51979 -1.517252,-2.54281 42.193587,12.0975 l 28.811481,9.64999 39.7255,-23.22803 c 21.84903,-12.77543 40.02295,-23.22804 40.38647,-23.22804 0.36354,0 23.03445,13.10642 50.3798,29.12537 l 49.71881,29.12536 H 375.24814 450.39 l 34.28063,-23.19242 c 18.85435,-12.75583 34.95328,-23.19242 35.7754,-23.19242 0.82212,0 19.01943,7.78988 40.43847,17.31085 l 38.94371,17.31085 49.74696,-29.17674 c 27.36083,-16.0472 50.06658,-29.17674 50.45722,-29.17674 0.39064,0 22.94088,15.71521 50.11166,34.92269 l 49.4014,34.92267 0.23046,150.07733 0.23044,150.07731 H 400.00318 0 Z"
+     id="path88" />
 </svg>
