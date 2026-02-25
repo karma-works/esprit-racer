@@ -1,4 +1,7 @@
-import PasuunaPlayer from "@pinkkis/pasuuna-player";
+// @ts-ignore
+import PasuunaPlayerModule from "@pinkkis/pasuuna-player";
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const PasuunaPlayer: any = PasuunaPlayerModule;
 
 export interface ModPlayerConfig {
   volume: number;
@@ -22,7 +25,8 @@ export interface ModPlayer {
 }
 
 class ModPlayerImpl implements ModPlayer {
-  private player: PasuunaPlayer | null = null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private player: any = null;
   private loaded = false;
   private playing = false;
   private config: ModPlayerConfig;

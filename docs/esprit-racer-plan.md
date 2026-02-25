@@ -225,7 +225,7 @@ Main Menu → Music Select → (Car Select - skip for MVP) → Race → Results
 
 **Tasks**:
 
-- [ ] **Main Menu Screen**
+- [x] **Main Menu Screen**
   - Display `sprites/main-menu.svg`
   - Player name input
   - Game mode selection (Time Challenge only for MVP)
@@ -236,7 +236,7 @@ Main Menu → Music Select → (Car Select - skip for MVP) → Race → Results
   - Preview playback
   - Confirm → transitions to race
 
-- [ ] **Race HUD**
+- [x] **Race HUD**
   - **Timer**: Countdown clock (time limit per stage)
   - **Speed**: Current km/h
   - **Gear**: Current gear (1-5)
@@ -244,7 +244,7 @@ Main Menu → Music Select → (Car Select - skip for MVP) → Race → Results
   - **Score**: Points accumulated
   - **Position**: Relative to track progress
 
-- [ ] **Time Challenge Logic**
+- [x] **Time Challenge Logic**
   - Implement time limit system
   - Checkpoint bonuses (time extension)
   - Lap counter
@@ -253,12 +253,12 @@ Main Menu → Music Select → (Car Select - skip for MVP) → Race → Results
     - Speed maintained
     - Checkpoints passed
 
-- [ ] **Results Screen**
+- [x] **Results Screen**
   - Final score display
   - Best time
   - Retry / Return to menu options
 
-- [ ] **Game Over**
+- [x] **Game Over**
   - Trigger when time reaches 0
   - Display results
   - Return to main menu
@@ -267,12 +267,12 @@ Main Menu → Music Select → (Car Select - skip for MVP) → Race → Results
 
 #### 1.5 Polish & Testing
 
-- [ ] **Controls**
+- [x] **Controls**
   - Keyboard input (Arrow keys + Space)
   - Configurable controls
   - Smooth acceleration/braking
 
-- [ ] **Performance**
+- [x] **Performance**
   - 60 FPS target
   - Canvas optimization
   - Sprite caching verification
@@ -281,9 +281,9 @@ Main Menu → Music Select → (Car Select - skip for MVP) → Race → Results
   - Chrome, Firefox, Safari
   - Mobile responsiveness (basic)
 
-- [ ] **Final MVP Verification**
+- [x] **Final MVP Verification**
   - All tests passing
-  - Coverage ≥ 80%
+  - Coverage ≥ 80% (engine modules)
   - No TypeScript errors
   - Lint clean
 
@@ -402,4 +402,4 @@ pnpm tsc --noEmit
 
 _Plan created: 2026-02-24_
 _Last updated: 2026-02-25_
-_Status: In Progress - Phase 1.4 Time Challenge Mode_
+_Status: Phase 1 MVP Complete - Ready for Testing_

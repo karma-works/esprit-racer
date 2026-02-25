@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   viewBox="0 0 90 62"
+   width="90"
+   height="62"
+   version="1.1"
+   id="svg146"
+   sodipodi:docname="sprites.svg"
+   inkscape:export-batch-name="sprites"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview146"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1">
+    <inkscape:page
+       x="0"
+       y="0"
+       width="90"
+       height="62"
+       id="page1"
+       margin="0"
+       bleed="0" />
+  </sodipodi:namedview>
+  <defs
+     id="defs20">
+    <!-- Background Checkerboard Pattern -->
+    <!-- Red Sports Car (OutRun Ferrari style) -->
+    <!-- Blue Sports Car -->
+    <!-- Palm Frond -->
+  </defs>
+  <!-- Background -->
+  <!-- ========================================== -->
+  <!-- TOP SECTION                                -->
+  <!-- ========================================== -->
+  <!-- Tall Curved Palm Tree -->
+  <!-- SNAKES Billboard -->
+  <!-- Bushy Deciduous Tree -->
+  <!-- Castle Turret -->
+  <!-- Blossoming Tree -->
+  <!-- ========================================== -->
+  <!-- MIDDLE SECTION                             -->
+  <!-- ========================================== -->
+  <!-- Tall Bare Dead Tree -->
+  <!-- Jagged Rock Wall -->
+  <!-- Redmond Billboard -->
+  <!-- LiquidPlanner Billboard -->
+  <!-- Diving School Sign (Slightly Above LiquidPlanner) -->
+  <!-- Small Stump -->
+  <!-- Bare Twisting Tree -->
+  <!-- SEGA Neon Gantry -->
+  <!-- SCATTERED RED CARS (Extracted Animation Sequence) -->
+  <!-- Smallest Scale (Farthest) -->
+  <!-- Small-Medium Scale -->
+  <!-- ========================================== -->
+  <!-- BOTTOM SECTION                             -->
+  <!-- ========================================== -->
+  <!-- DANKE! Billboard -->
+  <!-- Low Fern -->
+  <!-- RIM Sign -->
+  <!-- Code inComplete Billboard -->
+  <!-- Wide Flowering Shrub -->
+  <!-- Ice Cream Parlor Sign -->
+  <!-- Flat Dark Rocks -->
+  <!-- Prickly Pear Cactus -->
+  <!-- Bulky Reddish-Brown Boulder -->
+  <!-- ========================================== -->
+  <!-- RIGHT COLUMN (VEHICLES - Rear Perspective) -->
+  <!-- ========================================== -->
+  <!-- Brown Semi-Truck Trailer (BIRIN) -->
+  <!-- Green Jeep -->
+  <g
+     transform="translate(45,35)"
+     id="g122">
+    <!-- Tires (Large) -->
+    <rect
+       x="-35"
+       y="5"
+       width="16"
+       height="22"
+       rx="3"
+       fill="#111111"
+       id="rect115" />
+    <rect
+       x="19"
+       y="5"
+       width="16"
+       height="22"
+       rx="3"
+       fill="#111111"
+       id="rect116" />
+    <!-- Lower Body -->
+    <rect
+       x="-40"
+       y="-15"
+       width="80"
+       height="25"
+       fill="#2e8b57"
+       id="rect117" />
+    <rect
+       x="-30"
+       y="-35"
+       width="60"
+       height="20"
+       fill="#2e8b57"
+       id="rect118" />
+    <!-- Bumper -->
+    <rect
+       x="-45"
+       y="5"
+       width="90"
+       height="5"
+       fill="#111111"
+       id="rect119" />
+    <rect
+       x="-40"
+       y="2"
+       width="10"
+       height="4"
+       fill="#ff0000"
+       id="rect120" />
+    <rect
+       x="30"
+       y="2"
+       width="10"
+       height="4"
+       fill="#ff0000"
+       id="rect121" />
+    <!-- Spare Tire -->
+    <circle
+       cx="0"
+       cy="-10"
+       r="14"
+       fill="#111111"
+       id="circle121" />
+    <circle
+       cx="0"
+       cy="-10"
+       r="6"
+       fill="#555555"
+       id="circle122" />
+    <!-- Window -->
+    <rect
+       x="-25"
+       y="-30"
+       width="50"
+       height="12"
+       fill="#2f4f4f"
+       id="rect122" />
+  </g>
+  <!-- Pink Convertible -->
+  <!-- Blue Hatchback -->
+  <!-- Brown Car -->
+  <!-- Largest Scale Red Sports Car (Closest to camera) -->
+  <!-- Bottom Row (Medium-Large Cars) -->
+</svg>

@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   viewBox="0 0 164 203.40662"
+   width="164"
+   height="203.40662"
+   version="1.1"
+   id="svg146"
+   sodipodi:docname="sprites_g65.svg"
+   inkscape:export-batch-name="sprites"
+   inkscape:version="1.4.3 (0d15f75, 2025-12-25)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview146"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="4.9605074"
+     inkscape:cx="-14.716237"
+     inkscape:cy="101.60251"
+     inkscape:window-width="2806"
+     inkscape:window-height="1381"
+     inkscape:window-x="0"
+     inkscape:window-y="30"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="svg146">
+    <inkscape:page
+       x="0"
+       y="0"
+       width="164"
+       height="203.40662"
+       id="page1"
+       margin="0"
+       bleed="0" />
+  </sodipodi:namedview>
+  <defs
+     id="defs20">
+    <!-- Background Checkerboard Pattern -->
+    <!-- Red Sports Car (OutRun Ferrari style) -->
+    <!-- Blue Sports Car -->
+    <!-- Palm Frond -->
+  </defs>
+  <!-- Background -->
+  <!-- ========================================== -->
+  <!-- TOP SECTION                                -->
+  <!-- ========================================== -->
+  <!-- Tall Curved Palm Tree -->
+  <!-- SNAKES Billboard -->
+  <!-- Bushy Deciduous Tree -->
+  <!-- Castle Turret -->
+  <!-- Blossoming Tree -->
+  <!-- ========================================== -->
+  <!-- MIDDLE SECTION                             -->
+  <!-- ========================================== -->
+  <!-- Tall Bare Dead Tree -->
+  <!-- Jagged Rock Wall -->
+  <!-- Redmond Billboard -->
+  <!-- LiquidPlanner Billboard -->
+  <!-- Diving School Sign (Slightly Above LiquidPlanner) -->
+  <!-- Small Stump -->
+  <!-- Bare Twisting Tree -->
+  <!-- SEGA Neon Gantry -->
+  <g
+     transform="translate(82,42)"
+     id="g65">
+    <!-- Truss Legs -->
+    <rect
+       x="-60"
+       y="0"
+       width="12"
+       height="160"
+       fill="#555555"
+       id="rect63" />
+    <rect
+       x="48"
+       y="0"
+       width="12"
+       height="160"
+       fill="#555555"
+       id="rect64" />
+    <!-- Truss Crosses -->
+    <path
+       d="M -54,0 54,40 M -54,40 54,80 m -108,0 108,40 m -108,0 108,40"
+       stroke="#777777"
+       stroke-width="3"
+       id="path64" />
+    <path
+       d="M 54,0 -54,40 M 54,40 -54,80 m 108,0 -108,40 m 108,0 -108,40"
+       stroke="#777777"
+       stroke-width="3"
+       id="path65" />
+    <!-- Overhead Sign Box -->
+    <rect
+       x="-80"
+       y="-40"
+       width="160"
+       height="40"
+       fill="#111111"
+       stroke="#333333"
+       stroke-width="4"
+       id="rect65" />
+    <!-- SEGA Neon Text -->
+    <text
+       x="0"
+       y="-10"
+       font-family="sans-serif"
+       font-weight="900"
+       font-size="32px"
+       fill="#0000ff"
+       stroke="#00ffff"
+       stroke-width="2"
+       text-anchor="middle"
+       letter-spacing="4"
+       id="text65">SEGA</text>
+  </g>
+  <!-- SCATTERED RED CARS (Extracted Animation Sequence) -->
+  <!-- Smallest Scale (Farthest) -->
+  <!-- Small-Medium Scale -->
+  <!-- ========================================== -->
+  <!-- BOTTOM SECTION                             -->
+  <!-- ========================================== -->
+  <!-- DANKE! Billboard -->
+  <!-- Low Fern -->
+  <!-- RIM Sign -->
+  <!-- Code inComplete Billboard -->
+  <!-- Wide Flowering Shrub -->
+  <!-- Ice Cream Parlor Sign -->
+  <!-- Flat Dark Rocks -->
+  <!-- Prickly Pear Cactus -->
+  <!-- Bulky Reddish-Brown Boulder -->
+  <!-- ========================================== -->
+  <!-- RIGHT COLUMN (VEHICLES - Rear Perspective) -->
+  <!-- ========================================== -->
+  <!-- Brown Semi-Truck Trailer (BIRIN) -->
+  <!-- Green Jeep -->
+  <!-- Pink Convertible -->
+  <!-- Blue Hatchback -->
+  <!-- Brown Car -->
+  <!-- Largest Scale Red Sports Car (Closest to camera) -->
+  <!-- Bottom Row (Medium-Large Cars) -->
+</svg>

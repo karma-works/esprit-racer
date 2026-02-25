@@ -40,6 +40,11 @@ export default defineConfig({
         "src/engine/index.ts",
         "src/engine/types.ts",
         "src/engine/renderer/canvas.ts",
+        "src/engine/renderer/sprite.ts",
+        "src/assets/**/*.ts",
+        "src/audio/**/*.ts",
+        "src/game/**/*.ts",
+        "src/ui/**/*.ts",
       ],
       thresholds: {
         lines: 75,

@@ -4,7 +4,6 @@ import {
   update,
   handleKeyDown,
   handleKeyUp,
-  formatTime,
 } from "./engine/world";
 import * as Render from "./engine/renderer/canvas";
 import * as SvgRender from "./engine/renderer/sprite";
@@ -15,11 +14,26 @@ import {
   preloadGameSprites,
   type CachedSprite,
 } from "./assets/svg-loader";
+import {
+  loadGameMusic,
+  playGameMusic,
+  setMusicVolume,
+} from "./audio/mod-player";
+import {
+  createTimeChallengeState,
+  type TimeChallengeState,
+  type GameScreen,
+  updateTimer,
+  startRace,
+  pauseGame,
+  resumeGame,
+  returnToMenu,
+  completeLap,
+} from "./game/modes/time-challenge";
+import { createScreens, type Button } from "./ui/screens/screens";
+import { renderHud, renderPauseOverlay, renderCountdown } from "./ui/hud/hud";
 
 const canvas = document.getElementById("canvas") as HTMLCanvasElement | null;
-const speedEl = document.getElementById("speed-value");
-const timerEl = document.getElementById("timer-value");
-const lapEl = document.getElementById("lap-value");
 
 if (!canvas) {
   throw new Error("Canvas element not found");
@@ -41,10 +55,16 @@ let last = Util.timestamp();
 let gdt = 0;
 let useSvg = false;
 
+let gameState = createTimeChallengeState();
+let screens = createScreens(world.config.width, world.config.height);
+
 const cameraDepth = 1 / Math.tan(((100 / 2) * Math.PI) / 180);
 const cameraHeight = 1000;
 const playerZ = world.player.z;
 const resolution = world.config.height / 480;
+
+let countdown = 0;
+let countdownTimer = 0;
 
 const loadImages = (names: string[]): Promise<HTMLImageElement[]> => {
   return Promise.all(
@@ -65,7 +85,7 @@ const loadSvgSprites = async (): Promise<void> => {
   svgPlayerCar = globalSpriteCache.get("retro-racing-car.svg", 0.5);
 };
 
-const render = () => {
+const renderRacing = () => {
   const { config, player, skyOffset, hillOffset, treeOffset } = world;
   const {
     width,
@@ -316,11 +336,49 @@ const render = () => {
     }
   }
 
-  if (speedEl) {
-    speedEl.textContent = String(5 * Math.round(player.speed / 500));
+  renderHud(ctx, gameState, (player.speed / config.maxSpeed) * 300, {
+    x: 10,
+    y: 10,
+    width: 280,
+    height: 120,
+  });
+
+  if (countdown > 0) {
+    renderCountdown(ctx, width, height, countdown);
   }
-  if (timerEl) {
-    timerEl.textContent = formatTime(world.currentLapTime);
+
+  if (gameState.isPaused) {
+    renderPauseOverlay(ctx, width, height);
+  }
+};
+
+const render = () => {
+  const { width, height } = world.config;
+
+  if (gameState.screen === "racing") {
+    renderRacing();
+  } else {
+    const screen = screens.get(gameState.screen);
+    if (screen) {
+      ctx.fillStyle = "#1a1a2e";
+      ctx.fillRect(0, 0, width, height);
+      screen.render(ctx, gameState);
+    }
+  }
+};
+
+const updateGame = (dt: number) => {
+  if (gameState.screen !== "racing" || gameState.isPaused || countdown > 0) {
+    return;
+  }
+
+  gameState = updateTimer(gameState, dt);
+
+  const prevLap = world.currentLapTime;
+  update(world, dt);
+
+  if (prevLap > 0 && world.currentLapTime === 0 && world.lastLapTime !== null) {
+    gameState = completeLap(gameState, world);
   }
 };
 
@@ -329,9 +387,17 @@ const frame = () => {
   const dt = Math.min(1, (now - last) / 1000);
   gdt += dt;
 
+  if (countdown > 0) {
+    countdownTimer += dt;
+    if (countdownTimer >= 1) {
+      countdown--;
+      countdownTimer = 0;
+    }
+  }
+
   while (gdt > step) {
     gdt -= step;
-    update(world, step);
+    updateGame(step);
   }
 
   render();
@@ -339,8 +405,96 @@ const frame = () => {
   requestAnimationFrame(frame);
 };
 
-document.addEventListener("keydown", (ev) => handleKeyDown(world, ev.keyCode));
-document.addEventListener("keyup", (ev) => handleKeyUp(world, ev.keyCode));
+const startGame = () => {
+  gameState = startRace(gameState);
+  countdown = 3;
+  countdownTimer = 0;
+  playGameMusic();
+};
+
+const handleMenuKeyDown = (keyCode: number) => {
+  if (gameState.screen === "main-menu") {
+    if (keyCode === KEY.SPACE || keyCode === KEY.UP) {
+      startGame();
+    }
+  } else if (gameState.screen === "results") {
+    if (keyCode === KEY.SPACE) {
+      gameState = returnToMenu(gameState);
+    }
+  } else if (gameState.screen === "racing") {
+    if (keyCode === KEY.P || keyCode === 27) {
+      if (gameState.isPaused) {
+        gameState = resumeGame(gameState);
+      } else {
+        gameState = pauseGame(gameState);
+      }
+    }
+  }
+};
+
+document.addEventListener("keydown", (ev) => {
+  if (gameState.screen === "racing" && !gameState.isPaused && countdown === 0) {
+    handleKeyDown(world, ev.keyCode);
+  }
+  handleMenuKeyDown(ev.keyCode);
+});
+
+document.addEventListener("keyup", (ev) => {
+  if (gameState.screen === "racing") {
+    handleKeyUp(world, ev.keyCode);
+  }
+});
+
+canvas.addEventListener("click", (ev) => {
+  const rect = canvas.getBoundingClientRect();
+  const x = (ev.clientX - rect.left) * (world.config.width / rect.width);
+  const y = (ev.clientY - rect.top) * (world.config.height / rect.height);
+
+  if (gameState.screen === "main-menu") {
+    const screen = screens.get("main-menu") as
+      | { getButtons?: () => Button[] }
+      | undefined;
+    const buttons = screen?.getButtons?.() ?? [];
+    for (const button of buttons) {
+      if (
+        x >= button.x &&
+        x <= button.x + button.width &&
+        y >= button.y &&
+        y <= button.y + button.height
+      ) {
+        if (button.action === "start") {
+          startGame();
+        }
+        break;
+      }
+    }
+  }
+});
+
+canvas.addEventListener("mousemove", (ev) => {
+  const rect = canvas.getBoundingClientRect();
+  const x = (ev.clientX - rect.left) * (world.config.width / rect.width);
+  const y = (ev.clientY - rect.top) * (world.config.height / rect.height);
+
+  if (gameState.screen === "main-menu") {
+    const screen = screens.get("main-menu") as
+      | { getButtons?: () => Button[] }
+      | undefined;
+    const buttons = screen?.getButtons?.() ?? [];
+    for (const button of buttons) {
+      if (
+        x >= button.x &&
+        x <= button.x + button.width &&
+        y >= button.y &&
+        y <= button.y + button.height
+      ) {
+        canvas.style.cursor = "pointer";
+        return;
+      }
+    }
+  }
+  canvas.style.cursor = "default";
+});
 
 canvas.width = world.config.width;
 canvas.height = world.config.height;
@@ -361,6 +515,13 @@ const init = async () => {
     sprites = sp ?? null;
   } catch (err) {
     console.warn("Failed to load PNG images:", err);
+  }
+
+  try {
+    await loadGameMusic();
+    setMusicVolume(0.3);
+  } catch (err) {
+    console.warn("Failed to load music:", err);
   }
 
   frame();
