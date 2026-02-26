@@ -423,35 +423,12 @@ const MUSIC_CHANNELS = [
 ];
 
 export class MusicSelectionScreen implements UIScreen {
-  private zones: MenuZone[];
   private selectedIndex: number = 0;
 
   constructor(
     private width: number,
     private height: number,
-  ) {
-    this.zones = this.calculateZones();
-  }
-
-  private calculateZones(): MenuZone[] {
-    const scaleX = this.width / 800;
-    const scaleY = this.height / 600;
-    const centerX = this.width / 2;
-    const centerY = this.height / 2 + 50;
-    const zoneWidth = 300 * scaleX;
-    const zoneHeight = 60 * scaleY;
-    const spacing = 80 * scaleY;
-
-    return MUSIC_CHANNELS.map((ch, i) => ({
-      x: centerX - zoneWidth / 2,
-      y: centerY - zoneHeight / 2 + (i - 1) * spacing,
-      width: zoneWidth,
-      height: zoneHeight,
-      action: ch.id,
-      row: i,
-      col: 0,
-    }));
-  }
+  ) {}
 
   getSelectedChannel(): string {
     return MUSIC_CHANNELS[this.selectedIndex]?.id ?? "channel1";
@@ -467,14 +444,27 @@ export class MusicSelectionScreen implements UIScreen {
       ctx.fillRect(0, 0, this.width, this.height);
     }
 
-    const selectedZone = this.zones[this.selectedIndex];
-    if (selectedZone) {
-      drawSelectionBox(ctx, selectedZone);
+    const currentChannel = MUSIC_CHANNELS[this.selectedIndex];
+    if (currentChannel) {
+      const centerX = this.width / 2;
+      const displayY = 110 * (this.height / 600);
+
+      ctx.fillStyle = "rgba(0, 0, 0, 0.6)";
+      ctx.fillRect(centerX - 200, displayY - 30, 400, 50);
+
+      ctx.font = `bold ${28 * (this.height / 600)}px monospace`;
+      ctx.fillStyle = "#ff8c00";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.shadowColor = "#ff8c00";
+      ctx.shadowBlur = 10;
+      ctx.fillText(currentChannel.name, centerX, displayY);
+      ctx.shadowBlur = 0;
     }
 
     ctx.fillStyle = "rgba(0, 0, 0, 0.7)";
     ctx.fillRect(this.width / 2 - 160, this.height - 80, 320, 40);
-    ctx.font = "bold 16px monospace";
+    ctx.font = `bold ${16 * (this.height / 600)}px monospace`;
     ctx.fillStyle = "#ff8c00";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
@@ -485,21 +475,12 @@ export class MusicSelectionScreen implements UIScreen {
     );
   }
 
-  handleClick(x: number, y: number): string | null {
-    const idx = this.zones.findIndex(
-      (z) => x >= z.x && x <= z.x + z.width && y >= z.y && y <= z.y + z.height,
-    );
-    if (idx >= 0) {
-      this.selectedIndex = idx;
-      return "start_game";
-    }
-    return null;
+  handleClick(_x: number, _y: number): string | null {
+    return "start_game";
   }
 
   handleKeyDown(keyCode: number): string | null {
-    const { UP, DOWN, LEFT, RIGHT, SPACE } = {
-      UP: 38,
-      DOWN: 40,
+    const { LEFT, RIGHT, SPACE } = {
       LEFT: 37,
       RIGHT: 39,
       SPACE: 32,
@@ -509,28 +490,21 @@ export class MusicSelectionScreen implements UIScreen {
       return "start_game";
     }
 
-    if (keyCode === UP || keyCode === LEFT) {
+    if (keyCode === LEFT) {
       this.selectedIndex =
         (this.selectedIndex - 1 + MUSIC_CHANNELS.length) %
         MUSIC_CHANNELS.length;
-    } else if (keyCode === DOWN || keyCode === RIGHT) {
+    } else if (keyCode === RIGHT) {
       this.selectedIndex = (this.selectedIndex + 1) % MUSIC_CHANNELS.length;
     }
 
     return null;
   }
 
-  handleMouseMove(x: number, y: number): void {
-    const idx = this.zones.findIndex(
-      (z) => x >= z.x && x <= z.x + z.width && y >= z.y && y <= z.y + z.height,
-    );
-    if (idx >= 0) {
-      this.selectedIndex = idx;
-    }
-  }
+  handleMouseMove(_x: number, _y: number): void {}
 
   getZones(): MenuZone[] {
-    return this.zones;
+    return [];
   }
 }
 
