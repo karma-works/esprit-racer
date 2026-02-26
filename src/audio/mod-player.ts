@@ -1,7 +1,4 @@
-// @ts-ignore
-import PasuunaPlayerModule from "@pinkkis/pasuuna-player";
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const Pasuuna: any = PasuunaPlayerModule;
+import PasuunaPlayer from "@pinkkis/pasuuna-player";
 
 export interface ModPlayerConfig {
   volume: number;
@@ -25,7 +22,6 @@ export interface ModPlayer {
 }
 
 class ModPlayerImpl implements ModPlayer {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private tracker: any = null;
   private loaded = false;
   private playing = false;
@@ -40,6 +36,7 @@ class ModPlayerImpl implements ModPlayer {
   async load(url: string): Promise<void> {
     return new Promise((resolve, reject) => {
       try {
+        const Pasuuna = PasuunaPlayer as any;
         this.tracker = new Pasuuna.Tracker();
         this.tracker.init();
 

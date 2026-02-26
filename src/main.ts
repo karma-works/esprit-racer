@@ -60,7 +60,7 @@ if (!ctx) {
 
 const BASE_WIDTH = 1024;
 const BASE_HEIGHT = 768;
-const WINDOWED_SCALE = 2;
+const ASPECT_RATIO = BASE_WIDTH / BASE_HEIGHT;
 
 let world = createWorld();
 const step = 1 / world.config.fps;
@@ -79,7 +79,7 @@ let hudState = createDefaultHudState();
 const cameraDepth = 1 / Math.tan(((100 / 2) * Math.PI) / 180);
 const cameraHeight = 1000;
 const playerZ = world.player.z;
-const resolution = world.config.height / 480;
+let resolution = world.config.height / 480;
 
 let countdown = 0;
 let countdownTimer = 0;
@@ -87,14 +87,25 @@ let countdownTimer = 0;
 let isFullscreen = false;
 const TRAFFIC_CAR_COUNT = 20;
 
-const setCanvasSize = (scale: number) => {
-  canvas.width = BASE_WIDTH * scale;
-  canvas.height = BASE_HEIGHT * scale;
-  canvas.style.width = `${BASE_WIDTH * scale}px`;
-  canvas.style.height = `${BASE_HEIGHT * scale}px`;
+const setCanvasSize = (width?: number, height?: number) => {
+  const viewportWidth = width ?? window.innerWidth;
+  const viewportHeight = height ?? window.innerHeight;
 
-  world.config.width = BASE_WIDTH * scale;
-  world.config.height = BASE_HEIGHT * scale;
+  const scale = Math.min(
+    viewportWidth / BASE_WIDTH,
+    viewportHeight / BASE_HEIGHT,
+  );
+  const canvasWidth = Math.floor(BASE_WIDTH * scale);
+  const canvasHeight = Math.floor(BASE_HEIGHT * scale);
+
+  canvas.width = canvasWidth;
+  canvas.height = canvasHeight;
+  canvas.style.width = `${canvasWidth}px`;
+  canvas.style.height = `${canvasHeight}px`;
+
+  world.config.width = canvasWidth;
+  world.config.height = canvasHeight;
+  resolution = canvasHeight / 480;
   screens = createScreens(world.config.width, world.config.height);
 };
 
@@ -103,17 +114,20 @@ const toggleFullscreen = async () => {
     if (!document.fullscreenElement) {
       await document.documentElement.requestFullscreen();
       isFullscreen = true;
-      canvas.width = window.screen.width;
-      canvas.height = window.screen.height;
-      canvas.style.width = `${window.screen.width}px`;
-      canvas.style.height = `${window.screen.height}px`;
-      world.config.width = window.screen.width;
-      world.config.height = window.screen.height;
+      const screenWidth = window.screen.width;
+      const screenHeight = window.screen.height;
+      canvas.width = screenWidth;
+      canvas.height = screenHeight;
+      canvas.style.width = `${screenWidth}px`;
+      canvas.style.height = `${screenHeight}px`;
+      world.config.width = screenWidth;
+      world.config.height = screenHeight;
+      resolution = screenHeight / 480;
       screens = createScreens(world.config.width, world.config.height);
     } else {
       await document.exitFullscreen();
       isFullscreen = false;
-      setCanvasSize(WINDOWED_SCALE);
+      setCanvasSize();
     }
   } catch (err) {
     console.warn("Fullscreen not available:", err);
@@ -124,14 +138,14 @@ const exitFullscreen = async () => {
   if (document.fullscreenElement) {
     await document.exitFullscreen();
     isFullscreen = false;
-    setCanvasSize(WINDOWED_SCALE);
+    setCanvasSize();
   }
 };
 
 document.addEventListener("fullscreenchange", () => {
   if (!document.fullscreenElement && isFullscreen) {
     isFullscreen = false;
-    setCanvasSize(WINDOWED_SCALE);
+    setCanvasSize();
   }
 });
 
@@ -139,8 +153,8 @@ const loadSvgSprites = async (): Promise<void> => {
   await preloadGameSprites();
   svgBackground = globalSpriteCache.get("background-level-1.svg", 1);
   svgPlayerCarStraight = globalSpriteCache.get("player-car.svg", 0.5);
-  svgPlayerCarLeft = globalSpriteCache.get("player-car-left.svg", 0.5);
-  svgPlayerCarRight = globalSpriteCache.get("player-car-right.svg", 0.5);
+  svgPlayerCarLeft = globalSpriteCache.get("player-car-right.svg", 0.5);
+  svgPlayerCarRight = globalSpriteCache.get("player-car-left.svg", 0.5);
 };
 
 const SPRITE_NAME_MAP = new Map<string, string>([
@@ -637,7 +651,13 @@ canvas.addEventListener("mousemove", (ev) => {
   canvas.style.cursor = "default";
 });
 
-setCanvasSize(WINDOWED_SCALE);
+setCanvasSize();
+
+window.addEventListener("resize", () => {
+  if (!isFullscreen) {
+    setCanvasSize();
+  }
+});
 
 const init = async () => {
   try {
