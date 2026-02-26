@@ -30,7 +30,12 @@ import {
   returnToMenu,
   completeLap,
 } from "./game/modes/time-challenge";
-import { createScreens, type Button } from "./ui/screens/screens";
+import {
+  createScreens,
+  type Button,
+  type MenuZone,
+  type UIScreen,
+} from "./ui/screens/screens";
 import { renderHud, renderPauseOverlay, renderCountdown } from "./ui/hud/hud";
 
 const canvas = document.getElementById("canvas") as HTMLCanvasElement | null;
@@ -395,6 +400,10 @@ const frame = () => {
   requestAnimationFrame(frame);
 };
 
+const goToMusicSelection = () => {
+  gameState = { ...gameState, screen: "music-select" };
+};
+
 const startGame = () => {
   gameState = startRace(gameState);
   countdown = 3;
@@ -403,8 +412,16 @@ const startGame = () => {
 };
 
 const handleMenuKeyDown = (keyCode: number) => {
+  const screen = screens.get(gameState.screen) as UIScreen | undefined;
+
   if (gameState.screen === "main-menu") {
-    if (keyCode === KEY.SPACE || keyCode === KEY.UP) {
+    const action = screen?.handleKeyDown?.(keyCode);
+    if (action === "start" || action === "game") {
+      goToMusicSelection();
+    }
+  } else if (gameState.screen === "music-select") {
+    const action = screen?.handleKeyDown?.(keyCode);
+    if (action === "start_game") {
       startGame();
     }
   } else if (gameState.screen === "results") {
@@ -440,23 +457,17 @@ canvas.addEventListener("click", (ev) => {
   const x = (ev.clientX - rect.left) * (world.config.width / rect.width);
   const y = (ev.clientY - rect.top) * (world.config.height / rect.height);
 
+  const screen = screens.get(gameState.screen) as UIScreen | undefined;
+
   if (gameState.screen === "main-menu") {
-    const screen = screens.get("main-menu") as
-      | { getButtons?: () => Button[] }
-      | undefined;
-    const buttons = screen?.getButtons?.() ?? [];
-    for (const button of buttons) {
-      if (
-        x >= button.x &&
-        x <= button.x + button.width &&
-        y >= button.y &&
-        y <= button.y + button.height
-      ) {
-        if (button.action === "start") {
-          startGame();
-        }
-        break;
-      }
+    const action = screen?.handleClick?.(x, y);
+    if (action === "start" || action === "game") {
+      goToMusicSelection();
+    }
+  } else if (gameState.screen === "music-select") {
+    const action = screen?.handleClick?.(x, y);
+    if (action === "start_game") {
+      startGame();
     }
   }
 });
@@ -466,17 +477,17 @@ canvas.addEventListener("mousemove", (ev) => {
   const x = (ev.clientX - rect.left) * (world.config.width / rect.width);
   const y = (ev.clientY - rect.top) * (world.config.height / rect.height);
 
-  if (gameState.screen === "main-menu") {
-    const screen = screens.get("main-menu") as
-      | { getButtons?: () => Button[] }
-      | undefined;
-    const buttons = screen?.getButtons?.() ?? [];
-    for (const button of buttons) {
+  const screen = screens.get(gameState.screen) as UIScreen | undefined;
+  screen?.handleMouseMove?.(x, y);
+
+  if (gameState.screen === "main-menu" || gameState.screen === "music-select") {
+    const zones = screen?.getZones?.() ?? [];
+    for (const zone of zones) {
       if (
-        x >= button.x &&
-        x <= button.x + button.width &&
-        y >= button.y &&
-        y <= button.y + button.height
+        x >= zone.x &&
+        x <= zone.x + zone.width &&
+        y >= zone.y &&
+        y <= zone.y + zone.height
       ) {
         canvas.style.cursor = "pointer";
         return;

@@ -2,10 +2,14 @@ import type {
   TimeChallengeState,
   GameScreen,
 } from "../../game/modes/time-challenge";
+import { globalSpriteCache } from "../../assets/svg-loader";
 
 export interface UIScreen {
   render(ctx: CanvasRenderingContext2D, state: TimeChallengeState): void;
-  handleClick?(x: number, y: number): void;
+  handleClick?(x: number, y: number): string | null;
+  handleKeyDown?(keyCode: number): string | null;
+  handleMouseMove?(x: number, y: number): void;
+  getZones?(): MenuZone[];
 }
 
 export interface Button {
@@ -17,6 +21,16 @@ export interface Button {
   action: string;
 }
 
+export interface MenuZone {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  action: string;
+  row: number;
+  col: number;
+}
+
 const COLORS = {
   background: "#1a1a2e",
   panel: "#16213e",
@@ -26,6 +40,7 @@ const COLORS = {
   textDim: "#888888",
   timer: "#ffcc00",
   score: "#00ff88",
+  selection: "#e53935",
 };
 
 export const drawPanel = (
@@ -104,73 +119,418 @@ export const drawCenteredText = (
   drawText(ctx, text, centerX, y, { ...options, align: "center" });
 };
 
+const drawSelectionBox = (
+  ctx: CanvasRenderingContext2D,
+  zone: MenuZone,
+): void => {
+  ctx.strokeStyle = COLORS.selection;
+  ctx.lineWidth = 5;
+  ctx.strokeRect(zone.x, zone.y, zone.width, zone.height);
+
+  ctx.shadowColor = COLORS.selection;
+  ctx.shadowBlur = 10;
+  ctx.strokeRect(zone.x, zone.y, zone.width, zone.height);
+  ctx.shadowBlur = 0;
+};
+
+const MAIN_MENU_ZONES: Array<{
+  svgX: number;
+  svgY: number;
+  svgW: number;
+  svgH: number;
+  action: string;
+  row: number;
+  col: number;
+}> = [
+  {
+    svgX: 30,
+    svgY: 40,
+    svgW: 180,
+    svgH: 80,
+    action: "player1",
+    row: 0,
+    col: 0,
+  },
+  { svgX: 230, svgY: 40, svgW: 340, svgH: 80, action: "start", row: 0, col: 1 },
+  {
+    svgX: 590,
+    svgY: 40,
+    svgW: 180,
+    svgH: 80,
+    action: "player2",
+    row: 0,
+    col: 2,
+  },
+  {
+    svgX: 30,
+    svgY: 140,
+    svgW: 180,
+    svgH: 90,
+    action: "gears-p1",
+    row: 1,
+    col: 0,
+  },
+  { svgX: 230, svgY: 140, svgW: 340, svgH: 90, action: "game", row: 1, col: 1 },
+  {
+    svgX: 590,
+    svgY: 140,
+    svgW: 180,
+    svgH: 90,
+    action: "gears-p2",
+    row: 1,
+    col: 2,
+  },
+  {
+    svgX: 30,
+    svgY: 250,
+    svgW: 180,
+    svgH: 90,
+    action: "accel-p1",
+    row: 2,
+    col: 0,
+  },
+  {
+    svgX: 230,
+    svgY: 250,
+    svgW: 340,
+    svgH: 90,
+    action: "course",
+    row: 2,
+    col: 1,
+  },
+  {
+    svgX: 590,
+    svgY: 250,
+    svgW: 180,
+    svgH: 90,
+    action: "accel-p2",
+    row: 2,
+    col: 2,
+  },
+  {
+    svgX: 30,
+    svgY: 360,
+    svgW: 240,
+    svgH: 80,
+    action: "control",
+    row: 3,
+    col: 0,
+  },
+  {
+    svgX: 290,
+    svgY: 360,
+    svgW: 260,
+    svgH: 80,
+    action: "players",
+    row: 3,
+    col: 1,
+  },
+  {
+    svgX: 570,
+    svgY: 360,
+    svgW: 200,
+    svgH: 80,
+    action: "sound",
+    row: 3,
+    col: 2,
+  },
+  {
+    svgX: 30,
+    svgY: 460,
+    svgW: 240,
+    svgH: 80,
+    action: "constructor",
+    row: 4,
+    col: 0,
+  },
+  { svgX: 290, svgY: 460, svgW: 260, svgH: 80, action: "code", row: 4, col: 1 },
+  {
+    svgX: 570,
+    svgY: 460,
+    svgW: 200,
+    svgH: 80,
+    action: "define",
+    row: 4,
+    col: 2,
+  },
+];
+
+const NAVIGABLE_ZONES = [
+  "start",
+  "game",
+  "course",
+  "control",
+  "players",
+  "sound",
+  "constructor",
+  "code",
+  "define",
+];
+
 export class MainMenuScreen implements UIScreen {
   private buttons: Button[];
+  private zones: MenuZone[];
+  private selectedIndex: number = 0;
 
   constructor(
     private width: number,
     private height: number,
   ) {
-    const centerX = width / 2;
-    const buttonWidth = 200;
-    const buttonHeight = 50;
-    const startY = height / 2 + 50;
-    const spacing = 70;
+    this.buttons = [];
+    this.zones = this.calculateZones();
+    this.selectedIndex = this.zones.findIndex((z) =>
+      NAVIGABLE_ZONES.includes(z.action),
+    );
+    if (this.selectedIndex < 0) this.selectedIndex = 0;
+  }
 
-    this.buttons = [
-      {
-        x: centerX - buttonWidth / 2,
-        y: startY,
-        width: buttonWidth,
-        height: buttonHeight,
-        label: "TIME CHALLENGE",
-        action: "start",
-      },
-      {
-        x: centerX - buttonWidth / 2,
-        y: startY + spacing,
-        width: buttonWidth,
-        height: buttonHeight,
-        label: "OPTIONS",
-        action: "options",
-      },
-    ];
+  private calculateZones(): MenuZone[] {
+    const scaleX = this.width / 800;
+    const scaleY = this.height / 600;
+
+    return MAIN_MENU_ZONES.map((z) => ({
+      x: z.svgX * scaleX,
+      y: z.svgY * scaleY,
+      width: z.svgW * scaleX,
+      height: z.svgH * scaleY,
+      action: z.action,
+      row: z.row,
+      col: z.col,
+    }));
   }
 
   render(ctx: CanvasRenderingContext2D, state: TimeChallengeState): void {
-    ctx.fillStyle = COLORS.background;
-    ctx.fillRect(0, 0, this.width, this.height);
+    const scale = this.width / 800;
+    const menuSvg = globalSpriteCache.get("main-menu.svg", scale);
+    if (menuSvg) {
+      ctx.drawImage(menuSvg.canvas, 0, 0, this.width, this.height);
+    } else {
+      ctx.fillStyle = "#1a1c20";
+      ctx.fillRect(0, 0, this.width, this.height);
+      drawCenteredText(ctx, "LOADING...", this.width / 2, this.height / 2, {
+        font: "bold 32px monospace",
+        color: "#a0a0a0",
+      });
+      return;
+    }
 
-    drawCenteredText(ctx, "ESPRIT RACER", this.width / 2, 100, {
-      font: "bold 48px monospace",
-      color: COLORS.highlight,
-    });
+    const selectedZone = this.zones[this.selectedIndex];
+    if (selectedZone) {
+      drawSelectionBox(ctx, selectedZone);
+    }
+  }
 
-    drawCenteredText(ctx, state.playerName, this.width / 2, 180, {
-      font: "24px monospace",
-      color: COLORS.textDim,
-    });
+  private findZoneIndex(x: number, y: number): number {
+    return this.zones.findIndex(
+      (z) => x >= z.x && x <= z.x + z.width && y >= z.y && y <= z.y + z.height,
+    );
+  }
 
-    if (state.bestScore !== null) {
-      drawCenteredText(
-        ctx,
-        `BEST: ${state.bestScore.toString().padStart(6, "0")}`,
-        this.width / 2,
-        this.height - 80,
-        {
-          font: "20px monospace",
-          color: COLORS.score,
-        },
+  handleClick(x: number, y: number): string | null {
+    const idx = this.findZoneIndex(x, y);
+    if (idx >= 0) {
+      const zone = this.zones[idx];
+      if (zone) return zone.action;
+    }
+    return null;
+  }
+
+  handleMouseMove(x: number, y: number): void {
+    const idx = this.findZoneIndex(x, y);
+    const zone = this.zones[idx];
+    if (idx >= 0 && zone && NAVIGABLE_ZONES.includes(zone.action)) {
+      this.selectedIndex = idx;
+    }
+  }
+
+  handleKeyDown(keyCode: number): string | null {
+    const currentZone = this.zones[this.selectedIndex];
+    if (!currentZone) return null;
+
+    const { UP, DOWN, LEFT, RIGHT, SPACE } = {
+      UP: 38,
+      DOWN: 40,
+      LEFT: 37,
+      RIGHT: 39,
+      SPACE: 32,
+    };
+
+    if (keyCode === SPACE || keyCode === 13) {
+      return currentZone.action;
+    }
+
+    let candidates: MenuZone[] = [];
+
+    if (keyCode === UP) {
+      candidates = this.zones.filter(
+        (z) => NAVIGABLE_ZONES.includes(z.action) && z.row < currentZone.row,
+      );
+    } else if (keyCode === DOWN) {
+      candidates = this.zones.filter(
+        (z) => NAVIGABLE_ZONES.includes(z.action) && z.row > currentZone.row,
+      );
+    } else if (keyCode === LEFT) {
+      candidates = this.zones.filter(
+        (z) =>
+          NAVIGABLE_ZONES.includes(z.action) &&
+          z.col < currentZone.col &&
+          z.row === currentZone.row,
+      );
+    } else if (keyCode === RIGHT) {
+      candidates = this.zones.filter(
+        (z) =>
+          NAVIGABLE_ZONES.includes(z.action) &&
+          z.col > currentZone.col &&
+          z.row === currentZone.row,
       );
     }
 
-    for (const button of this.buttons) {
-      drawButton(ctx, button);
+    if (candidates.length > 0) {
+      if (keyCode === UP || keyCode === LEFT) {
+        candidates.sort((a, b) =>
+          keyCode === UP ? b.row - a.row : b.col - a.col,
+        );
+      } else {
+        candidates.sort((a, b) =>
+          keyCode === DOWN ? a.row - b.row : a.col - b.col,
+        );
+      }
+      const firstCandidate = candidates[0];
+      if (firstCandidate) {
+        const newIdx = this.zones.indexOf(firstCandidate);
+        if (newIdx >= 0) {
+          this.selectedIndex = newIdx;
+        }
+      }
     }
+
+    return null;
+  }
+
+  getZones(): MenuZone[] {
+    return this.zones;
   }
 
   getButtons(): Button[] {
     return this.buttons;
+  }
+}
+
+const MUSIC_CHANNELS = [
+  { id: "channel1", name: "LOTUS III TITLE" },
+  { id: "channel2", name: "ESPRIT TURBO" },
+  { id: "channel3", name: "ESPRIT SE" },
+];
+
+export class MusicSelectionScreen implements UIScreen {
+  private zones: MenuZone[];
+  private selectedIndex: number = 0;
+
+  constructor(
+    private width: number,
+    private height: number,
+  ) {
+    this.zones = this.calculateZones();
+  }
+
+  private calculateZones(): MenuZone[] {
+    const scaleX = this.width / 800;
+    const scaleY = this.height / 600;
+    const centerX = this.width / 2;
+    const centerY = this.height / 2 + 50;
+    const zoneWidth = 300 * scaleX;
+    const zoneHeight = 60 * scaleY;
+    const spacing = 80 * scaleY;
+
+    return MUSIC_CHANNELS.map((ch, i) => ({
+      x: centerX - zoneWidth / 2,
+      y: centerY - zoneHeight / 2 + (i - 1) * spacing,
+      width: zoneWidth,
+      height: zoneHeight,
+      action: ch.id,
+      row: i,
+      col: 0,
+    }));
+  }
+
+  getSelectedChannel(): string {
+    return MUSIC_CHANNELS[this.selectedIndex]?.id ?? "channel1";
+  }
+
+  render(ctx: CanvasRenderingContext2D, state: TimeChallengeState): void {
+    const scale = this.width / 800;
+    const musicSvg = globalSpriteCache.get("music-selection.svg", scale);
+    if (musicSvg) {
+      ctx.drawImage(musicSvg.canvas, 0, 0, this.width, this.height);
+    } else {
+      ctx.fillStyle = "#d2b48c";
+      ctx.fillRect(0, 0, this.width, this.height);
+    }
+
+    const selectedZone = this.zones[this.selectedIndex];
+    if (selectedZone) {
+      drawSelectionBox(ctx, selectedZone);
+    }
+
+    ctx.fillStyle = "rgba(0, 0, 0, 0.7)";
+    ctx.fillRect(this.width / 2 - 160, this.height - 80, 320, 40);
+    ctx.font = "bold 16px monospace";
+    ctx.fillStyle = "#ff8c00";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(
+      "LEFT/RIGHT: SELECT   SPACE/ENTER: START",
+      this.width / 2,
+      this.height - 60,
+    );
+  }
+
+  handleClick(x: number, y: number): string | null {
+    const idx = this.zones.findIndex(
+      (z) => x >= z.x && x <= z.x + z.width && y >= z.y && y <= z.y + z.height,
+    );
+    if (idx >= 0) {
+      this.selectedIndex = idx;
+      return "start_game";
+    }
+    return null;
+  }
+
+  handleKeyDown(keyCode: number): string | null {
+    const { UP, DOWN, LEFT, RIGHT, SPACE } = {
+      UP: 38,
+      DOWN: 40,
+      LEFT: 37,
+      RIGHT: 39,
+      SPACE: 32,
+    };
+
+    if (keyCode === SPACE || keyCode === 13) {
+      return "start_game";
+    }
+
+    if (keyCode === UP || keyCode === LEFT) {
+      this.selectedIndex =
+        (this.selectedIndex - 1 + MUSIC_CHANNELS.length) %
+        MUSIC_CHANNELS.length;
+    } else if (keyCode === DOWN || keyCode === RIGHT) {
+      this.selectedIndex = (this.selectedIndex + 1) % MUSIC_CHANNELS.length;
+    }
+
+    return null;
+  }
+
+  handleMouseMove(x: number, y: number): void {
+    const idx = this.zones.findIndex(
+      (z) => x >= z.x && x <= z.x + z.width && y >= z.y && y <= z.y + z.height,
+    );
+    if (idx >= 0) {
+      this.selectedIndex = idx;
+    }
+  }
+
+  getZones(): MenuZone[] {
+    return this.zones;
   }
 }
 
@@ -251,6 +611,7 @@ export const createScreens = (
 ): Map<GameScreen, UIScreen> => {
   const screens = new Map<GameScreen, UIScreen>();
   screens.set("main-menu", new MainMenuScreen(width, height));
+  screens.set("music-select", new MusicSelectionScreen(width, height));
   screens.set("results", new ResultsScreen(width, height));
   return screens;
 };
