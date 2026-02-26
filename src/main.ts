@@ -107,11 +107,7 @@ const getSpriteName = (sprite: {
   h: number;
 }): string | null => {
   const key = `${sprite.w}_${sprite.h}_${sprite.x}`;
-  const result = SPRITE_NAME_MAP.get(key);
-  if (!result) {
-    console.warn(`Unknown sprite: ${key}`, sprite);
-  }
-  return result ?? null;
+  return SPRITE_NAME_MAP.get(key) ?? null;
 };
 
 const renderRacing = () => {
@@ -256,6 +252,8 @@ const renderRacing = () => {
             -0.5,
             -1,
             segment.clip ?? 0,
+            car.sprite.w,
+            car.sprite.h,
           );
         }
       }
@@ -283,6 +281,8 @@ const renderRacing = () => {
             sprite.offset < 0 ? -1 : 0,
             -1,
             segment.clip ?? 0,
+            sprite.source.w,
+            sprite.source.h,
           );
         }
       }

@@ -1,5 +1,5 @@
 import type { CachedSprite } from "../../assets/svg-loader";
-import { SPRITE_SCALE } from "../constants";
+import { SPRITE_SCALE, SPRITES } from "../constants";
 
 export const svgSprite = (
   ctx: CanvasRenderingContext2D,
@@ -12,15 +12,13 @@ export const svgSprite = (
   offsetX: number = 0,
   offsetY: number = 0,
   clipY: number = 0,
+  spriteW: number = 80,
+  spriteH: number = 80,
 ): void => {
-  const aspectRatio = cachedSprite.width / cachedSprite.height;
-  const baseWidth = 80;
-  const baseHeight = baseWidth / aspectRatio;
-
   const destW =
-    ((baseWidth * scale * canvasWidth) / 2) * (SPRITE_SCALE * roadWidth);
+    ((spriteW * scale * canvasWidth) / 2) * (SPRITE_SCALE * roadWidth);
   const destH =
-    ((baseHeight * scale * canvasWidth) / 2) * (SPRITE_SCALE * roadWidth);
+    ((spriteH * scale * canvasWidth) / 2) * (SPRITE_SCALE * roadWidth);
 
   const finalX = destX + destW * offsetX;
   const finalY = destY + destH * offsetY;
@@ -46,23 +44,22 @@ export const svgPlayer = (
   ctx: CanvasRenderingContext2D,
   cachedSprite: CachedSprite,
   canvasWidth: number,
-  canvasHeight: number,
+  _canvasHeight: number,
   roadWidth: number,
-  speedPercent: number,
+  _speedPercent: number,
   scale: number,
   destX: number,
   destY: number,
-  steer: number,
+  _steer: number,
   bounce: number,
 ): void => {
-  const aspectRatio = cachedSprite.width / cachedSprite.height;
-  const baseWidth = 80;
-  const baseHeight = baseWidth / aspectRatio;
+  const spriteW = SPRITES.PLAYER_STRAIGHT.w;
+  const spriteH = SPRITES.PLAYER_STRAIGHT.h;
 
   const destW =
-    ((baseWidth * scale * canvasWidth) / 2) * (SPRITE_SCALE * roadWidth);
+    ((spriteW * scale * canvasWidth) / 2) * (SPRITE_SCALE * roadWidth);
   const destH =
-    ((baseHeight * scale * canvasWidth) / 2) * (SPRITE_SCALE * roadWidth);
+    ((spriteH * scale * canvasWidth) / 2) * (SPRITE_SCALE * roadWidth);
 
   const finalX = destX - destW / 2;
   const finalY = destY - destH + bounce;

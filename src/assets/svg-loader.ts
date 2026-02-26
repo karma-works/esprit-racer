@@ -62,7 +62,6 @@ class SpriteCacheImpl implements SpriteCache {
   private cache = new Map<string, Map<number, CachedSprite>>();
   private config: SpriteLoaderConfig;
   private svgCache = new Map<string, string>();
-  private pendingRenders = new Map<string, Promise<CachedSprite>>();
 
   constructor(config: Partial<SpriteLoaderConfig> = {}) {
     this.config = { ...DEFAULT_CONFIG, ...config };
@@ -144,33 +143,6 @@ class SpriteCacheImpl implements SpriteCache {
         }
       }),
     );
-  }
-
-  async getOrRender(
-    svgPath: string,
-    scale: number,
-  ): Promise<CachedSprite | null> {
-    const cached = this.get(svgPath, scale);
-    if (cached) return cached;
-
-    const fullPath = svgPath.startsWith("/")
-      ? svgPath
-      : this.config.basePath + svgPath;
-
-    if (!this.svgCache.has(fullPath)) {
-      return null;
-    }
-
-    const svgText = this.svgCache.get(fullPath)!;
-    const roundedScale = Math.ceil(scale * 2) / 2;
-    const rendered = await this.renderSVGToCanvas(svgText, roundedScale);
-
-    if (!this.cache.has(svgPath)) {
-      this.cache.set(svgPath, new Map());
-    }
-    this.cache.get(svgPath)!.set(roundedScale, rendered);
-
-    return rendered;
   }
 
   get(svgPath: string, scale: number): CachedSprite | null {
