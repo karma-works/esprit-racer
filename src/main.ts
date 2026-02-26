@@ -4,6 +4,7 @@ import {
   update,
   handleKeyDown,
   handleKeyUp,
+  resetCars,
 } from "./engine/world";
 import * as Render from "./engine/renderer/canvas";
 import * as SvgRender from "./engine/renderer/sprite";
@@ -29,6 +30,8 @@ import {
   resumeGame,
   returnToMenu,
   completeLap,
+  checkCheckpoint,
+  DEFAULT_TIME_LIMIT,
 } from "./game/modes/time-challenge";
 import {
   createScreens,
@@ -36,7 +39,13 @@ import {
   type MenuZone,
   type UIScreen,
 } from "./ui/screens/screens";
-import { renderHud, renderPauseOverlay, renderCountdown } from "./ui/hud/hud";
+import {
+  renderHud,
+  renderPauseOverlay,
+  renderCountdown,
+  createDefaultHudState,
+  type HudStateType,
+} from "./ui/hud/hud";
 
 const canvas = document.getElementById("canvas") as HTMLCanvasElement | null;
 
@@ -49,16 +58,23 @@ if (!ctx) {
   throw new Error("Could not get 2d context");
 }
 
-const world = createWorld();
+const BASE_WIDTH = 1024;
+const BASE_HEIGHT = 768;
+const WINDOWED_SCALE = 2;
+
+let world = createWorld();
 const step = 1 / world.config.fps;
 
 let svgBackground: CachedSprite | null = null;
-let svgPlayerCar: CachedSprite | null = null;
+let svgPlayerCarStraight: CachedSprite | null = null;
+let svgPlayerCarLeft: CachedSprite | null = null;
+let svgPlayerCarRight: CachedSprite | null = null;
 let last = Util.timestamp();
 let gdt = 0;
 
 let gameState = createTimeChallengeState();
 let screens = createScreens(world.config.width, world.config.height);
+let hudState = createDefaultHudState();
 
 const cameraDepth = 1 / Math.tan(((100 / 2) * Math.PI) / 180);
 const cameraHeight = 1000;
@@ -68,10 +84,63 @@ const resolution = world.config.height / 480;
 let countdown = 0;
 let countdownTimer = 0;
 
+let isFullscreen = false;
+const TRAFFIC_CAR_COUNT = 20;
+
+const setCanvasSize = (scale: number) => {
+  canvas.width = BASE_WIDTH * scale;
+  canvas.height = BASE_HEIGHT * scale;
+  canvas.style.width = `${BASE_WIDTH * scale}px`;
+  canvas.style.height = `${BASE_HEIGHT * scale}px`;
+
+  world.config.width = BASE_WIDTH * scale;
+  world.config.height = BASE_HEIGHT * scale;
+  screens = createScreens(world.config.width, world.config.height);
+};
+
+const toggleFullscreen = async () => {
+  try {
+    if (!document.fullscreenElement) {
+      await document.documentElement.requestFullscreen();
+      isFullscreen = true;
+      canvas.width = window.screen.width;
+      canvas.height = window.screen.height;
+      canvas.style.width = `${window.screen.width}px`;
+      canvas.style.height = `${window.screen.height}px`;
+      world.config.width = window.screen.width;
+      world.config.height = window.screen.height;
+      screens = createScreens(world.config.width, world.config.height);
+    } else {
+      await document.exitFullscreen();
+      isFullscreen = false;
+      setCanvasSize(WINDOWED_SCALE);
+    }
+  } catch (err) {
+    console.warn("Fullscreen not available:", err);
+  }
+};
+
+const exitFullscreen = async () => {
+  if (document.fullscreenElement) {
+    await document.exitFullscreen();
+    isFullscreen = false;
+    setCanvasSize(WINDOWED_SCALE);
+  }
+};
+
+document.addEventListener("fullscreenchange", () => {
+  if (!document.fullscreenElement && isFullscreen) {
+    isFullscreen = false;
+    setCanvasSize(WINDOWED_SCALE);
+  }
+});
+
 const loadSvgSprites = async (): Promise<void> => {
   await preloadGameSprites();
   svgBackground = globalSpriteCache.get("background-level-1.svg", 1);
-  svgPlayerCar = globalSpriteCache.get("player-car.svg", 0.5);
+  svgPlayerCarStraight = globalSpriteCache.get("player-car.svg", 0.5);
+  svgPlayerCarLeft = globalSpriteCache.get("player-car-left.svg", 0.5);
+  svgPlayerCarRight = globalSpriteCache.get("player-car-right.svg", 0.5);
 };
 
 const SPRITE_NAME_MAP = new Map<string, string>([
@@ -113,6 +182,12 @@ const getSpriteName = (sprite: {
 }): string | null => {
   const key = `${sprite.w}_${sprite.h}_${sprite.x}`;
   return SPRITE_NAME_MAP.get(key) ?? null;
+};
+
+const getPlayerCarSprite = (steer: number): CachedSprite | null => {
+  if (steer < -0.5) return svgPlayerCarLeft;
+  if (steer > 0.5) return svgPlayerCarRight;
+  return svgPlayerCarStraight;
 };
 
 const renderRacing = () => {
@@ -218,6 +293,8 @@ const renderRacing = () => {
     maxy = segment.p1.screen.y;
   }
 
+  const mirrorCars: { offset: number; distance: number; color: string }[] = [];
+
   for (let n = drawDistance - 1; n > 0; n--) {
     const segmentIndex = (baseSegment.index + n) % world.segments.length;
     const segment = world.segments[segmentIndex];
@@ -262,6 +339,22 @@ const renderRacing = () => {
           );
         }
       }
+
+      if (n < drawDistance / 4) {
+        const carColors = ["#dc2626", "#3b82f6", "#f59e0b", "#10b981"];
+        const colorIndex =
+          Math.floor(Math.abs(car.offset * 10)) % carColors.length;
+        const distanceFromPlayer = Math.abs(car.z - player.position);
+        const normalizedDistance = Math.min(
+          1,
+          distanceFromPlayer / (world.trackLength * 0.1),
+        );
+        mirrorCars.push({
+          offset: car.offset,
+          distance: normalizedDistance,
+          color: carColors[colorIndex] ?? "#dc2626",
+        });
+      }
     }
 
     for (const sprite of segment.sprites) {
@@ -293,7 +386,7 @@ const renderRacing = () => {
       }
     }
 
-    if (segment === playerSegment && svgPlayerCar) {
+    if (segment === playerSegment) {
       const playerScale = cameraDepth / playerZ;
       const playerScreenY =
         height / 2 -
@@ -315,28 +408,55 @@ const renderRacing = () => {
       const steer =
         player.speed * (world.input.left ? -1 : world.input.right ? 1 : 0);
 
-      SvgRender.svgPlayer(
-        ctx,
-        svgPlayerCar,
-        width,
-        height,
-        roadWidth,
-        speedPercent,
-        playerScale,
-        width / 2,
-        playerScreenY,
-        steer,
-        bounce,
-      );
+      const playerSprite = getPlayerCarSprite(steer);
+
+      if (playerSprite) {
+        SvgRender.svgPlayer(
+          ctx,
+          playerSprite,
+          width,
+          height,
+          roadWidth,
+          speedPercent,
+          playerScale,
+          width / 2,
+          playerScreenY,
+          steer,
+          bounce,
+        );
+      }
     }
   }
 
-  renderHud(ctx, gameState, (player.speed / config.maxSpeed) * 300, {
-    x: 10,
-    y: 10,
-    width: 280,
-    height: 120,
-  });
+  const speed = (player.speed / config.maxSpeed) * 300;
+
+  let playerPosition = 1;
+  for (const car of world.cars) {
+    if (car.z > player.position) {
+      playerPosition++;
+    }
+  }
+
+  hudState = {
+    ...hudState,
+    speed,
+    maxSpeed: 300,
+    position: Math.min(playerPosition, TRAFFIC_CAR_COUNT + 1),
+    totalPositions: TRAFFIC_CAR_COUNT + 1,
+    mirrorCars: mirrorCars.slice(0, 3),
+    boostMeter: Math.min(1, gameState.currentTime / DEFAULT_TIME_LIMIT),
+  };
+
+  renderHud(
+    ctx,
+    gameState,
+    speed,
+    {
+      width,
+      height,
+    },
+    hudState,
+  );
 
   if (countdown > 0) {
     renderCountdown(ctx, width, height, countdown);
@@ -372,6 +492,16 @@ const updateGame = (dt: number) => {
   const prevLap = world.currentLapTime;
   update(world, dt);
 
+  const checkpointResult = checkCheckpoint(
+    gameState,
+    world.player.position,
+    world.trackLength,
+    world.config.segmentLength,
+  );
+  if (checkpointResult.bonusAwarded > 0) {
+    gameState = checkpointResult.state;
+  }
+
   if (prevLap > 0 && world.currentLapTime === 0 && world.lastLapTime !== null) {
     gameState = completeLap(gameState, world);
   }
@@ -405,9 +535,12 @@ const goToMusicSelection = () => {
 };
 
 const startGame = () => {
+  world = createWorld();
+  resetCars(world, TRAFFIC_CAR_COUNT);
   gameState = startRace(gameState);
   countdown = 3;
   countdownTimer = 0;
+  hudState = createDefaultHudState();
   playGameMusic();
 };
 
@@ -436,10 +569,17 @@ const handleMenuKeyDown = (keyCode: number) => {
         gameState = pauseGame(gameState);
       }
     }
+    if (keyCode === KEY.F || keyCode === 122) {
+      toggleFullscreen();
+    }
   }
 };
 
 document.addEventListener("keydown", (ev) => {
+  if (ev.keyCode === 122) {
+    ev.preventDefault();
+  }
+
   if (gameState.screen === "racing" && !gameState.isPaused && countdown === 0) {
     handleKeyDown(world, ev.keyCode);
   }
@@ -497,8 +637,7 @@ canvas.addEventListener("mousemove", (ev) => {
   canvas.style.cursor = "default";
 });
 
-canvas.width = world.config.width;
-canvas.height = world.config.height;
+setCanvasSize(WINDOWED_SCALE);
 
 const init = async () => {
   try {

@@ -1,7 +1,7 @@
 // @ts-ignore
 import PasuunaPlayerModule from "@pinkkis/pasuuna-player";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const PasuunaPlayer: any = PasuunaPlayerModule;
+const Pasuuna: any = PasuunaPlayerModule;
 
 export interface ModPlayerConfig {
   volume: number;
@@ -26,30 +26,39 @@ export interface ModPlayer {
 
 class ModPlayerImpl implements ModPlayer {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private player: any = null;
+  private tracker: any = null;
   private loaded = false;
   private playing = false;
   private config: ModPlayerConfig;
+  private volume: number;
 
   constructor(config: Partial<ModPlayerConfig> = {}) {
     this.config = { ...DEFAULT_CONFIG, ...config };
+    this.volume = this.config.volume;
   }
 
   async load(url: string): Promise<void> {
     return new Promise((resolve, reject) => {
       try {
-        this.player = new PasuunaPlayer({
-          repeat: this.config.loop,
-          onReady: () => {
-            this.loaded = true;
-            this.player?.setVolume(this.config.volume);
-            resolve();
-          },
-          onError: (error: Error) => {
+        this.tracker = new Pasuuna.Tracker();
+        this.tracker.init();
+
+        const onSongLoaded = (song: { title: string }) => {
+          this.loaded = true;
+          this.setVolume(this.volume);
+          resolve();
+        };
+
+        this.tracker.events.on(Pasuuna.EVENT.songLoaded, onSongLoaded);
+
+        fetch(url)
+          .then((response) => response.arrayBuffer())
+          .then((buffer) => {
+            this.tracker.parse(buffer);
+          })
+          .catch((error) => {
             reject(error);
-          },
-        });
-        this.player.load(url);
+          });
       } catch (error) {
         reject(error);
       }
@@ -57,35 +66,35 @@ class ModPlayerImpl implements ModPlayer {
   }
 
   play(): void {
-    if (this.player && this.loaded) {
-      this.player.play();
+    if (this.tracker && this.loaded && !this.playing) {
+      this.tracker.playSong();
       this.playing = true;
     }
   }
 
   pause(): void {
-    if (this.player && this.loaded) {
-      this.player.stop();
+    if (this.tracker && this.loaded && this.playing) {
+      this.tracker.stop();
       this.playing = false;
     }
   }
 
   stop(): void {
-    if (this.player && this.loaded) {
-      this.player.stop();
+    if (this.tracker && this.loaded) {
+      this.tracker.stop();
       this.playing = false;
     }
   }
 
   setVolume(volume: number): void {
-    this.config.volume = Math.max(0, Math.min(1, volume));
-    if (this.player && this.loaded) {
-      this.player.setVolume(this.config.volume);
+    this.volume = Math.max(0, Math.min(1, volume));
+    if (this.tracker && this.tracker.audio && this.tracker.audio.masterVolume) {
+      this.tracker.audio.masterVolume.gain.setValueAtTime(this.volume, 0);
     }
   }
 
   getVolume(): number {
-    return this.config.volume;
+    return this.volume;
   }
 
   isPlaying(): boolean {

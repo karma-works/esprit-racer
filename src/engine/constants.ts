@@ -10,6 +10,7 @@ export const KEY = {
   S: 83,
   W: 87,
   P: 80,
+  F: 70,
   SPACE: 32,
 } as const satisfies Record<string, KeyCode>;
 

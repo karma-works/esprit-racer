@@ -11,23 +11,23 @@ export interface TimeChallengeState {
   score: number;
   lap: number;
   totalLaps: number;
-  checkpoints: number[];
-  lastCheckpointTime: number;
+  checkpointsPassed: number;
+  totalCheckpoints: number;
+  lastCheckpointSegment: number;
   isPaused: boolean;
   isGameOver: boolean;
   bestTime: number | null;
   bestScore: number | null;
+  timeBonusFlash: number;
 }
 
-export interface Checkpoint {
-  segmentIndex: number;
-  passed: boolean;
-  bonus: number;
-}
-
-export const DEFAULT_TIME_LIMIT = 60;
+export const DEFAULT_TIME_LIMIT = 45;
 export const DEFAULT_LAPS = 3;
-export const CHECKPOINT_BONUS = 10;
+export const CHECKPOINT_TIME_BONUS = 3;
+export const LAP_TIME_BONUS = 20;
+export const CHECKPOINT_SCORE_BONUS = 25;
+export const LAP_SCORE_BONUS = 100;
+export const CHECKPOINTS_PER_LAP = 4;
 
 export const createTimeChallengeState = (): TimeChallengeState => ({
   screen: "main-menu",
@@ -38,12 +38,14 @@ export const createTimeChallengeState = (): TimeChallengeState => ({
   score: 0,
   lap: 1,
   totalLaps: DEFAULT_LAPS,
-  checkpoints: [],
-  lastCheckpointTime: 0,
+  checkpointsPassed: 0,
+  totalCheckpoints: CHECKPOINTS_PER_LAP,
+  lastCheckpointSegment: -1,
   isPaused: false,
   isGameOver: false,
   bestTime: null,
   bestScore: null,
+  timeBonusFlash: 0,
 });
 
 export const updateTimer = (
@@ -55,6 +57,7 @@ export const updateTimer = (
   }
 
   const newTime = state.currentTime - dt;
+  const newFlash = Math.max(0, state.timeBonusFlash - dt);
 
   if (newTime <= 0) {
     return {
@@ -62,24 +65,56 @@ export const updateTimer = (
       currentTime: 0,
       isGameOver: true,
       screen: "results",
+      timeBonusFlash: 0,
     };
   }
 
   return {
     ...state,
     currentTime: newTime,
+    timeBonusFlash: newFlash,
   };
 };
 
-export const addCheckpointBonus = (
+export const checkCheckpoint = (
   state: TimeChallengeState,
-): TimeChallengeState => {
-  const bonus = CHECKPOINT_BONUS + Math.floor(state.currentTime);
-  return {
-    ...state,
-    score: state.score + bonus,
-    lastCheckpointTime: state.currentTime,
-  };
+  playerPosition: number,
+  trackLength: number,
+  segmentLength: number,
+): { state: TimeChallengeState; bonusAwarded: number } => {
+  if (state.isPaused || state.isGameOver) {
+    return { state, bonusAwarded: 0 };
+  }
+
+  const currentSegment = Math.floor(playerPosition / segmentLength);
+  const totalSegments = Math.floor(trackLength / segmentLength);
+  const segmentsPerCheckpoint = Math.floor(
+    totalSegments / (CHECKPOINTS_PER_LAP + 1),
+  );
+
+  const currentCheckpointIndex = Math.floor(
+    currentSegment / segmentsPerCheckpoint,
+  );
+
+  if (
+    currentCheckpointIndex > state.lastCheckpointSegment &&
+    currentCheckpointIndex <= CHECKPOINTS_PER_LAP
+  ) {
+    const bonus = CHECKPOINT_TIME_BONUS;
+    return {
+      state: {
+        ...state,
+        currentTime: state.currentTime + bonus,
+        score: state.score + CHECKPOINT_SCORE_BONUS,
+        checkpointsPassed: currentCheckpointIndex,
+        lastCheckpointSegment: currentCheckpointIndex,
+        timeBonusFlash: 1.5,
+      },
+      bonusAwarded: bonus,
+    };
+  }
+
+  return { state, bonusAwarded: 0 };
 };
 
 export const completeLap = (
@@ -89,7 +124,8 @@ export const completeLap = (
   const newLap = state.lap + 1;
 
   if (newLap > state.totalLaps) {
-    const finalScore = state.score + Math.floor(state.currentTime * 100);
+    const finalScore =
+      state.score + Math.floor(state.currentTime * 50) + LAP_SCORE_BONUS;
     const isNewBest = state.bestScore === null || finalScore > state.bestScore;
 
     return {
@@ -99,14 +135,18 @@ export const completeLap = (
       score: finalScore,
       bestScore: isNewBest ? finalScore : state.bestScore,
       bestTime: isNewBest ? world.currentLapTime : state.bestTime,
+      timeBonusFlash: 0,
     };
   }
 
   return {
     ...state,
     lap: newLap,
-    currentTime: state.currentTime + 30,
-    score: state.score + 50,
+    currentTime: state.currentTime + LAP_TIME_BONUS,
+    score: state.score + LAP_SCORE_BONUS,
+    checkpointsPassed: 0,
+    lastCheckpointSegment: 0,
+    timeBonusFlash: 2,
   };
 };
 
@@ -116,9 +156,11 @@ export const startRace = (state: TimeChallengeState): TimeChallengeState => ({
   currentTime: state.timeLimit,
   score: 0,
   lap: 1,
+  checkpointsPassed: 0,
+  lastCheckpointSegment: 0,
   isPaused: false,
   isGameOver: false,
-  lastCheckpointTime: state.timeLimit,
+  timeBonusFlash: 0,
 });
 
 export const pauseGame = (state: TimeChallengeState): TimeChallengeState => ({

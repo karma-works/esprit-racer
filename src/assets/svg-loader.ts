@@ -46,11 +46,11 @@ export const SPRITE_SVG_MAP: Record<string, string> = {
   SEMI: "truck-semi.svg",
   TRUCK: "truck-jeep.svg",
   PLAYER_STRAIGHT: "player-car.svg",
-  PLAYER_LEFT: "player-car.svg",
-  PLAYER_RIGHT: "player-car.svg",
+  PLAYER_LEFT: "player-car-left.svg",
+  PLAYER_RIGHT: "player-car-right.svg",
   PLAYER_UPHILL_STRAIGHT: "player-car.svg",
-  PLAYER_UPHILL_LEFT: "player-car.svg",
-  PLAYER_UPHILL_RIGHT: "player-car.svg",
+  PLAYER_UPHILL_LEFT: "player-car-left.svg",
+  PLAYER_UPHILL_RIGHT: "player-car-right.svg",
 };
 
 const DEFAULT_CONFIG: SpriteLoaderConfig = {
@@ -206,6 +206,8 @@ export const preloadGameSprites = async (): Promise<void> => {
 
   const sprites = [
     { path: "player-car.svg", scales: largeScales },
+    { path: "player-car-left.svg", scales: largeScales },
+    { path: "player-car-right.svg", scales: largeScales },
     { path: "background-level-1.svg", scales: [1, 2] },
     { path: "background.svg", scales: [1, 2] },
     { path: "main-menu.svg", scales: [1.5, 2] },
