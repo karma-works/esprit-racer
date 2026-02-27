@@ -433,8 +433,25 @@ export const MUSIC_TRACKS: MusicTrack[] = [
 
 const MUSIC_CHANNELS = MUSIC_TRACKS;
 
+const THEME_LIST = [
+  { id: "night", name: "NIGHT" },
+  { id: "fog", name: "FOG" },
+  { id: "snow", name: "SNOW" },
+  { id: "storm", name: "STORM" },
+  { id: "desert", name: "DESERT" },
+  { id: "future", name: "FUTURE" },
+  { id: "marsh", name: "MARSH" },
+  { id: "mountains", name: "MOUNTAINS" },
+  { id: "lakes", name: "LAKES" },
+  { id: "country", name: "COUNTRY" },
+  { id: "city", name: "CITY" },
+  { id: "roadworks", name: "ROADWORKS" },
+  { id: "windy", name: "WINDY" },
+];
+
 export class MusicSelectionScreen implements UIScreen {
   private selectedIndex: number = 0;
+  private themeIndex: number = 0;
 
   constructor(
     private width: number,
@@ -449,6 +466,10 @@ export class MusicSelectionScreen implements UIScreen {
     return this.getSelectedTrack().id;
   }
 
+  getSelectedThemeId(): string {
+    return THEME_LIST[this.themeIndex]?.id ?? "night";
+  }
+
   render(ctx: CanvasRenderingContext2D, state: TimeChallengeState): void {
     const scale = this.width / 800;
     const musicSvg = globalSpriteCache.get("music-selection.svg", scale);
@@ -459,15 +480,16 @@ export class MusicSelectionScreen implements UIScreen {
       ctx.fillRect(0, 0, this.width, this.height);
     }
 
+    const centerX = this.width / 2;
+
     const currentChannel = MUSIC_CHANNELS[this.selectedIndex];
     if (currentChannel) {
-      const centerX = this.width / 2;
-      const displayY = 110 * (this.height / 600);
+      const displayY = 80 * (this.height / 600);
 
       ctx.fillStyle = "rgba(0, 0, 0, 0.6)";
       ctx.fillRect(centerX - 200, displayY - 30, 400, 50);
 
-      ctx.font = `bold ${28 * (this.height / 600)}px monospace`;
+      ctx.font = `bold ${24 * (this.height / 600)}px monospace`;
       ctx.fillStyle = "#ff8c00";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
@@ -477,16 +499,33 @@ export class MusicSelectionScreen implements UIScreen {
       ctx.shadowBlur = 0;
     }
 
+    const currentTheme = THEME_LIST[this.themeIndex];
+    if (currentTheme) {
+      const displayY = 150 * (this.height / 600);
+
+      ctx.fillStyle = "rgba(0, 0, 0, 0.6)";
+      ctx.fillRect(centerX - 200, displayY - 30, 400, 50);
+
+      ctx.font = `bold ${24 * (this.height / 600)}px monospace`;
+      ctx.fillStyle = "#00ff88";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.shadowColor = "#00ff88";
+      ctx.shadowBlur = 10;
+      ctx.fillText(`TRACK: ${currentTheme.name}`, centerX, displayY);
+      ctx.shadowBlur = 0;
+    }
+
     ctx.fillStyle = "rgba(0, 0, 0, 0.7)";
-    ctx.fillRect(this.width / 2 - 160, this.height - 80, 320, 40);
-    ctx.font = `bold ${16 * (this.height / 600)}px monospace`;
+    ctx.fillRect(this.width / 2 - 200, this.height - 80, 400, 50);
+    ctx.font = `bold ${14 * (this.height / 600)}px monospace`;
     ctx.fillStyle = "#ff8c00";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.fillText(
-      "LEFT/RIGHT: SELECT   SPACE/ENTER: START",
+      "UP/DOWN: THEME   LEFT/RIGHT: MUSIC   SPACE: START",
       this.width / 2,
-      this.height - 60,
+      this.height - 55,
     );
   }
 
@@ -495,9 +534,11 @@ export class MusicSelectionScreen implements UIScreen {
   }
 
   handleKeyDown(keyCode: number): string | null {
-    const { LEFT, RIGHT, SPACE } = {
+    const { LEFT, RIGHT, UP, DOWN, SPACE } = {
       LEFT: 37,
       RIGHT: 39,
+      UP: 38,
+      DOWN: 40,
       SPACE: 32,
     };
 
@@ -511,6 +552,11 @@ export class MusicSelectionScreen implements UIScreen {
         MUSIC_CHANNELS.length;
     } else if (keyCode === RIGHT) {
       this.selectedIndex = (this.selectedIndex + 1) % MUSIC_CHANNELS.length;
+    } else if (keyCode === UP) {
+      this.themeIndex =
+        (this.themeIndex - 1 + THEME_LIST.length) % THEME_LIST.length;
+    } else if (keyCode === DOWN) {
+      this.themeIndex = (this.themeIndex + 1) % THEME_LIST.length;
     }
 
     return null;

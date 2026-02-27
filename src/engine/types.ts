@@ -115,3 +115,126 @@ export interface KeyBinding {
   mode: "down" | "up";
   action: () => void;
 }
+
+export interface ParticleConfig {
+  density: number;
+  speed: number;
+  direction: number;
+  sprite?: string;
+}
+
+export interface LightningConfig {
+  interval: number;
+  duration: number;
+  flashIntensity: number;
+}
+
+export interface WindConfig {
+  baseForce: number;
+  gustInterval: number;
+  gustDuration: number;
+  maxGustForce: number;
+  direction: number;
+}
+
+export interface ThemeEffects {
+  fogDensity: number;
+  fogStart: number;
+  lightning?: LightningConfig;
+  rain?: ParticleConfig;
+  snow?: ParticleConfig;
+  heatHaze?: boolean;
+  wind?: WindConfig;
+}
+
+export interface ThemePhysics {
+  grip: number;
+  offRoadGrip: number;
+  maxSpeed: number;
+  acceleration: number;
+  brakeForce: number;
+  windForce?: number;
+  windDirection?: number;
+  jumpZones?: boolean;
+  turboZones?: boolean;
+  slippery?: boolean;
+}
+
+export interface ThemeFilters {
+  global: string;
+  background: string;
+  road: string;
+}
+
+export interface LevelTheme {
+  id: string;
+  name: string;
+  description: string;
+  colors: {
+    sky: string;
+    fog: string;
+    road: SegmentColor;
+  };
+  effects: ThemeEffects;
+  physics: ThemePhysics;
+  filters: ThemeFilters;
+  background: string;
+  spriteOverrides?: Record<string, string>;
+}
+
+export interface WindState {
+  currentForce: number;
+  currentDirection: number;
+  gustTimer: number;
+  gusting: boolean;
+  gustDuration: number;
+}
+
+export interface JumpState {
+  active: boolean;
+  startTime: number;
+  duration: number;
+  peakHeight: number;
+}
+
+export interface Particle {
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  life: number;
+  sprite?: string;
+  size: number;
+}
+
+export interface Tumbleweed {
+  x: number;
+  z: number;
+  rotation: number;
+  speed: number;
+  direction: number;
+}
+
+export interface OilSlick {
+  offset: number;
+  z: number;
+}
+
+export interface TurboZone {
+  z: number;
+  length: number;
+  multiplier: number;
+}
+
+export interface LaserObstacle {
+  z: number;
+  timing: number;
+  active: boolean;
+  interval: number;
+}
+
+export interface JumpZone {
+  z: number;
+  length: number;
+  height: number;
+}

@@ -249,11 +249,74 @@ export const fogLayer = (
   width: number,
   height: number,
   fog: number,
+  fogColor: string = COLORS.FOG,
 ): void => {
   if (fog < 1) {
     ctx.globalAlpha = 1 - fog;
-    ctx.fillStyle = COLORS.FOG;
+    ctx.fillStyle = fogColor;
     ctx.fillRect(x, y, width, height);
     ctx.globalAlpha = 1;
   }
+};
+
+export const lightningFlash = (
+  ctx: CanvasRenderingContext2D,
+  width: number,
+  height: number,
+  intensity: number,
+): void => {
+  ctx.globalAlpha = intensity;
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(0, 0, width, height);
+  ctx.globalAlpha = 1;
+};
+
+export const renderParticles = (
+  ctx: CanvasRenderingContext2D,
+  particles: Array<{
+    x: number;
+    y: number;
+    life: number;
+    size: number;
+    sprite?: string;
+    vx: number;
+    vy: number;
+  }>,
+  cachedSprites: Map<string, { canvas: HTMLCanvasElement }>,
+): void => {
+  for (const p of particles) {
+    ctx.globalAlpha = p.life;
+    if (p.sprite && cachedSprites.has(p.sprite)) {
+      const cached = cachedSprites.get(p.sprite)!;
+      ctx.drawImage(
+        cached.canvas,
+        p.x - p.size,
+        p.y - p.size,
+        p.size * 2,
+        p.size * 2,
+      );
+    } else {
+      ctx.fillStyle = p.sprite?.includes("rain")
+        ? "rgba(150,180,220,0.6)"
+        : "#ffffff";
+      const h = p.sprite?.includes("rain") ? p.size * 4 : p.size;
+      ctx.fillRect(p.x, p.y, p.size, h);
+    }
+    ctx.globalAlpha = 1;
+  }
+};
+
+export const renderTumbleweed = (
+  ctx: CanvasRenderingContext2D,
+  tumbleweed: { x: number; y: number; rotation: number; scale: number },
+  cachedSprite: { canvas: HTMLCanvasElement } | null,
+): void => {
+  if (!cachedSprite) return;
+
+  ctx.save();
+  ctx.translate(tumbleweed.x, tumbleweed.y);
+  ctx.rotate(tumbleweed.rotation);
+  const size = 40 * tumbleweed.scale;
+  ctx.drawImage(cachedSprite.canvas, -size / 2, -size / 2, size, size);
+  ctx.restore();
 };

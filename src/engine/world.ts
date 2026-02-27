@@ -4,6 +4,12 @@ import type {
   InputState,
   Car,
   Segment,
+  LevelTheme,
+  WindState,
+  JumpState,
+  Particle,
+  Tumbleweed,
+  ThemePhysics,
 } from "./types";
 import { SPRITE_SCALE, SPRITE_GROUPS, KEY } from "./constants";
 import * as Util from "./utils/math";
@@ -13,6 +19,7 @@ import * as Camera from "./camera";
 
 export interface WorldState {
   config: GameConfig;
+  baseConfig: GameConfig;
   player: PlayerState;
   input: InputState;
   cars: Car[];
@@ -24,6 +31,14 @@ export interface WorldState {
   currentLapTime: number;
   lastLapTime: number | null;
   fastLapTime: number | null;
+  currentTheme: LevelTheme | null;
+  windState: WindState;
+  jumpState: JumpState;
+  particles: Particle[];
+  tumbleweeds: Tumbleweed[];
+  slideVelocity: number;
+  lightningActive: boolean;
+  lightningTimer: number;
 }
 
 export const createDefaultConfig = (): GameConfig => ({
@@ -52,11 +67,220 @@ export const createDefaultPlayer = (playerZ: number): PlayerState => ({
   speed: 0,
 });
 
+export const applyThemePhysics = (
+  baseConfig: GameConfig,
+  physics: ThemePhysics,
+): GameConfig => {
+  return {
+    ...baseConfig,
+    maxSpeed: baseConfig.maxSpeed * physics.maxSpeed,
+    accel: baseConfig.accel * physics.acceleration,
+    braking: baseConfig.braking * physics.brakeForce,
+    offRoadDecel: baseConfig.offRoadDecel * physics.offRoadGrip,
+    centrifugal: baseConfig.centrifugal * physics.grip,
+  };
+};
+
+export const setTheme = (world: WorldState, theme: LevelTheme): void => {
+  world.currentTheme = theme;
+  world.config = applyThemePhysics(world.baseConfig, theme.physics);
+  world.windState = createDefaultWindState();
+  world.jumpState = createDefaultJumpState();
+  world.particles = [];
+  world.tumbleweeds = [];
+  world.slideVelocity = 0;
+  world.lightningActive = false;
+  world.lightningTimer = 0;
+};
+
+export const updateWind = (world: WorldState, dt: number): void => {
+  const theme = world.currentTheme;
+  if (!theme?.effects.wind) return;
+
+  const wind = world.windState;
+  const config = theme.effects.wind;
+
+  wind.gustTimer += dt * 1000;
+
+  if (!wind.gusting && wind.gustTimer > config.gustInterval) {
+    if (Math.random() < 0.1) {
+      wind.gusting = true;
+      wind.gustDuration = config.gustDuration + Math.random() * 1000;
+      wind.currentDirection = Math.random() > 0.5 ? 1 : -1;
+      wind.currentForce = config.maxGustForce;
+    }
+    wind.gustTimer = 0;
+  }
+
+  if (wind.gusting && wind.gustTimer > wind.gustDuration) {
+    wind.gusting = false;
+    wind.currentForce = config.baseForce;
+    wind.gustTimer = 0;
+  }
+
+  world.player.x += wind.currentForce * wind.currentDirection * dt * 0.5;
+};
+
+export const updateJump = (world: WorldState, dt: number): void => {
+  const jump = world.jumpState;
+  if (!jump.active) return;
+
+  const elapsed = (performance.now() - jump.startTime) / 1000;
+  const progress = elapsed / jump.duration;
+
+  if (progress >= 1) {
+    jump.active = false;
+    jump.peakHeight = 0;
+    spawnWaterSplash(world, world.player.x);
+  } else {
+    jump.peakHeight = 4 * jump.peakHeight * (progress - progress * progress);
+  }
+};
+
+export const spawnWaterSplash = (world: WorldState, x: number): void => {
+  for (let i = 0; i < 8; i++) {
+    world.particles.push({
+      x,
+      y: 0,
+      vx: (Math.random() - 0.5) * 3,
+      vy: -Math.random() * 5,
+      life: 0.5,
+      sprite: "water-splash.svg",
+      size: 3 + Math.random() * 4,
+    });
+  }
+};
+
+export const updateParticles = (world: WorldState, dt: number): void => {
+  const theme = world.currentTheme;
+  const windX = world.windState.currentForce * world.windState.currentDirection;
+
+  for (const p of world.particles) {
+    p.x += (p.vx + windX * 50) * dt;
+    p.y += p.vy * dt;
+    p.life -= dt * 0.8;
+  }
+
+  world.particles = world.particles.filter(
+    (p) => p.life > 0 && p.y < world.config.height,
+  );
+
+  if (theme?.effects.snow && Math.random() < theme.effects.snow.density * dt) {
+    world.particles.push({
+      x: Math.random() * world.config.width,
+      y: -10,
+      vx: theme.effects.snow.direction * 30,
+      vy: theme.effects.snow.speed * 80,
+      life: 1,
+      sprite: "snowflake.svg",
+      size: 2 + Math.random() * 3,
+    });
+  }
+
+  if (theme?.effects.rain && Math.random() < theme.effects.rain.density * dt) {
+    world.particles.push({
+      x: Math.random() * world.config.width,
+      y: -10,
+      vx: theme.effects.rain.direction * 50,
+      vy: theme.effects.rain.speed * 200,
+      life: 0.8,
+      sprite: "raindrop.svg",
+      size: 1 + Math.random() * 2,
+    });
+  }
+};
+
+export const updateTumbleweeds = (world: WorldState, dt: number): void => {
+  if (!world.currentTheme?.effects.wind) return;
+
+  for (const weed of world.tumbleweeds) {
+    weed.x += weed.speed * weed.direction * dt;
+    weed.rotation += weed.speed * 3 * dt;
+  }
+
+  world.tumbleweeds = world.tumbleweeds.filter(
+    (w) => Math.abs(w.x) < 2 && w.z > world.player.position - 500,
+  );
+
+  if (Math.random() < 0.01) {
+    world.tumbleweeds.push({
+      x: Math.random() > 0.5 ? -1.5 : 1.5,
+      z:
+        world.player.position +
+        world.config.drawDistance * world.config.segmentLength,
+      rotation: 0,
+      speed: 0.3 + Math.random() * 0.4,
+      direction:
+        world.windState.currentDirection || (Math.random() > 0.5 ? 1 : -1),
+    });
+  }
+
+  for (const weed of world.tumbleweeds) {
+    if (Math.abs(world.player.x - weed.x) < 0.15) {
+      world.player.x += weed.direction * 0.02;
+      world.player.speed *= 0.995;
+    }
+  }
+};
+
+export const updateLightning = (world: WorldState, dt: number): void => {
+  const theme = world.currentTheme;
+  if (!theme?.effects.lightning) return;
+
+  const config = theme.effects.lightning;
+  world.lightningTimer += dt * 1000;
+
+  if (world.lightningActive) {
+    if (world.lightningTimer > config.duration) {
+      world.lightningActive = false;
+      world.lightningTimer = 0;
+    }
+  } else if (world.lightningTimer > config.interval && Math.random() < 0.05) {
+    world.lightningActive = true;
+    world.lightningTimer = 0;
+  }
+};
+
+export const updateSlidePhysics = (world: WorldState, dt: number): void => {
+  const theme = world.currentTheme;
+  if (!theme?.physics.slippery) {
+    world.slideVelocity *= 0.9;
+    return;
+  }
+
+  const { input, player } = world;
+
+  if (input.left) {
+    world.slideVelocity -= 0.02 * (1 - theme.physics.grip);
+  } else if (input.right) {
+    world.slideVelocity += 0.02 * (1 - theme.physics.grip);
+  }
+
+  player.x += world.slideVelocity * dt * 20;
+  world.slideVelocity *= 0.98;
+  world.slideVelocity = Util.limit(world.slideVelocity, -0.3, 0.3);
+};
+
 export const createDefaultInput = (): InputState => ({
   left: false,
   right: false,
   faster: false,
   slower: false,
+});
+
+export const createDefaultWindState = (): WindState => ({
+  currentForce: 0,
+  currentDirection: 0,
+  gustTimer: 0,
+  gusting: false,
+  gustDuration: 0,
+});
+
+export const createDefaultJumpState = (): JumpState => ({
+  active: false,
+  startTime: 0,
+  duration: 0,
+  peakHeight: 0,
 });
 
 export const createWorld = (): WorldState => {
@@ -73,6 +297,7 @@ export const createWorld = (): WorldState => {
 
   return {
     config,
+    baseConfig: { ...config },
     player: createDefaultPlayer(playerZ),
     input: createDefaultInput(),
     cars: [],
@@ -84,6 +309,14 @@ export const createWorld = (): WorldState => {
     currentLapTime: 0,
     lastLapTime: null,
     fastLapTime: null,
+    currentTheme: null,
+    windState: createDefaultWindState(),
+    jumpState: createDefaultJumpState(),
+    particles: [],
+    tumbleweeds: [],
+    slideVelocity: 0,
+    lightningActive: false,
+    lightningTimer: 0,
   };
 };
 

@@ -1,4 +1,5 @@
-import { KEY } from "./engine/constants";
+import { KEY, THEMES, THEME_ORDER, COLORS } from "./engine/constants";
+import type { LevelTheme } from "./engine/types";
 import {
   createWorld,
   update,
@@ -6,6 +7,13 @@ import {
   handleKeyUp,
   resetCars,
   getMirrorCars,
+  setTheme,
+  updateWind,
+  updateJump,
+  updateParticles,
+  updateTumbleweeds,
+  updateLightning,
+  updateSlidePhysics,
 } from "./engine/world";
 import * as Render from "./engine/renderer/canvas";
 import * as SvgRender from "./engine/renderer/sprite";
@@ -93,6 +101,11 @@ let countdownTimer = 0;
 
 let isFullscreen = false;
 const TRAFFIC_CAR_COUNT = 20;
+let selectedThemeId: string = "night";
+
+const getSelectedTheme = (): LevelTheme => {
+  return THEMES[selectedThemeId] ?? THEMES["night"]!;
+};
 
 const setCanvasSize = (width?: number, height?: number) => {
   const viewportWidth = width ?? window.innerWidth;
@@ -211,8 +224,16 @@ const getPlayerCarSprite = (steer: number): CachedSprite | null => {
   return svgPlayerCarStraight;
 };
 
+const adjustColor = (hex: string, amount: number): string => {
+  const num = parseInt(hex.replace("#", ""), 16);
+  const r = Math.min(255, Math.max(0, (num >> 16) + amount));
+  const g = Math.min(255, Math.max(0, ((num >> 8) & 0x00ff) + amount));
+  const b = Math.min(255, Math.max(0, (num & 0x0000ff) + amount));
+  return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
+};
+
 const renderRacing = () => {
-  const { config, player, skyOffset } = world;
+  const { config, player, skyOffset, currentTheme } = world;
   const {
     width,
     height,
@@ -224,6 +245,13 @@ const renderRacing = () => {
   } = config;
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  const theme = currentTheme ?? getSelectedTheme();
+  const fogColor = theme.colors.fog;
+  const skyColor = theme.colors.sky;
+
+  ctx.fillStyle = skyColor;
+  ctx.fillRect(0, 0, width, height / 2);
 
   const baseSegment = Segments.findSegment(player.position, segmentLength);
   const basePercent = Util.percentRemaining(player.position, segmentLength);
@@ -246,6 +274,10 @@ const renderRacing = () => {
   let dx = -(baseSegment.curve * basePercent);
 
   if (svgBackground) {
+    ctx.save();
+    if (theme.filters.background) {
+      ctx.filter = theme.filters.background;
+    }
     SvgRender.svgBackground(
       ctx,
       svgBackground,
@@ -254,7 +286,18 @@ const renderRacing = () => {
       skyOffset,
       resolution * 0.001 * playerY,
     );
+    ctx.restore();
   }
+
+  const themeColors = {
+    light: theme.colors.road,
+    dark: {
+      ...theme.colors.road,
+      road: adjustColor(theme.colors.road.road, -15),
+      grass: adjustColor(theme.colors.road.grass, -15),
+      rumble: adjustColor(theme.colors.road.rumble, -15),
+    },
+  };
 
   for (let n = 0; n < drawDistance; n++) {
     const segmentIndex = (baseSegment.index + n) % world.segments.length;
@@ -262,13 +305,16 @@ const renderRacing = () => {
     if (!segment) continue;
 
     segment.looped = segment.index < baseSegment.index;
-    segment.fog = Util.exponentialFog(n / drawDistance, fogDensity);
+    segment.fog = Util.exponentialFog(
+      n / drawDistance,
+      theme.effects.fogDensity,
+    );
     segment.clip = maxy;
 
     Util.project(
       segment.p1,
       player.x * roadWidth - x,
-      playerY + cameraHeight,
+      playerY + cameraHeight - (world.jumpState.peakHeight || 0) * 50,
       player.position - (segment.looped ? world.trackLength : 0),
       cameraDepth,
       width,
@@ -278,7 +324,7 @@ const renderRacing = () => {
     Util.project(
       segment.p2,
       player.x * roadWidth - x - dx,
-      playerY + cameraHeight,
+      playerY + cameraHeight - (world.jumpState.peakHeight || 0) * 50,
       player.position - (segment.looped ? world.trackLength : 0),
       cameraDepth,
       width,
@@ -297,6 +343,11 @@ const renderRacing = () => {
       continue;
     }
 
+    const segmentColor =
+      Math.floor(segment.index / config.rumbleLength) % 2
+        ? themeColors.light
+        : themeColors.dark;
+
     Render.segment(
       ctx,
       width,
@@ -308,7 +359,17 @@ const renderRacing = () => {
       segment.p2.screen.y,
       segment.p2.screen.w ?? 0,
       segment.fog ?? 0,
-      segment.color,
+      segmentColor,
+    );
+
+    Render.fogLayer(
+      ctx,
+      0,
+      segment.p2.screen.y,
+      width,
+      segment.p1.screen.y - segment.p2.screen.y,
+      segment.fog ?? 0,
+      fogColor,
     );
 
     maxy = segment.p1.screen.y;
@@ -449,6 +510,34 @@ const renderRacing = () => {
     }
   }
 
+  Render.renderParticles(ctx, world.particles, new Map());
+
+  for (const weed of world.tumbleweeds) {
+    const relZ = weed.z - player.position;
+    if (relZ > 0 && relZ < 5000) {
+      const scale = 1 - relZ / 5000;
+      const screenY = height * 0.7 + scale * 50;
+      const screenX = width / 2 + weed.x * width * 0.3;
+      const cachedWeed = globalSpriteCache.get("tumbleweed.svg", scale);
+      if (cachedWeed) {
+        Render.renderTumbleweed(
+          ctx,
+          { x: screenX, y: screenY, rotation: weed.rotation, scale },
+          cachedWeed,
+        );
+      }
+    }
+  }
+
+  if (world.lightningActive && theme.effects.lightning) {
+    Render.lightningFlash(
+      ctx,
+      width,
+      height,
+      theme.effects.lightning.flashIntensity,
+    );
+  }
+
   hudState = {
     ...hudState,
     speed,
@@ -503,6 +592,12 @@ const updateGame = (dt: number) => {
 
   const prevLap = world.currentLapTime;
   update(world, dt);
+  updateWind(world, dt);
+  updateJump(world, dt);
+  updateParticles(world, dt);
+  updateTumbleweeds(world, dt);
+  updateLightning(world, dt);
+  updateSlidePhysics(world, dt);
 
   const checkpointResult = checkCheckpoint(
     gameState,
@@ -556,15 +651,24 @@ const goToMusicSelection = async () => {
 
 const startGame = async () => {
   world = createWorld();
+
+  const musicScreen = screens.get("music-select") as
+    | MusicSelectionScreen
+    | undefined;
+
+  if (musicScreen && typeof musicScreen.getSelectedThemeId === "function") {
+    selectedThemeId = musicScreen.getSelectedThemeId();
+  }
+
+  const theme = getSelectedTheme();
+  setTheme(world, theme);
+  canvas.style.filter = theme.filters.global;
   resetCars(world, TRAFFIC_CAR_COUNT);
   gameState = startRace(gameState);
   countdown = 3;
   countdownTimer = 0;
   hudState = createDefaultHudState();
 
-  const musicScreen = screens.get("music-select") as
-    | MusicSelectionScreen
-    | undefined;
   const selectedTrack = musicScreen?.getSelectedTrack();
   if (selectedTrack) {
     stopGameMusic();

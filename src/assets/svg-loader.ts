@@ -203,11 +203,13 @@ export const getSpriteByName = (
 export const preloadGameSprites = async (): Promise<void> => {
   const baseScales = [0.5, 1, 1.5, 2, 3];
   const largeScales = [0.5, 1, 1.5, 2, 3, 4];
+  const particleScales = [0.5, 1, 1.5, 2];
 
   const sprites = [
     { path: "player-car.svg", scales: largeScales },
     { path: "player-car-left.svg", scales: largeScales },
     { path: "player-car-right.svg", scales: largeScales },
+    { path: "car-jump.svg", scales: largeScales },
     { path: "background-level-1.svg", scales: [1, 2] },
     { path: "background.svg", scales: [1, 2] },
     { path: "main-menu.svg", scales: [1.5, 2] },
@@ -237,6 +239,16 @@ export const preloadGameSprites = async (): Promise<void> => {
     { path: "car-brown.svg", scales: largeScales },
     { path: "truck-semi.svg", scales: largeScales },
     { path: "truck-jeep.svg", scales: largeScales },
+    { path: "snowflake.svg", scales: particleScales },
+    { path: "raindrop.svg", scales: particleScales },
+    { path: "lightning.svg", scales: baseScales },
+    { path: "tumbleweed.svg", scales: baseScales },
+    { path: "traffic-cone.svg", scales: baseScales },
+    { path: "barrier.svg", scales: baseScales },
+    { path: "oil-slick.svg", scales: baseScales },
+    { path: "water-splash.svg", scales: particleScales },
+    { path: "turbo-zone.svg", scales: baseScales },
+    { path: "laser-beam.svg", scales: baseScales },
   ];
 
   await Promise.all(
