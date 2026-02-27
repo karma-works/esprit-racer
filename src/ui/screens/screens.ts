@@ -569,26 +569,26 @@ export interface MusicTrack {
 }
 
 export const MUSIC_TRACKS: MusicTrack[] = [
-  { id: "esprit", name: "ESPRIT THEME", file: "/sound/Esprit_Theme.mp3" },
+  { id: "esprit", name: "ESPRIT THEME", file: "./sound/Esprit_Theme.mp3" },
   {
     id: "velocity",
     name: "VELOCITY VORTEX",
-    file: "/sound/Velocity_Vortex.mp3",
+    file: "./sound/Velocity_Vortex.mp3",
   },
   {
     id: "nebula",
     name: "NEBULA NAVIGATOR",
-    file: "/sound/Nebula_Navigator.mp3",
+    file: "./sound/Nebula_Navigator.mp3",
   },
   {
     id: "neon",
     name: "NEON DRIVE",
-    file: "/sound/Neon_Drive.mp3",
+    file: "./sound/Neon_Drive.mp3",
   },
   {
     id: "neon2",
     name: "NEON VELOCITY",
-    file: "/sound/Neon_Velocity.mp3",
+    file: "./sound/Neon_Velocity.mp3",
   },
   {
     id: "silent",
