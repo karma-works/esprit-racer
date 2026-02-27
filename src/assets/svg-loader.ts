@@ -54,7 +54,7 @@ export const SPRITE_SVG_MAP: Record<string, string> = {
 };
 
 const DEFAULT_CONFIG: SpriteLoaderConfig = {
-  basePath: "/sprites/",
+  basePath: "./sprites/",
   defaultScales: [0.25, 0.5, 1, 2],
 };
 
