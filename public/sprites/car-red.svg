@@ -5,8 +5,9 @@
    height="80"
    version="1.1"
    id="svg146"
-   sodipodi:docname="sprites.svg"
+   sodipodi:docname="car-red.svg"
    inkscape:export-batch-name="sprites"
+   inkscape:version="1.4.3 (0d15f75, 2025-12-25)"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
@@ -19,7 +20,16 @@
      inkscape:showpageshadow="2"
      inkscape:pageopacity="0.0"
      inkscape:pagecheckerboard="0"
-     inkscape:deskcolor="#d1d1d1">
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="9.305983"
+     inkscape:cx="47.28141"
+     inkscape:cy="40.028012"
+     inkscape:window-width="3006"
+     inkscape:window-height="1186"
+     inkscape:window-x="0"
+     inkscape:window-y="30"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="svg146">
     <inkscape:page
        x="0"
        y="0"
@@ -164,18 +174,6 @@
   <!-- Flat Dark Rocks -->
   <!-- Prickly Pear Cactus -->
   <!-- Bulky Reddish-Brown Boulder -->
-  <g
-     transform="translate(41.961524,80)"
-     id="g108">
-    <path
-       d="m -40,0 c -10,-50 20,-80 50,-80 30,0 50,40 40,80 z"
-       fill="#8b4513"
-       id="path107" />
-    <path
-       d="m -30,0 c -5,-40 20,-60 45,-60 20,0 30,30 25,60 z"
-       fill="#a0522d"
-       id="path108" />
-  </g>
   <!-- ========================================== -->
   <!-- RIGHT COLUMN (VEHICLES - Rear Perspective) -->
   <!-- ========================================== -->
@@ -186,7 +184,7 @@
   <!-- Brown Car -->
   <!-- Largest Scale Red Sports Car (Closest to camera) -->
   <g
-     transform="matrix(1.4,0,0,1.4,81.961524,60)"
+     transform="matrix(1.0489713,0,0,1.0489713,47.252671,52.544821)"
      id="g143">
     <use
        href="#ferrari"
