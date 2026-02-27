@@ -7,10 +7,6 @@ settings:
 importers:
 
   .:
-    dependencies:
-      '@pinkkis/pasuuna-player':
-        specifier: ^0.5.2
-        version: 0.5.2
     devDependencies:
       '@vitest/coverage-v8':
         specifier: ^4.0.18
@@ -273,9 +269,6 @@ packages:
 
   '@jridgewell/trace-mapping@0.3.31':
     resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
-
-  '@pinkkis/pasuuna-player@0.5.2':
-    resolution: {integrity: sha512-1qsp5M33Nv/rKNIaA2MqndSge5rwVgNNChDuR7RHtIMREYDxD0yE2EPovbwvXH2sUZkdM3cDwXS/NvXg2YXxfw==}
 
   '@rollup/rollup-android-arm-eabi@4.59.0':
     resolution: {integrity: sha512-upnNBkA6ZH2VKGcBj9Fyl9IGNPULcjXRlg0LLeaioQWueH30p6IXtJEbKAgvyv+mJaMxSm1l6xwDXYjpEMiLMg==}
@@ -673,9 +666,6 @@ packages:
   symbol-tree@3.2.4:
     resolution: {integrity: sha512-9QNk5KwDF+Bvz+PyObkmSYjI5ksVUYtjW7AU22r2NKcfLJcXp96hkDWU3+XndOsUb+AQ9QhfzfCT2O+CNWT5Tw==}
 
-  tiny-emitter@2.1.0:
-    resolution: {integrity: sha512-NB6Dk1A9xgQPMoGqC5CVXn123gWyte215ONT5Pp5a0yt4nlEoO1ZWeCwpncaekPHXO60i47ihFnZPiRPjRMq4Q==}
-
   tinybench@2.9.0:
     resolution: {integrity: sha512-0+DUvqWMValLmha6lr4kD8iAMK1HzV0/aKnCtWb9v9641TnP/MFb7Pc2bxoxQjTXAErryXVgUOfv2YqNllqGeg==}
 
@@ -792,9 +782,6 @@ packages:
   w3c-xmlserializer@5.0.0:
     resolution: {integrity: sha512-o8qghlI8NZHU1lLPrpi2+Uq7abh4GGPpYANlalzWxyWteJOCsr/P+oPBA49TOLu5FTZO4d3F9MnWJfiMo4BkmA==}
     engines: {node: '>=18'}
-
-  waaclock@0.5.5:
-    resolution: {integrity: sha512-1bqXR843g7eNTYRoZ/Vgf3tRBmvH4diSFDOcfioDTjqNndNgVD3F/p34lO1/tKN1kZFV8v77dE1QGKJJELbn+Q==}
 
   webidl-conversions@8.0.1:
     resolution: {integrity: sha512-BMhLD/Sw+GbJC21C/UgyaZX41nPt8bUTg+jWyDeg7e7YN4xOM05YPSIXceACnXVtqyEw/LMClUQMtMZ+PGGpqQ==}
@@ -971,11 +958,6 @@ snapshots:
     dependencies:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
-
-  '@pinkkis/pasuuna-player@0.5.2':
-    dependencies:
-      tiny-emitter: 2.1.0
-      waaclock: 0.5.5
 
   '@rollup/rollup-android-arm-eabi@4.59.0':
     optional: true
@@ -1366,8 +1348,6 @@ snapshots:
 
   symbol-tree@3.2.4: {}
 
-  tiny-emitter@2.1.0: {}
-
   tinybench@2.9.0: {}
 
   tinyexec@1.0.2: {}
@@ -1448,8 +1428,6 @@ snapshots:
   w3c-xmlserializer@5.0.0:
     dependencies:
       xml-name-validator: 5.0.0
-
-  waaclock@0.5.5: {}
 
   webidl-conversions@8.0.1: {}
 
