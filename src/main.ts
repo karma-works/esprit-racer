@@ -909,27 +909,36 @@ const renderRacingForViewport = (
         const otherInput = world.inputs[otherIndex];
         if (!otherPlayer || !otherInput) continue;
 
-        const otherPlayerSegment = Segments.findSegment(
-          otherPlayer.position + playerZ,
-          segmentLength,
-        );
+        // Calculate which segment the other player is on
+        const otherPlayerZ = otherPlayer.position + playerZ;
+        const otherPlayerSegmentIndex =
+          Math.floor(otherPlayerZ / segmentLength) % world.segments.length;
 
-        if (segment === otherPlayerSegment) {
+        if (segment.index === otherPlayerSegmentIndex) {
           const otherPlayerPercent = Util.percentRemaining(
-            otherPlayer.position + playerZ,
+            otherPlayerZ,
             segmentLength,
           );
-          const otherPlayerScale = cameraDepth / playerZ;
+
+          // Use the segment's scale which accounts for distance from camera
+          const otherPlayerScale = Util.interpolate(
+            segment.p1.screen.scale,
+            segment.p2.screen.scale,
+            otherPlayerPercent,
+          );
+
+          // Calculate Y position based on the segment's projected coordinates
           const otherPlayerScreenY =
             viewportHeight / 2 -
             (otherPlayerScale *
               Util.interpolate(
-                otherPlayerSegment.p1.camera.y,
-                otherPlayerSegment.p2.camera.y,
+                segment.p1.camera.y,
+                segment.p2.camera.y,
                 otherPlayerPercent,
               ) *
               viewportHeight) /
               2;
+
           const otherSpeedPercent = otherPlayer.speed / config.maxSpeed;
           const otherBounce =
             1.5 *
@@ -945,8 +954,13 @@ const renderRacingForViewport = (
 
           if (otherPlayerSprite) {
             // Calculate lateral position based on the difference in x positions
+            // Scale by viewport width and road width to get screen coordinates
             const xOffset =
-              (otherPlayer.x - player.x) * roadWidth * otherPlayerScale;
+              (otherPlayer.x - player.x) *
+              roadWidth *
+              viewportWidth *
+              otherPlayerScale *
+              0.5;
             SvgRender.svgPlayer(
               ctx,
               otherPlayerSprite,
@@ -978,11 +992,25 @@ const renderRacingForViewport = (
   );
 
   let playerPosition = 1;
+
+  // Count traffic cars ahead
   for (const car of world.cars) {
     if (car.z > player.position) {
       playerPosition++;
     }
   }
+
+  // Count other human players ahead
+  for (let i = 0; i < playerCount; i++) {
+    if (i === playerIndex) continue;
+    const otherPlayer = world.players[i];
+    if (otherPlayer && otherPlayer.position > player.position) {
+      playerPosition++;
+    }
+  }
+
+  // Calculate total positions (traffic cars + all human players)
+  const totalPositions = TRAFFIC_CAR_COUNT + playerCount;
 
   renderSplitScreenHud(
     ctx,
@@ -991,15 +1019,15 @@ const renderRacingForViewport = (
     {
       width: viewportWidth,
       height: viewportHeight,
-      x: viewportX,
+      x: 0,
       y: 0,
       playerIndex,
     },
     {
       speed,
       maxSpeed: 300,
-      position: Math.min(playerPosition, TRAFFIC_CAR_COUNT + 1),
-      totalPositions: TRAFFIC_CAR_COUNT + 1,
+      position: Math.min(playerPosition, totalPositions),
+      totalPositions,
       mirrorCars: mirrorCars.slice(0, 3),
       boostMeter: Math.min(1, gameState.currentTime / DEFAULT_TIME_LIMIT),
     },
@@ -1095,7 +1123,7 @@ const updateGame = (dt: number) => {
     }
 
     // Handle player-player collisions
-    resolveAllPlayerCollisions(world.players);
+    resolveAllPlayerCollisions(world.players, world.config.segmentLength);
 
     // Restore first player as default
     world.player = world.players[0]!;

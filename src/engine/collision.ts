@@ -1,4 +1,5 @@
 import type { PlayerState } from "./types";
+import * as Util from "./utils/math";
 
 export interface PlayerCollision {
   p1: number;
@@ -8,18 +9,33 @@ export interface PlayerCollision {
   dz: number;
 }
 
-export const PLAYER_COLLISION_RADIUS = 0.15;
-export const PLAYER_COLLISION_ELASTICITY = 0.5;
+// Player car width for collision detection (similar to traffic cars)
+export const PLAYER_CAR_WIDTH = 0.5;
+// How close players need to be on the track (in segment lengths)
+export const PLAYER_COLLISION_Z_DISTANCE = 200; // segmentLength is typically 200
 
 export const checkPlayerCollision = (
   p1: PlayerState,
   p2: PlayerState,
-  collisionRadius: number = PLAYER_COLLISION_RADIUS,
+  segmentLength: number = 200,
 ): boolean => {
-  const dx = p1.x - p2.x;
-  const dz = p1.position - p2.position;
-  const distance = Math.sqrt(dx * dx + dz * dz);
-  return distance < collisionRadius;
+  // Check if players are close enough on the Z axis (track position)
+  let dz = p1.position - p2.position;
+
+  // Handle track wrapping
+  if (Math.abs(dz) > segmentLength * 100) {
+    // Wrapped around track
+    return false;
+  }
+
+  // Check Z distance
+  if (Math.abs(dz) > PLAYER_COLLISION_Z_DISTANCE) {
+    return false;
+  }
+
+  // Check lateral overlap using same method as traffic cars
+  // Use 0.8 percent overlap like traffic car collision
+  return Util.overlap(p1.x, PLAYER_CAR_WIDTH, p2.x, PLAYER_CAR_WIDTH, 0.8);
 };
 
 export const resolvePlayerCollision = (
@@ -32,39 +48,32 @@ export const resolvePlayerCollision = (
 
   if (distance === 0) return;
 
-  const minDistance = PLAYER_COLLISION_RADIUS;
-  const overlap = minDistance - distance;
-
+  // Push players apart laterally
+  const pushFactor = 0.15;
   const nx = dx / distance;
-  const nz = dz / distance;
 
-  const v1x = p1.speed * 0.01;
-  const v2x = p2.speed * 0.01;
-
-  const v1Parallel = v1x * nx;
-  const v2Parallel = v2x * nx;
-
-  const m1 = 1;
-  const m2 = 1;
-
-  const v1ParallelNew =
-    (v1Parallel * (m1 - m2) + 2 * m2 * v2Parallel) / (m1 + m2);
-  const v2ParallelNew =
-    (v2Parallel * (m2 - m1) + 2 * m1 * v1Parallel) / (m1 + m2);
-
-  const pushFactor = overlap * 0.5;
+  // Push sideways (x direction)
   p1.x += nx * pushFactor;
-  p1.position += nz * pushFactor;
   p2.x -= nx * pushFactor;
-  p2.position -= nz * pushFactor;
 
-  const speedTransfer = (p2.speed - p1.speed) * PLAYER_COLLISION_ELASTICITY;
-  p1.speed = Math.max(0, p1.speed - speedTransfer * 0.5);
-  p2.speed = Math.max(0, p2.speed + speedTransfer * 0.5);
+  // Speed collision effect - similar to traffic cars
+  // If p1 is behind and faster, slow down
+  if (dz > 0 && p1.speed > p2.speed) {
+    // p1 is behind p2 and trying to overtake - slow p1 down
+    p1.speed = p2.speed * 0.9;
+  } else if (dz < 0 && p2.speed > p1.speed) {
+    // p2 is behind p1 and trying to overtake - slow p2 down
+    p2.speed = p1.speed * 0.9;
+  }
+
+  // Minimum speed reduction on any collision
+  p1.speed = Math.max(0, p1.speed * 0.95);
+  p2.speed = Math.max(0, p2.speed * 0.95);
 };
 
 export const checkAllPlayerCollisions = (
   players: PlayerState[],
+  segmentLength: number = 200,
 ): PlayerCollision[] => {
   const collisions: PlayerCollision[] = [];
 
@@ -74,7 +83,7 @@ export const checkAllPlayerCollisions = (
       const p2 = players[j];
       if (!p1 || !p2) continue;
 
-      if (checkPlayerCollision(p1, p2)) {
+      if (checkPlayerCollision(p1, p2, segmentLength)) {
         const dx = p1.x - p2.x;
         const dz = p1.position - p2.position;
         const distance = Math.sqrt(dx * dx + dz * dz);
@@ -93,8 +102,11 @@ export const checkAllPlayerCollisions = (
   return collisions;
 };
 
-export const resolveAllPlayerCollisions = (players: PlayerState[]): void => {
-  const collisions = checkAllPlayerCollisions(players);
+export const resolveAllPlayerCollisions = (
+  players: PlayerState[],
+  segmentLength: number = 200,
+): void => {
+  const collisions = checkAllPlayerCollisions(players, segmentLength);
 
   for (const collision of collisions) {
     const p1 = players[collision.p1];
