@@ -527,7 +527,8 @@
        width="230"
        height="85"
        class="box-highlight"
-       id="rect46" />
+       id="rect46"
+       style="stroke:#555555;stroke-opacity:1" />
     <text
        x="15"
        y="32"
@@ -1017,5 +1018,8 @@
      height="100%"
      fill="url(#scanlines)"
      pointer-events="none"
-     id="rect94" />
+     id="rect94"
+     x="0"
+     y="0"
+     style="display:inline" />
 </svg>
