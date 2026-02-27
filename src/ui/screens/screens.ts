@@ -416,11 +416,22 @@ export class MainMenuScreen implements UIScreen {
   }
 }
 
-const MUSIC_CHANNELS = [
-  { id: "channel1", name: "LOTUS III TITLE" },
-  { id: "channel2", name: "ESPRIT TURBO" },
-  { id: "channel3", name: "ESPRIT SE" },
+export interface MusicTrack {
+  id: string;
+  name: string;
+  file: string;
+}
+
+export const MUSIC_TRACKS: MusicTrack[] = [
+  { id: "esprit", name: "ESPRIT THEME", file: "/sound/Esprit_Theme.mp3" },
+  {
+    id: "velocity",
+    name: "VELOCITY VORTEX",
+    file: "/sound/Velocity_Vortex.mp3",
+  },
 ];
+
+const MUSIC_CHANNELS = MUSIC_TRACKS;
 
 export class MusicSelectionScreen implements UIScreen {
   private selectedIndex: number = 0;
@@ -430,8 +441,12 @@ export class MusicSelectionScreen implements UIScreen {
     private height: number,
   ) {}
 
+  getSelectedTrack(): MusicTrack {
+    return MUSIC_TRACKS[this.selectedIndex] ?? MUSIC_TRACKS[0]!;
+  }
+
   getSelectedChannel(): string {
-    return MUSIC_CHANNELS[this.selectedIndex]?.id ?? "channel1";
+    return this.getSelectedTrack().id;
   }
 
   render(ctx: CanvasRenderingContext2D, state: TimeChallengeState): void {

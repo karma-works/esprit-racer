@@ -105,3 +105,9 @@ mod-player.ts:119:13
 the rear mirrow should display the cars BEHIND the players car. (at the moment it displays cars in front of and besides the players car)
 
 The hud for Nitro seems to be displayed twice with a strong overlap (should only be displayed once)
+
+
+
+
+
+There seems to be a refresh problem when the race is started. after the radio-menu, when entering the game, there are strange atrifacts on the right and side and bellow the game area. when resizing the window manually the artifacts disappear. please check.

@@ -17,9 +17,9 @@ import {
   type CachedSprite,
 } from "./assets/svg-loader";
 import {
-  loadGameMusic,
-  playGameMusic,
   setMusicVolume,
+  stopGameMusic,
+  loadAndPlayTrack,
 } from "./audio/mod-player";
 import {
   createTimeChallengeState,
@@ -38,6 +38,8 @@ import {
   type Button,
   type MenuZone,
   type UIScreen,
+  MusicSelectionScreen,
+  MUSIC_TRACKS,
 } from "./ui/screens/screens";
 import {
   renderHud,
@@ -216,6 +218,8 @@ const renderRacing = () => {
     fogDensity,
   } = config;
 
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
   const baseSegment = Segments.findSegment(player.position, segmentLength);
   const basePercent = Util.percentRemaining(player.position, segmentLength);
   const playerSegment = Segments.findSegment(
@@ -235,8 +239,6 @@ const renderRacing = () => {
 
   let x = 0;
   let dx = -(baseSegment.curve * basePercent);
-
-  ctx.clearRect(0, 0, width, height);
 
   if (svgBackground) {
     SvgRender.svgBackground(
@@ -354,14 +356,14 @@ const renderRacing = () => {
         }
       }
 
-      if (n < drawDistance / 4) {
+      const distanceBehind = player.position - car.z;
+      if (distanceBehind > 0 && distanceBehind < world.trackLength * 0.08) {
         const carColors = ["#dc2626", "#3b82f6", "#f59e0b", "#10b981"];
         const colorIndex =
           Math.floor(Math.abs(car.offset * 10)) % carColors.length;
-        const distanceFromPlayer = Math.abs(car.z - player.position);
         const normalizedDistance = Math.min(
           1,
-          distanceFromPlayer / (world.trackLength * 0.1),
+          distanceBehind / (world.trackLength * 0.08),
         );
         mirrorCars.push({
           offset: car.offset,
@@ -490,7 +492,7 @@ const render = () => {
     const screen = screens.get(gameState.screen);
     if (screen) {
       ctx.fillStyle = "#1a1a2e";
-      ctx.fillRect(0, 0, width, height);
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
       screen.render(ctx, gameState);
     }
   }
@@ -544,36 +546,65 @@ const frame = () => {
   requestAnimationFrame(frame);
 };
 
-const goToMusicSelection = () => {
+const goToMusicSelection = async () => {
   gameState = { ...gameState, screen: "music-select" };
+  const musicScreen = screens.get("music-select") as
+    | MusicSelectionScreen
+    | undefined;
+  const selectedTrack = musicScreen?.getSelectedTrack();
+  if (selectedTrack) {
+    await loadAndPlayTrack(selectedTrack.file);
+    setMusicVolume(0.3);
+  }
 };
 
-const startGame = () => {
+const startGame = async () => {
   world = createWorld();
   resetCars(world, TRAFFIC_CAR_COUNT);
   gameState = startRace(gameState);
   countdown = 3;
   countdownTimer = 0;
   hudState = createDefaultHudState();
-  playGameMusic();
+
+  const musicScreen = screens.get("music-select") as
+    | MusicSelectionScreen
+    | undefined;
+  const selectedTrack = musicScreen?.getSelectedTrack();
+  if (selectedTrack) {
+    stopGameMusic();
+    await loadAndPlayTrack(selectedTrack.file);
+    setMusicVolume(0.3);
+  }
 };
 
-const handleMenuKeyDown = (keyCode: number) => {
+const handleMenuKeyDown = async (keyCode: number) => {
   const screen = screens.get(gameState.screen) as UIScreen | undefined;
 
   if (gameState.screen === "main-menu") {
     const action = screen?.handleKeyDown?.(keyCode);
     if (action === "start" || action === "game") {
-      goToMusicSelection();
+      await goToMusicSelection();
     }
   } else if (gameState.screen === "music-select") {
+    const musicScreen = screen as MusicSelectionScreen | undefined;
+    const prevTrack = musicScreen?.getSelectedTrack();
     const action = screen?.handleKeyDown?.(keyCode);
+    const newTrack = musicScreen?.getSelectedTrack();
+
     if (action === "start_game") {
       startGame();
+    } else if (prevTrack?.id !== newTrack?.id && newTrack) {
+      await loadAndPlayTrack(newTrack.file);
+      setMusicVolume(0.3);
     }
   } else if (gameState.screen === "results") {
     if (keyCode === KEY.SPACE) {
       gameState = returnToMenu(gameState);
+      const titleTrack = MUSIC_TRACKS[0];
+      if (titleTrack) {
+        await loadAndPlayTrack(titleTrack.file);
+        setMusicVolume(0.3);
+      }
     }
   } else if (gameState.screen === "racing") {
     if (keyCode === KEY.P || keyCode === 27) {
@@ -606,7 +637,7 @@ document.addEventListener("keyup", (ev) => {
   }
 });
 
-canvas.addEventListener("click", (ev) => {
+canvas.addEventListener("click", async (ev) => {
   const rect = canvas.getBoundingClientRect();
   const x = (ev.clientX - rect.left) * (world.config.width / rect.width);
   const y = (ev.clientY - rect.top) * (world.config.height / rect.height);
@@ -616,7 +647,7 @@ canvas.addEventListener("click", (ev) => {
   if (gameState.screen === "main-menu") {
     const action = screen?.handleClick?.(x, y);
     if (action === "start" || action === "game") {
-      goToMusicSelection();
+      await goToMusicSelection();
     }
   } else if (gameState.screen === "music-select") {
     const action = screen?.handleClick?.(x, y);
@@ -667,14 +698,24 @@ const init = async () => {
     console.error("Failed to load SVG sprites:", err);
   }
 
-  try {
-    await loadGameMusic();
-    setMusicVolume(0.3);
-  } catch (err) {
-    console.warn("Failed to load music:", err);
-  }
-
+  setMusicVolume(0.3);
   frame();
 };
+
+let menuMusicStarted = false;
+
+const startMenuMusic = async () => {
+  if (menuMusicStarted) return;
+  menuMusicStarted = true;
+
+  const titleTrack = MUSIC_TRACKS[0];
+  if (titleTrack) {
+    await loadAndPlayTrack(titleTrack.file);
+    setMusicVolume(0.3);
+  }
+};
+
+document.addEventListener("click", startMenuMusic, { once: true });
+document.addEventListener("keydown", startMenuMusic, { once: true });
 
 init();

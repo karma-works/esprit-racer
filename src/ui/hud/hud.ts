@@ -380,7 +380,7 @@ export const renderHud = (
   renderTimerPanel(ctx, state, rightColumnX - 160, row1Y);
   renderScorePanel(ctx, state.score, rightColumnX - 180, row2Y);
   renderLapPanel(ctx, state.lap, state.totalLaps, rightColumnX - 120, row3Y);
-  renderBoostPanel(ctx, hs.boostMeter, rightColumnX - 100, row3Y);
+  renderBoostPanel(ctx, hs.boostMeter, rightColumnX - 230, row3Y);
 };
 
 export const renderPauseOverlay = (
