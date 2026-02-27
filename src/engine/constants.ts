@@ -514,10 +514,10 @@ export const THEMES: Record<string, LevelTheme> = {
       fogDensity: 2,
       fogStart: 0.8,
       wind: {
-        baseForce: 0.2,
-        gustInterval: 5000,
-        gustDuration: 2000,
-        maxGustForce: 0.6,
+        baseForce: 0.1,
+        gustInterval: 8000,
+        gustDuration: 1500,
+        maxGustForce: 0.2,
         direction: 0,
       },
     },
@@ -531,6 +531,11 @@ export const THEMES: Record<string, LevelTheme> = {
     },
     filters: { global: "sepia(0.1) saturate(0.9)", background: "", road: "" },
     background: "background-level-1.svg",
+    spriteOverrides: {
+      PALM_TREE: "CACTUS",
+      TREE1: "DEAD_TREE1",
+      TREE2: "DEAD_TREE2",
+    },
   },
 };
 

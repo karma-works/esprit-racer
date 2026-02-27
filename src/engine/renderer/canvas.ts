@@ -316,7 +316,7 @@ export const renderTumbleweed = (
   ctx.save();
   ctx.translate(tumbleweed.x, tumbleweed.y);
   ctx.rotate(tumbleweed.rotation);
-  const size = 40 * tumbleweed.scale;
+  const size = 80 * tumbleweed.scale;
   ctx.drawImage(cachedSprite.canvas, -size / 2, -size / 2, size, size);
   ctx.restore();
 };

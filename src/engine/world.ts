@@ -93,7 +93,11 @@ export const setTheme = (world: WorldState, theme: LevelTheme): void => {
   world.lightningTimer = 0;
 };
 
-export const updateWind = (world: WorldState, dt: number): void => {
+export const updateWind = (
+  world: WorldState,
+  dt: number,
+  speedPercent: number,
+): void => {
   const theme = world.currentTheme;
   if (!theme?.effects.wind) return;
 
@@ -103,22 +107,31 @@ export const updateWind = (world: WorldState, dt: number): void => {
   wind.gustTimer += dt * 1000;
 
   if (!wind.gusting && wind.gustTimer > config.gustInterval) {
-    if (Math.random() < 0.1) {
+    // Variable gust duration (1.5-3s) and random direction
+    if (Math.random() < 0.7) {
       wind.gusting = true;
-      wind.gustDuration = config.gustDuration + Math.random() * 1000;
+      wind.gustDuration = config.gustDuration + Math.random() * 1500;
       wind.currentDirection = Math.random() > 0.5 ? 1 : -1;
-      wind.currentForce = config.maxGustForce;
+      wind.currentForce =
+        config.baseForce +
+        Math.random() * (config.maxGustForce - config.baseForce);
     }
     wind.gustTimer = 0;
   }
 
   if (wind.gusting && wind.gustTimer > wind.gustDuration) {
     wind.gusting = false;
-    wind.currentForce = config.baseForce;
+    wind.currentForce = 0;
+    wind.currentDirection = 0;
     wind.gustTimer = 0;
   }
 
-  world.player.x += wind.currentForce * wind.currentDirection * dt * 0.5;
+  // Apply wind force only during active gusts and only when moving
+  // Wind doesn't affect stationary cars
+  if (wind.gusting && speedPercent > 0) {
+    world.player.x +=
+      wind.currentForce * wind.currentDirection * dt * 0.5 * speedPercent;
+  }
 };
 
 export const updateJump = (world: WorldState, dt: number): void => {
@@ -199,19 +212,20 @@ export const updateTumbleweeds = (world: WorldState, dt: number): void => {
   }
 
   world.tumbleweeds = world.tumbleweeds.filter(
-    (w) => Math.abs(w.x) < 2 && w.z > world.player.position - 500,
+    (w) => Math.abs(w.x) < 4 && w.z > world.player.position - 500,
   );
 
-  if (Math.random() < 0.01) {
+  if (Math.random() < 0.015) {
+    const direction =
+      world.windState.currentDirection || (Math.random() > 0.5 ? 1 : -1);
     world.tumbleweeds.push({
-      x: Math.random() > 0.5 ? -1.5 : 1.5,
+      x: direction > 0 ? -3.5 : 3.5,
       z:
         world.player.position +
         world.config.drawDistance * world.config.segmentLength,
       rotation: 0,
-      speed: 0.3 + Math.random() * 0.4,
-      direction:
-        world.windState.currentDirection || (Math.random() > 0.5 ? 1 : -1),
+      speed: 0.5 + Math.random() * 0.5,
+      direction,
     });
   }
 
@@ -274,6 +288,8 @@ export const createDefaultWindState = (): WindState => ({
   gustTimer: 0,
   gusting: false,
   gustDuration: 0,
+  extremeWindTimer: 0,
+  extremeWindActive: false,
 });
 
 export const createDefaultJumpState = (): JumpState => ({

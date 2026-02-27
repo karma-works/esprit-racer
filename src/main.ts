@@ -209,14 +209,16 @@ const SPRITE_NAME_MAP = new Map<string, string>([
   ["80_56_1205", "CAR01"],
 ]);
 
-const getSpriteName = (sprite: {
-  x: number;
-  y: number;
-  w: number;
-  h: number;
-}): string | null => {
+const getSpriteName = (
+  sprite: { x: number; y: number; w: number; h: number },
+  overrides?: Record<string, string>,
+): string | null => {
   const key = `${sprite.w}_${sprite.h}_${sprite.x}`;
-  return SPRITE_NAME_MAP.get(key) ?? null;
+  const name = SPRITE_NAME_MAP.get(key) ?? null;
+  if (name && overrides && overrides[name]) {
+    return overrides[name];
+  }
+  return name;
 };
 
 const getPlayerCarSprite = (steer: number): CachedSprite | null => {
@@ -400,7 +402,10 @@ const renderRacing = () => {
         car.percent ?? 0,
       );
 
-      const spriteName = getSpriteName(car.sprite);
+      const spriteName = getSpriteName(
+        car.sprite,
+        world.currentTheme?.spriteOverrides,
+      );
       if (spriteName) {
         const cachedSprite = getSpriteByName(spriteName, spriteScale);
         if (cachedSprite) {
@@ -429,7 +434,10 @@ const renderRacing = () => {
         (spriteScale * sprite.offset * roadWidth * width) / 2;
       const spriteY = segment.p1.screen.y;
 
-      const spriteName = getSpriteName(sprite.source);
+      const spriteName = getSpriteName(
+        sprite.source,
+        world.currentTheme?.spriteOverrides,
+      );
       if (spriteName) {
         const cachedSprite = getSpriteByName(spriteName, spriteScale);
         if (cachedSprite) {
@@ -515,10 +523,11 @@ const renderRacing = () => {
 
   for (const weed of world.tumbleweeds) {
     const relZ = weed.z - player.position;
-    if (relZ > 0 && relZ < 5000) {
-      const scale = 1 - relZ / 5000;
-      const screenY = height * 0.7 + scale * 50;
-      const screenX = width / 2 + weed.x * width * 0.3;
+    if (relZ > 0 && relZ < 8000) {
+      const distanceScale = 1 - relZ / 8000;
+      const scale = 0.5 + distanceScale * 0.8;
+      const screenY = height * 0.75 + distanceScale * 100;
+      const screenX = width / 2 + weed.x * width * 0.25;
       const cachedWeed = globalSpriteCache.get("tumbleweed.svg", scale);
       if (cachedWeed) {
         Render.renderTumbleweed(
@@ -593,7 +602,8 @@ const updateGame = (dt: number) => {
 
   const prevLap = world.currentLapTime;
   update(world, dt);
-  updateWind(world, dt);
+  const speedPercent = world.player.speed / world.config.maxSpeed;
+  updateWind(world, dt, speedPercent);
   updateJump(world, dt);
   updateParticles(world, dt);
   updateTumbleweeds(world, dt);

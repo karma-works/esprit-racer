@@ -188,6 +188,8 @@ export interface WindState {
   gustTimer: number;
   gusting: boolean;
   gustDuration: number;
+  extremeWindTimer: number;
+  extremeWindActive: boolean;
 }
 
 export interface JumpState {
