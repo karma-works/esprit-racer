@@ -46,6 +46,7 @@ import {
   returnToMenu,
   completeLap,
   checkCheckpoint,
+  toggleGameMode,
   DEFAULT_TIME_LIMIT,
   calculateTimeLimit,
 } from "./game/modes/time-challenge";
@@ -1251,9 +1252,14 @@ const handleMenuKeyDown = async (keyCode: number) => {
     // Check if player count was toggled (action will be null if toggle happened)
     if (mainMenuScreen) {
       playerCount = mainMenuScreen.getPlayerCount();
+      // Sync game mode from main menu to game state
+      const menuGameMode = mainMenuScreen.getGameMode();
+      if (gameState.gameMode !== menuGameMode) {
+        gameState = toggleGameMode(gameState);
+      }
     }
 
-    if (action === "start" || action === "game") {
+    if (action === "start") {
       await goToMusicSelection();
     } else if (action === "constructor") {
       goToRECS();
@@ -1356,9 +1362,14 @@ canvas.addEventListener("click", async (ev) => {
     // Check if player count was toggled (action will be null if toggle happened)
     if (mainMenuScreen) {
       playerCount = mainMenuScreen.getPlayerCount();
+      // Sync game mode from main menu to game state
+      const menuGameMode = mainMenuScreen.getGameMode();
+      if (gameState.gameMode !== menuGameMode) {
+        gameState = toggleGameMode(gameState);
+      }
     }
 
-    if (action === "start" || action === "game") {
+    if (action === "start") {
       await goToMusicSelection();
     } else if (action === "constructor") {
       goToRECS();

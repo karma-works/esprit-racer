@@ -273,6 +273,7 @@ export class MainMenuScreen implements UIScreen {
   private zones: MenuZone[];
   private selectedIndex: number = 0;
   private playerCount: 1 | 2 = 1;
+  private gameMode: "time" | "race" = "time";
 
   constructor(
     private width: number,
@@ -290,8 +291,16 @@ export class MainMenuScreen implements UIScreen {
     return this.playerCount;
   }
 
+  getGameMode(): "time" | "race" {
+    return this.gameMode;
+  }
+
   togglePlayerCount(): void {
     this.playerCount = this.playerCount === 1 ? 2 : 1;
+  }
+
+  toggleGameMode(): void {
+    this.gameMode = this.gameMode === "time" ? "race" : "time";
   }
 
   private calculateZones(): MenuZone[] {
@@ -340,6 +349,22 @@ export class MainMenuScreen implements UIScreen {
         {
           font: `bold ${14 * scale}px monospace`,
           color: "#ffcc00",
+        },
+      );
+    }
+
+    // Draw game mode in GAME box
+    const gameZone = this.zones.find((z) => z.action === "game");
+    if (gameZone) {
+      const modeText = this.gameMode === "time" ? "TIME MODE" : "RACE MODE";
+      drawCenteredText(
+        ctx,
+        modeText,
+        gameZone.x + gameZone.width / 2,
+        gameZone.y + gameZone.height / 2 + 25 * scale,
+        {
+          font: `bold ${12 * scale}px monospace`,
+          color: "#4caf50",
         },
       );
     }
@@ -438,6 +463,10 @@ export class MainMenuScreen implements UIScreen {
           this.togglePlayerCount();
           return null;
         }
+        if (zone.action === "game") {
+          this.toggleGameMode();
+          return null;
+        }
         return zone.action;
       }
     }
@@ -467,6 +496,10 @@ export class MainMenuScreen implements UIScreen {
     if (keyCode === SPACE || keyCode === 13) {
       if (currentZone.action === "players") {
         this.togglePlayerCount();
+        return null;
+      }
+      if (currentZone.action === "game") {
+        this.toggleGameMode();
         return null;
       }
       return currentZone.action;
@@ -1051,16 +1084,18 @@ export class ResultsScreen implements UIScreen {
 
     const centerX = this.width / 2;
 
-    drawCenteredText(
-      ctx,
-      state.isGameOver ? "GAME OVER" : "RACE COMPLETE",
-      centerX,
-      100,
-      {
-        font: "bold 36px monospace",
-        color: state.isGameOver ? COLORS.highlight : COLORS.score,
-      },
-    );
+    const titleText = state.isGameOver
+      ? state.gameMode === "race"
+        ? "RACE COMPLETE"
+        : "GAME OVER"
+      : "RACE COMPLETE";
+    drawCenteredText(ctx, titleText, centerX, 100, {
+      font: "bold 36px monospace",
+      color:
+        state.isGameOver && state.gameMode === "time"
+          ? COLORS.highlight
+          : COLORS.score,
+    });
 
     drawPanel(ctx, centerX - 150, 160, 300, 200);
 

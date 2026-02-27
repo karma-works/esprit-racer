@@ -61,6 +61,7 @@ export const createTimeChallengeState = (
     screen: "main-menu",
     playerName: "PLAYER 1",
     selectedTrack: 0,
+    gameMode: "time",
     timeLimit,
     currentTime: timeLimit,
     score: 0,
@@ -85,8 +86,19 @@ export const updateTimer = (
     return state;
   }
 
-  const newTime = state.currentTime - dt;
   const newFlash = Math.max(0, state.timeBonusFlash - dt);
+
+  if (state.gameMode === "race") {
+    // Race mode: count up, no time limit
+    return {
+      ...state,
+      currentTime: state.currentTime + dt,
+      timeBonusFlash: newFlash,
+    };
+  }
+
+  // Time mode: count down with limit
+  const newTime = state.currentTime - dt;
 
   if (newTime <= 0) {
     return {
@@ -129,7 +141,8 @@ export const checkCheckpoint = (
     currentCheckpointIndex > state.lastCheckpointSegment &&
     currentCheckpointIndex <= CHECKPOINTS_PER_LAP
   ) {
-    const bonus = CHECKPOINT_TIME_BONUS;
+    // No time bonus in race mode
+    const bonus = state.gameMode === "race" ? 0 : CHECKPOINT_TIME_BONUS;
     return {
       state: {
         ...state,
@@ -137,7 +150,7 @@ export const checkCheckpoint = (
         score: state.score + CHECKPOINT_SCORE_BONUS,
         checkpointsPassed: currentCheckpointIndex,
         lastCheckpointSegment: currentCheckpointIndex,
-        timeBonusFlash: 1.5,
+        timeBonusFlash: state.gameMode === "race" ? 0 : 1.5,
       },
       bonusAwarded: bonus,
     };
@@ -153,6 +166,24 @@ export const completeLap = (
   const newLap = state.lap + 1;
 
   if (newLap > state.totalLaps) {
+    // Race complete
+    if (state.gameMode === "race") {
+      // Race mode: lower time is better
+      const isNewBest =
+        state.bestTime === null || world.currentLapTime < state.bestTime;
+
+      return {
+        ...state,
+        isGameOver: true,
+        screen: "results",
+        score: state.score,
+        bestScore: state.bestScore,
+        bestTime: isNewBest ? world.currentLapTime : state.bestTime,
+        timeBonusFlash: 0,
+      };
+    }
+
+    // Time mode: higher remaining time is better
     const finalScore =
       state.score + Math.floor(state.currentTime * 50) + LAP_SCORE_BONUS;
     const isNewBest = state.bestScore === null || finalScore > state.bestScore;
@@ -168,6 +199,18 @@ export const completeLap = (
     };
   }
 
+  // Lap complete but race continues
+  if (state.gameMode === "race") {
+    return {
+      ...state,
+      lap: newLap,
+      checkpointsPassed: 0,
+      lastCheckpointSegment: 0,
+      timeBonusFlash: 2,
+    };
+  }
+
+  // Time mode: add time bonus
   return {
     ...state,
     lap: newLap,
@@ -182,7 +225,7 @@ export const completeLap = (
 export const startRace = (state: TimeChallengeState): TimeChallengeState => ({
   ...state,
   screen: "racing",
-  currentTime: state.timeLimit,
+  currentTime: state.gameMode === "race" ? 0 : state.timeLimit,
   score: 0,
   lap: 1,
   checkpointsPassed: 0,
@@ -228,3 +271,10 @@ export const formatTimeDisplay = (seconds: number): string => {
 export const formatScore = (score: number): string => {
   return score.toString().padStart(6, "0");
 };
+
+export const toggleGameMode = (
+  state: TimeChallengeState,
+): TimeChallengeState => ({
+  ...state,
+  gameMode: state.gameMode === "time" ? "race" : "time",
+});

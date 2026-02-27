@@ -256,9 +256,18 @@ const renderTimerPanel = (
   ctx.lineWidth = 1;
   ctx.strokeRect(x, y, panelWidth, panelHeight);
 
-  const timerColor = state.currentTime < 10 ? COLORS.timerLow : COLORS.timer;
+  const isRaceMode = state.gameMode === "race";
+  const timerColor =
+    !isRaceMode && state.currentTime < 10 ? COLORS.timerLow : COLORS.timer;
 
-  drawBlockyText(ctx, "TIME", x + 15, y + 8, 14, "#888888");
+  drawBlockyText(
+    ctx,
+    isRaceMode ? "RACE TIME" : "TIME",
+    x + 15,
+    y + 8,
+    14,
+    "#888888",
+  );
   drawBlockyText(
     ctx,
     formatTimeDisplay(state.currentTime),
@@ -649,12 +658,14 @@ const renderCompactTimerPanel = (
   ctx.lineWidth = 1;
   ctx.strokeRect(x, y, panelWidth, panelHeight);
 
-  const timerColor = state.currentTime < 10 ? COLORS.timerLow : COLORS.timer;
+  const isRaceMode = state.gameMode === "race";
+  const timerColor =
+    !isRaceMode && state.currentTime < 10 ? COLORS.timerLow : COLORS.timer;
   const fontSize = Math.max(12, panelHeight * 0.45);
 
   drawBlockyText(
     ctx,
-    "TIME",
+    isRaceMode ? "RACE TIME" : "TIME",
     x + panelWidth * 0.1,
     y + panelHeight * 0.1,
     fontSize * 0.5,
