@@ -49,6 +49,7 @@ import {
   type MenuZone,
   type UIScreen,
   MusicSelectionScreen,
+  RECSScreen,
   MUSIC_TRACKS,
 } from "./ui/screens/screens";
 import {
@@ -649,16 +650,14 @@ const goToMusicSelection = async () => {
   }
 };
 
-const startGame = async () => {
+const startGame = async (themeId?: string) => {
   world = createWorld();
 
   const musicScreen = screens.get("music-select") as
     | MusicSelectionScreen
     | undefined;
 
-  if (musicScreen && typeof musicScreen.getSelectedThemeId === "function") {
-    selectedThemeId = musicScreen.getSelectedThemeId();
-  }
+  selectedThemeId = themeId ?? "night";
 
   const theme = getSelectedTheme();
   setTheme(world, theme);
@@ -677,6 +676,10 @@ const startGame = async () => {
   }
 };
 
+const goToRECS = () => {
+  gameState = { ...gameState, screen: "recs" };
+};
+
 const handleMenuKeyDown = async (keyCode: number) => {
   const screen = screens.get(gameState.screen) as UIScreen | undefined;
 
@@ -684,6 +687,18 @@ const handleMenuKeyDown = async (keyCode: number) => {
     const action = screen?.handleKeyDown?.(keyCode);
     if (action === "start" || action === "game") {
       await goToMusicSelection();
+    } else if (action === "constructor") {
+      goToRECS();
+    }
+  } else if (gameState.screen === "recs") {
+    const recsScreen = screen as RECSScreen | undefined;
+    const action = screen?.handleKeyDown?.(keyCode);
+
+    if (action === "start_game") {
+      const themeId = recsScreen?.getSelectedThemeId() ?? "night";
+      await startGame(themeId);
+    } else if (action === "back") {
+      gameState = { ...gameState, screen: "main-menu" };
     }
   } else if (gameState.screen === "music-select") {
     const musicScreen = screen as MusicSelectionScreen | undefined;
@@ -748,11 +763,22 @@ canvas.addEventListener("click", async (ev) => {
     const action = screen?.handleClick?.(x, y);
     if (action === "start" || action === "game") {
       await goToMusicSelection();
+    } else if (action === "constructor") {
+      goToRECS();
     }
   } else if (gameState.screen === "music-select") {
     const action = screen?.handleClick?.(x, y);
     if (action === "start_game") {
-      startGame();
+      await startGame();
+    }
+  } else if (gameState.screen === "recs") {
+    const recsScreen = screen as RECSScreen | undefined;
+    const action = screen?.handleClick?.(x, y);
+    if (action === "start_game") {
+      const themeId = recsScreen?.getSelectedThemeId() ?? "night";
+      await startGame(themeId);
+    } else if (action === "back") {
+      gameState = { ...gameState, screen: "main-menu" };
     }
   }
 });
@@ -765,7 +791,11 @@ canvas.addEventListener("mousemove", (ev) => {
   const screen = screens.get(gameState.screen) as UIScreen | undefined;
   screen?.handleMouseMove?.(x, y);
 
-  if (gameState.screen === "main-menu" || gameState.screen === "music-select") {
+  if (
+    gameState.screen === "main-menu" ||
+    gameState.screen === "music-select" ||
+    gameState.screen === "recs"
+  ) {
     const zones = screen?.getZones?.() ?? [];
     for (const zone of zones) {
       if (

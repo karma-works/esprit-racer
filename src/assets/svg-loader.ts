@@ -214,6 +214,7 @@ export const preloadGameSprites = async (): Promise<void> => {
     { path: "background.svg", scales: [1, 2] },
     { path: "main-menu.svg", scales: [1.5, 2] },
     { path: "music-selection.svg", scales: [1.5, 2] },
+    { path: "track-builder.svg", scales: [1, 1.5, 2] },
     { path: "palm-tree.svg", scales: largeScales },
     { path: "tree-deciduous.svg", scales: largeScales },
     { path: "tree-blossom.svg", scales: largeScales },
@@ -249,6 +250,19 @@ export const preloadGameSprites = async (): Promise<void> => {
     { path: "water-splash.svg", scales: particleScales },
     { path: "turbo-zone.svg", scales: baseScales },
     { path: "laser-beam.svg", scales: baseScales },
+    { path: "theme-night.svg", scales: [0.5, 1] },
+    { path: "theme-fog.svg", scales: [0.5, 1] },
+    { path: "theme-snow.svg", scales: [0.5, 1] },
+    { path: "theme-storm.svg", scales: [0.5, 1] },
+    { path: "theme-desert.svg", scales: [0.5, 1] },
+    { path: "theme-future.svg", scales: [0.5, 1] },
+    { path: "theme-marsh.svg", scales: [0.5, 1] },
+    { path: "theme-mountains.svg", scales: [0.5, 1] },
+    { path: "theme-lakes.svg", scales: [0.5, 1] },
+    { path: "theme-country.svg", scales: [0.5, 1] },
+    { path: "theme-city.svg", scales: [0.5, 1] },
+    { path: "theme-roadworks.svg", scales: [0.5, 1] },
+    { path: "theme-windy.svg", scales: [0.5, 1] },
   ];
 
   await Promise.all(

@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 46 75" width="100%" height="100%">
+  <defs>
+    <filter id="sun-glow">
+      <feGaussianBlur stdDeviation="2" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <rect width="46" height="75" fill="#f4a460" rx="3"/>
+  <circle cx="23" cy="28" r="14" fill="#ff6600" filter="url(#sun-glow)"/>
+  <circle cx="23" cy="28" r="10" fill="#ffcc00"/>
+  <circle cx="23" cy="28" r="6" fill="#ffee88"/>
+  <g stroke="#ff6600" stroke-width="2" stroke-linecap="round">
+    <line x1="23" y1="5" x2="23" y2="10"/>
+    <line x1="23" y1="46" x2="23" y2="51"/>
+    <line x1="0" y1="28" x2="5" y2="28"/>
+    <line x1="41" y1="28" x2="46" y2="28"/>
+    <line x1="7" y1="12" x2="11" y2="16"/>
+    <line x1="35" y1="40" x2="39" y2="44"/>
+    <line x1="7" y1="44" x2="11" y2="40"/>
+    <line x1="35" y1="16" x2="39" y2="12"/>
+  </g>
+  <path d="M 5,60 Q 15,50 25,60 T 45,60" fill="none" stroke="#d2691e" stroke-width="3"/>
+  <path d="M 0,68 Q 10,58 20,68 T 40,68" fill="none" stroke="#8b4513" stroke-width="2"/>
+</svg>

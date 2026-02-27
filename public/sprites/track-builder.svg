@@ -1,7 +1,40 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%" style="background-color: #1a1a1a; user-select: none;">
-    <defs>
-        <!-- Fonts & Styles -->
-        <style>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   viewBox="0 0 800 600"
+   width="100%"
+   height="100%"
+   style="background-color: #1a1a1a; user-select: none;"
+   version="1.1"
+   id="svg94"
+   sodipodi:docname="track-builder.svg"
+   inkscape:version="1.4.3 (0d15f75, 2025-12-25)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview94"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="1.9610428"
+     inkscape:cx="514.01224"
+     inkscape:cy="311.82389"
+     inkscape:window-width="2924"
+     inkscape:window-height="1400"
+     inkscape:window-x="0"
+     inkscape:window-y="30"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="svg94" />
+  <defs
+     id="defs9">
+    <!-- Fonts & Styles -->
+    <style
+       id="style1">
             @import url('https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&amp;display=swap');
             
             .box { fill: #333333; stroke: #555555; stroke-width: 4; rx: 4; filter: url(#shadow); }
@@ -18,316 +51,971 @@
             .slot-selected { fill: #2a2a2a; stroke: #c1272d; stroke-width: 3; rx: 3; filter: url(#glow-red); }
             .icon-sil { fill: #151515; }
         </style>
-
-        <!-- Drop Shadows & Filters -->
-        <filter id="shadow" x="-10%" y="-10%" width="130%" height="130%">
-            <feDropShadow dx="3" dy="4" stdDeviation="0" flood-color="#000" flood-opacity="0.6"/>
-        </filter>
-        <filter id="shadow-red" x="-10%" y="-10%" width="130%" height="130%">
-            <feDropShadow dx="3" dy="4" stdDeviation="0" flood-color="#3a0000" flood-opacity="0.8"/>
-        </filter>
-        <filter id="glow-red" x="-20%" y="-20%" width="140%" height="140%">
-            <feGaussianBlur stdDeviation="3" result="blur" />
-            <feMerge>
-                <feMergeNode in="blur"/>
-                <feMergeNode in="SourceGraphic"/>
-            </feMerge>
-        </filter>
-        <filter id="inner-shadow">
-            <feOffset dx="0" dy="2"/>
-            <feGaussianBlur stdDeviation="1" result="offset-blur"/>
-            <feComposite operator="out" in="SourceGraphic" in2="offset-blur" result="inverse"/>
-            <feFlood flood-color="black" flood-opacity="0.8" result="color"/>
-            <feComposite operator="in" in="color" in2="inverse" result="shadow"/>
-            <feComposite operator="over" in="shadow" in2="SourceGraphic"/>
-        </filter>
-
-        <!-- Overlays -->
-        <radialGradient id="vignette" cx="50%" cy="50%" r="75%">
-            <stop offset="50%" stop-color="#000" stop-opacity="0"/>
-            <stop offset="100%" stop-color="#000" stop-opacity="0.7"/>
-        </radialGradient>
-        <pattern id="scanlines" width="4" height="4" patternUnits="userSpaceOnUse">
-            <rect width="4" height="2" fill="#000" opacity="0.3"/>
-        </pattern>
-        <pattern id="checker" width="12" height="12" patternUnits="userSpaceOnUse">
-            <rect width="6" height="6" fill="#111"/>
-            <rect x="6" y="6" width="6" height="6" fill="#111"/>
-            <rect x="6" width="6" height="6" fill="#eee"/>
-            <rect y="6" width="6" height="6" fill="#eee"/>
-        </pattern>
-    </defs>
-
-    <!-- Base Background & Vignette -->
-    <rect width="100%" height="100%" fill="#1e1e1e" />
-    <rect width="100%" height="100%" fill="url(#vignette)" />
-
-    <!-- Faint Watermark Logo (Bottom Right behind Obstacles Box) -->
-    <g transform="translate(655, 362)" stroke="#ffffff" fill="none" opacity="0.04">
-        <circle r="120" stroke-width="15"/>
-        <circle r="80" stroke-width="8"/>
-        <path d="M-150,0 h300 M0,-150 v300" stroke-width="8"/>
-        <circle r="30" fill="#ffffff" opacity="0.05" />
-        <path d="M -30,-30 L 30,30 M -30,30 L 30,-30" stroke-width="4"/>
+    <!-- Drop Shadows & Filters -->
+    <filter
+       id="shadow"
+       x="-0.0086956522"
+       y="-0.025"
+       width="1.0173913"
+       height="1.05">
+      <feDropShadow
+         dx="3"
+         dy="4"
+         stdDeviation="0"
+         flood-color="#000"
+         flood-opacity="0.6" />
+    </filter>
+    <filter
+       id="shadow-red"
+       x="-0.0086956522"
+       y="-0.023529412"
+       width="1.0173913"
+       height="1.0470588">
+      <feDropShadow
+         dx="3"
+         dy="4"
+         stdDeviation="0"
+         flood-color="#3a0000"
+         flood-opacity="0.8" />
+    </filter>
+    <filter
+       id="glow-red"
+       x="-0.18913043"
+       y="-0.116"
+       width="1.3782609"
+       height="1.232">
+      <feGaussianBlur
+         stdDeviation="3"
+         result="blur"
+         id="feGaussianBlur1" />
+      <feMerge
+         id="feMerge2">
+        <feMergeNode
+           in="blur"
+           id="feMergeNode1" />
+        <feMergeNode
+           in="SourceGraphic"
+           id="feMergeNode2" />
+      </feMerge>
+    </filter>
+    <filter
+       id="inner-shadow"
+       x="-0.022666667"
+       y="-0.28333333"
+       width="1.0453333"
+       height="1.7333333">
+      <feOffset
+         dx="0"
+         dy="2"
+         id="feOffset2" />
+      <feGaussianBlur
+         stdDeviation="1"
+         result="offset-blur"
+         id="feGaussianBlur2" />
+      <feComposite
+         operator="out"
+         in="SourceGraphic"
+         in2="offset-blur"
+         result="inverse"
+         id="feComposite2" />
+      <feFlood
+         flood-color="black"
+         flood-opacity="0.8"
+         result="color"
+         id="feFlood2" />
+      <feComposite
+         operator="in"
+         in="color"
+         in2="inverse"
+         result="shadow"
+         id="feComposite3" />
+      <feComposite
+         operator="over"
+         in="shadow"
+         in2="SourceGraphic"
+         id="feComposite4" />
+    </filter>
+    <!-- Overlays -->
+    <radialGradient
+       id="vignette"
+       cx="50%"
+       cy="50%"
+       r="75%">
+      <stop
+         offset="50%"
+         stop-color="#000"
+         stop-opacity="0"
+         id="stop4" />
+      <stop
+         offset="100%"
+         stop-color="#000"
+         stop-opacity="0.7"
+         id="stop5" />
+    </radialGradient>
+    <pattern
+       id="scanlines"
+       width="4"
+       height="4"
+       patternUnits="userSpaceOnUse">
+      <rect
+         width="4"
+         height="2"
+         fill="#000"
+         opacity="0.3"
+         id="rect5" />
+    </pattern>
+    <pattern
+       id="checker"
+       width="12"
+       height="12"
+       patternUnits="userSpaceOnUse">
+      <rect
+         width="6"
+         height="6"
+         fill="#111"
+         id="rect6" />
+      <rect
+         x="6"
+         y="6"
+         width="6"
+         height="6"
+         fill="#111"
+         id="rect7" />
+      <rect
+         x="6"
+         width="6"
+         height="6"
+         fill="#eee"
+         id="rect8" />
+      <rect
+         y="6"
+         width="6"
+         height="6"
+         fill="#eee"
+         id="rect9" />
+    </pattern>
+  </defs>
+  <!-- Base Background & Vignette -->
+  <rect
+     width="100%"
+     height="100%"
+     fill="#1e1e1e"
+     id="rect10" />
+  <rect
+     width="100%"
+     height="100%"
+     fill="url(#vignette)"
+     id="rect11" />
+  <!-- Faint Watermark Logo (Bottom Right behind Obstacles Box) -->
+  <g
+     transform="translate(655, 362)"
+     stroke="#ffffff"
+     fill="none"
+     opacity="0.04"
+     id="g13">
+    <circle
+       r="120"
+       stroke-width="15"
+       id="circle11" />
+    <circle
+       r="80"
+       stroke-width="8"
+       id="circle12" />
+    <path
+       d="M-150,0 h300 M0,-150 v300"
+       stroke-width="8"
+       id="path12" />
+    <circle
+       r="30"
+       fill="#ffffff"
+       opacity="0.05"
+       id="circle13" />
+    <path
+       d="M -30,-30 L 30,30 M -30,30 L 30,-30"
+       stroke-width="4"
+       id="path13" />
+  </g>
+  <!-- ========================================== -->
+  <!-- TOP NAVIGATION ROW                         -->
+  <!-- ========================================== -->
+  <!-- Type Box -->
+  <g
+     transform="translate(30, 20)"
+     id="g15">
+    <rect
+       width="230"
+       height="80"
+       class="box"
+       id="rect13" />
+    <text
+       x="15"
+       y="45"
+       class="text-title"
+       id="text13">TYPE</text>
+    <!-- Winding Line Icon -->
+    <path
+       d="M 80,45 Q 90,25 100,45 T 120,45"
+       fill="none"
+       stroke="#ffeb3b"
+       stroke-width="3"
+       stroke-linecap="round"
+       id="path14" />
+    <!-- Circuit Loop Icon (Highlighted) -->
+    <rect
+       x="145"
+       y="20"
+       width="50"
+       height="40"
+       fill="#4a4a4a"
+       rx="4"
+       id="rect14" />
+    <rect
+       x="155"
+       y="30"
+       width="30"
+       height="20"
+       rx="10"
+       fill="none"
+       stroke="#ffeb3b"
+       stroke-width="3"
+       id="rect15" />
+  </g>
+  <!-- Exit Box -->
+  <g
+     transform="translate(285, 20)"
+     id="g18">
+    <rect
+       width="230"
+       height="80"
+       class="box"
+       id="rect16" />
+    <text
+       x="15"
+       y="45"
+       class="text-title"
+       id="text16">EXIT</text>
+    <!-- Checkered Flag Icon -->
+    <rect
+       x="120"
+       y="20"
+       width="4"
+       height="40"
+       fill="#888"
+       rx="1"
+       id="rect17" />
+    <rect
+       x="124"
+       y="20"
+       width="36"
+       height="24"
+       fill="url(#checker)"
+       id="rect18" />
+  </g>
+  <!-- Code Box -->
+  <g
+     transform="translate(540, 20)"
+     id="g20">
+    <rect
+       width="230"
+       height="80"
+       class="box"
+       id="rect19" />
+    <text
+       x="15"
+       y="45"
+       class="text-title"
+       id="text19">CODE</text>
+    <!-- Text Field -->
+    <rect
+       x="75"
+       y="25"
+       width="140"
+       height="30"
+       fill="#111"
+       stroke="#333"
+       stroke-width="2"
+       rx="2"
+       id="rect20" />
+    <text
+       x="145"
+       y="45"
+       class="text-title"
+       text-anchor="middle"
+       font-size="14"
+       id="text20">I MXFSFK0-69</text>
+  </g>
+  <!-- ========================================== -->
+  <!-- MIDDLE SECTION: SLIDER GRID (3x3)          -->
+  <!-- ========================================== -->
+  <!-- ROW 1 -->
+  <!-- Curves (50%) -->
+  <g
+     transform="translate(30, 120)"
+     id="g25">
+    <rect
+       width="230"
+       height="85"
+       class="box"
+       id="rect21" />
+    <text
+       x="15"
+       y="32"
+       class="text-title"
+       id="text21">CURVES</text>
+    <text
+       x="32"
+       y="64"
+       class="text-minmax"
+       text-anchor="end"
+       id="text23">MIN</text>
+    <text
+       x="198"
+       y="64"
+       class="text-minmax"
+       text-anchor="start"
+       id="text24">MAX</text>
+    <rect
+       x="40"
+       y="55"
+       width="150"
+       height="12"
+       class="track-bg"
+       id="rect24" />
+  </g>
+  <!-- Hills (64%) -->
+  <g
+     transform="translate(285, 120)"
+     id="g30">
+    <rect
+       width="230"
+       height="85"
+       class="box"
+       id="rect26" />
+    <text
+       x="15"
+       y="32"
+       class="text-title"
+       id="text26">HILLS</text>
+    <text
+       x="32"
+       y="64"
+       class="text-minmax"
+       text-anchor="end"
+       id="text28">MIN</text>
+    <text
+       x="198"
+       y="64"
+       class="text-minmax"
+       text-anchor="start"
+       id="text29">MAX</text>
+    <rect
+       x="40"
+       y="55"
+       width="150"
+       height="12"
+       class="track-bg"
+       id="rect29" />
+  </g>
+  <!-- Scenery (64%) -->
+  <g
+     transform="translate(540, 120)"
+     id="g35">
+    <rect
+       width="230"
+       height="85"
+       class="box"
+       id="rect31" />
+    <text
+       x="15"
+       y="32"
+       class="text-title"
+       id="text31">SCENERY</text>
+    <text
+       x="32"
+       y="64"
+       class="text-minmax"
+       text-anchor="end"
+       id="text33">MIN</text>
+    <text
+       x="198"
+       y="64"
+       class="text-minmax"
+       text-anchor="start"
+       id="text34">MAX</text>
+    <rect
+       x="40"
+       y="55"
+       width="150"
+       height="12"
+       class="track-bg"
+       id="rect34" />
+  </g>
+  <!-- ROW 2 -->
+  <!-- Sharpness (24%) -->
+  <g
+     transform="translate(30, 220)"
+     id="g40">
+    <rect
+       width="230"
+       height="85"
+       class="box"
+       id="rect36" />
+    <text
+       x="15"
+       y="32"
+       class="text-title"
+       id="text36">SHARPNESS</text>
+    <text
+       x="32"
+       y="64"
+       class="text-minmax"
+       text-anchor="end"
+       id="text38">MIN</text>
+    <text
+       x="198"
+       y="64"
+       class="text-minmax"
+       text-anchor="start"
+       id="text39">MAX</text>
+    <rect
+       x="40"
+       y="55"
+       width="150"
+       height="12"
+       class="track-bg"
+       id="rect39" />
+  </g>
+  <!-- Steepness (36%) -->
+  <g
+     transform="translate(285, 220)"
+     id="g45">
+    <rect
+       width="230"
+       height="85"
+       class="box"
+       id="rect41" />
+    <text
+       x="15"
+       y="32"
+       class="text-title"
+       id="text41">STEEPNESS</text>
+    <text
+       x="32"
+       y="64"
+       class="text-minmax"
+       text-anchor="end"
+       id="text43">MIN</text>
+    <text
+       x="198"
+       y="64"
+       class="text-minmax"
+       text-anchor="start"
+       id="text44">MAX</text>
+    <rect
+       x="40"
+       y="55"
+       width="150"
+       height="12"
+       class="track-bg"
+       id="rect44" />
+  </g>
+  <!-- Scatter (100% - Selected / Highlighted) -->
+  <g
+     transform="translate(540, 220)"
+     id="g50">
+    <rect
+       width="230"
+       height="85"
+       class="box-highlight"
+       id="rect46" />
+    <text
+       x="15"
+       y="32"
+       class="text-title"
+       id="text46">SCATTER</text>
+    <text
+       x="32"
+       y="64"
+       class="text-minmax"
+       text-anchor="end"
+       id="text48">MIN</text>
+    <text
+       x="198"
+       y="64"
+       class="text-minmax"
+       text-anchor="start"
+       id="text49">MAX</text>
+    <rect
+       x="40"
+       y="55"
+       width="150"
+       height="12"
+       class="track-bg"
+       id="rect49" />
+  </g>
+  <!-- ROW 3 -->
+  <!-- Length (0%) -->
+  <g
+     transform="translate(30, 320)"
+     id="g54">
+    <rect
+       width="230"
+       height="85"
+       class="box"
+       id="rect51" />
+    <text
+       x="15"
+       y="32"
+       class="text-title"
+       id="text51">LENGTH</text>
+    <text
+       x="32"
+       y="64"
+       class="text-minmax"
+       text-anchor="end"
+       id="text53">MIN</text>
+    <text
+       x="198"
+       y="64"
+       class="text-minmax"
+       text-anchor="start"
+       id="text54">MAX</text>
+    <rect
+       x="40"
+       y="55"
+       width="150"
+       height="12"
+       class="track-bg"
+       id="rect54" />
+    <!-- No track-fill rect since value is 0% -->
+  </g>
+  <!-- Difficulty (69) -->
+  <g
+     transform="translate(285, 320)"
+     id="g59">
+    <rect
+       width="230"
+       height="85"
+       class="box"
+       id="rect55" />
+    <text
+       x="15"
+       y="32"
+       class="text-title"
+       id="text55">DIFFICULTY</text>
+    <text
+       x="32"
+       y="64"
+       class="text-minmax"
+       text-anchor="end"
+       id="text57">MIN</text>
+    <text
+       x="198"
+       y="64"
+       class="text-minmax"
+       text-anchor="start"
+       id="text58">MAX</text>
+    <rect
+       x="40"
+       y="55"
+       width="150"
+       height="12"
+       class="track-bg"
+       id="rect58" />
+  </g>
+  <!-- Obstacles (44%) -->
+  <g
+     transform="translate(540, 320)"
+     id="g64">
+    <rect
+       width="230"
+       height="85"
+       class="box"
+       id="rect60" />
+    <text
+       x="15"
+       y="32"
+       class="text-title"
+       id="text60">OBSTACLES</text>
+    <text
+       x="32"
+       y="64"
+       class="text-minmax"
+       text-anchor="end"
+       id="text62">MIN</text>
+    <text
+       x="198"
+       y="64"
+       class="text-minmax"
+       text-anchor="start"
+       id="text63">MAX</text>
+    <rect
+       x="40"
+       y="55"
+       width="150"
+       height="12"
+       class="track-bg"
+       id="rect63" />
+  </g>
+  <!-- ========================================== -->
+  <!-- BOTTOM TRAY: SCENARIO SELECTION            -->
+  <!-- ========================================== -->
+  <g
+     transform="translate(30, 430)"
+     id="g94">
+    <rect
+       width="740"
+       height="140"
+       class="box"
+       id="rect65" />
+    <text
+       x="15"
+       y="30"
+       class="text-title"
+       id="text65">SCENARIO</text>
+    <!-- 13 Icons inside the Tray -->
+    <!-- Starting X = 23, width = 46, gap = 8 => stride = 54 -->
+    <!-- 1. City / Castle -->
+    <g
+       transform="translate(23, 45)"
+       id="g66">
+      <rect
+         width="46"
+         height="75"
+         class="slot"
+         id="rect66" />
+      <path
+         d="M 5,60 v-20 h6 v5 h5 v-5 h5 v15 h8 v-25 h5 v25 h5 v-10 h5 v15 z"
+         class="icon-sil"
+         id="path66" />
     </g>
-
-    <!-- ========================================== -->
-    <!-- TOP NAVIGATION ROW                         -->
-    <!-- ========================================== -->
-    
-    <!-- Type Box -->
-    <g transform="translate(30, 20)">
-        <rect width="230" height="80" class="box" />
-        <text x="15" y="45" class="text-title">TYPE</text>
-        
-        <!-- Winding Line Icon -->
-        <path d="M 80,45 Q 90,25 100,45 T 120,45" fill="none" stroke="#ffeb3b" stroke-width="3" stroke-linecap="round"/>
-        
-        <!-- Circuit Loop Icon (Highlighted) -->
-        <rect x="145" y="20" width="50" height="40" fill="#4a4a4a" rx="4" />
-        <rect x="155" y="30" width="30" height="20" rx="10" fill="none" stroke="#ffeb3b" stroke-width="3" />
+    <!-- 2. Space / Planet -->
+    <g
+       transform="translate(77, 45)"
+       id="g67">
+      <rect
+         width="46"
+         height="75"
+         class="slot"
+         id="rect67" />
+      <circle
+         cx="23"
+         cy="37"
+         r="10"
+         class="icon-sil"
+         id="circle67" />
+      <ellipse
+         cx="23"
+         cy="37"
+         rx="16"
+         ry="4"
+         fill="none"
+         stroke="#151515"
+         stroke-width="3"
+         transform="rotate(-15 23 37)"
+         id="ellipse67" />
     </g>
-
-    <!-- Exit Box -->
-    <g transform="translate(285, 20)">
-        <rect width="230" height="80" class="box" />
-        <text x="15" y="45" class="text-title">EXIT</text>
-        
-        <!-- Checkered Flag Icon -->
-        <rect x="120" y="20" width="4" height="40" fill="#888" rx="1" />
-        <rect x="124" y="20" width="36" height="24" fill="url(#checker)" />
+    <!-- 3. Crescent Moon -->
+    <g
+       transform="translate(131, 45)"
+       id="g68">
+      <rect
+         width="46"
+         height="75"
+         class="slot"
+         id="rect68" />
+      <path
+         d="M 28,25 a 15,15 0 1,0 10,25 a 18,18 0 1,1 -10,-25 z"
+         class="icon-sil"
+         id="path68" />
     </g>
-
-    <!-- Code Box -->
-    <g transform="translate(540, 20)">
-        <rect width="230" height="80" class="box" />
-        <text x="15" y="45" class="text-title">CODE</text>
-        
-        <!-- Text Field -->
-        <rect x="75" y="25" width="140" height="30" fill="#111" stroke="#333" stroke-width="2" rx="2" />
-        <text x="145" y="45" class="text-title" text-anchor="middle" font-size="14">I MXFSFK0-69</text>
+    <!-- 4. Crystal / Explosion -->
+    <g
+       transform="translate(185, 45)"
+       id="g69">
+      <rect
+         width="46"
+         height="75"
+         class="slot"
+         id="rect69" />
+      <polygon
+         points="23,20 27,32 39,36 27,40 23,52 19,40 7,36 19,32"
+         class="icon-sil"
+         id="polygon69" />
     </g>
-
-
-    <!-- ========================================== -->
-    <!-- MIDDLE SECTION: SLIDER GRID (3x3)          -->
-    <!-- ========================================== -->
-    
-    <!-- ROW 1 -->
-    <!-- Curves (50%) -->
-    <g transform="translate(30, 120)">
-        <rect width="230" height="85" class="box" />
-        <text x="15" y="32" class="text-title">CURVES</text>
-        <text x="215" y="32" class="text-value" text-anchor="end">50%</text>
-        <text x="32" y="64" class="text-minmax" text-anchor="end">MIN</text>
-        <text x="198" y="64" class="text-minmax" text-anchor="start">MAX</text>
-        <rect x="40" y="55" width="150" height="12" class="track-bg" />
-        <rect x="42" y="57" width="73" height="8" class="track-fill" />
+    <!-- 5. Mountain -->
+    <g
+       transform="translate(239, 45)"
+       id="g71">
+      <rect
+         width="46"
+         height="75"
+         class="slot"
+         id="rect70" />
+      <polygon
+         points="23,25 43,60 3,60"
+         class="icon-sil"
+         id="polygon70" />
+      <polygon
+         points="35,40 45,60 25,60"
+         class="icon-sil"
+         id="polygon71" />
     </g>
-
-    <!-- Hills (64%) -->
-    <g transform="translate(285, 120)">
-        <rect width="230" height="85" class="box" />
-        <text x="15" y="32" class="text-title">HILLS</text>
-        <text x="215" y="32" class="text-value" text-anchor="end">64%</text>
-        <text x="32" y="64" class="text-minmax" text-anchor="end">MIN</text>
-        <text x="198" y="64" class="text-minmax" text-anchor="start">MAX</text>
-        <rect x="40" y="55" width="150" height="12" class="track-bg" />
-        <rect x="42" y="57" width="93" height="8" class="track-fill" />
+    <!-- 6. Tree with Cloud -->
+    <g
+       transform="translate(293, 45)"
+       id="g74">
+      <rect
+         width="46"
+         height="75"
+         class="slot"
+         id="rect71" />
+      <circle
+         cx="15"
+         cy="30"
+         r="7"
+         class="icon-sil"
+         id="circle71" />
+      <circle
+         cx="25"
+         cy="30"
+         r="9"
+         class="icon-sil"
+         id="circle72" />
+      <circle
+         cx="35"
+         cy="32"
+         r="6"
+         class="icon-sil"
+         id="circle73" />
+      <rect
+         x="17"
+         y="50"
+         width="6"
+         height="15"
+         class="icon-sil"
+         id="rect73" />
+      <circle
+         cx="20"
+         cy="40"
+         r="10"
+         class="icon-sil"
+         id="circle74" />
     </g>
-
-    <!-- Scenery (64%) -->
-    <g transform="translate(540, 120)">
-        <rect width="230" height="85" class="box" />
-        <text x="15" y="32" class="text-title">SCENERY</text>
-        <text x="215" y="32" class="text-value" text-anchor="end">64%</text>
-        <text x="32" y="64" class="text-minmax" text-anchor="end">MIN</text>
-        <text x="198" y="64" class="text-minmax" text-anchor="start">MAX</text>
-        <rect x="40" y="55" width="150" height="12" class="track-bg" />
-        <rect x="42" y="57" width="93" height="8" class="track-fill" />
+    <!-- 7. Warning Sign (SELECTED) -->
+    <g
+       transform="translate(347, 45)"
+       id="g75">
+      <rect
+         width="46"
+         height="75"
+         class="slot-selected"
+         id="rect74" />
+      <polygon
+         points="23,15 3,60 43,60"
+         fill="#fbc02d"
+         stroke="#c1272d"
+         stroke-width="3"
+         stroke-linejoin="round"
+         id="polygon74" />
+      <path
+         d="M 15,38 l 5,10 l -5,10 M 20,48 l 5,-5 M 31,38 l -5,10 l 5,10 M 26,48 l -5,-5"
+         stroke="#111"
+         stroke-width="2"
+         stroke-linecap="round"
+         stroke-linejoin="round"
+         fill="none"
+         id="path74" />
     </g>
-
-    <!-- ROW 2 -->
-    <!-- Sharpness (24%) -->
-    <g transform="translate(30, 220)">
-        <rect width="230" height="85" class="box" />
-        <text x="15" y="32" class="text-title">SHARPNESS</text>
-        <text x="215" y="32" class="text-value" text-anchor="end">24%</text>
-        <text x="32" y="64" class="text-minmax" text-anchor="end">MIN</text>
-        <text x="198" y="64" class="text-minmax" text-anchor="start">MAX</text>
-        <rect x="40" y="55" width="150" height="12" class="track-bg" />
-        <rect x="42" y="57" width="35" height="8" class="track-fill" />
+    <!-- 8. Cloud over Hill -->
+    <g
+       transform="translate(401, 45)"
+       id="g77">
+      <rect
+         width="46"
+         height="75"
+         class="slot"
+         id="rect75" />
+      <path
+         d="M 5,65 q 18,-25 36,0"
+         class="icon-sil"
+         id="path75" />
+      <circle
+         cx="15"
+         cy="30"
+         r="7"
+         class="icon-sil"
+         id="circle75" />
+      <circle
+         cx="25"
+         cy="28"
+         r="9"
+         class="icon-sil"
+         id="circle76" />
+      <circle
+         cx="35"
+         cy="32"
+         r="6"
+         class="icon-sil"
+         id="circle77" />
     </g>
-
-    <!-- Steepness (36%) -->
-    <g transform="translate(285, 220)">
-        <rect width="230" height="85" class="box" />
-        <text x="15" y="32" class="text-title">STEEPNESS</text>
-        <text x="215" y="32" class="text-value" text-anchor="end">36%</text>
-        <text x="32" y="64" class="text-minmax" text-anchor="end">MIN</text>
-        <text x="198" y="64" class="text-minmax" text-anchor="start">MAX</text>
-        <rect x="40" y="55" width="150" height="12" class="track-bg" />
-        <rect x="42" y="57" width="53" height="8" class="track-fill" />
+    <!-- 9. Circular Bush -->
+    <g
+       transform="translate(455, 45)"
+       id="g80">
+      <rect
+         width="46"
+         height="75"
+         class="slot"
+         id="rect77" />
+      <circle
+         cx="23"
+         cy="45"
+         r="10"
+         class="icon-sil"
+         id="circle78" />
+      <circle
+         cx="13"
+         cy="50"
+         r="8"
+         class="icon-sil"
+         id="circle79" />
+      <circle
+         cx="33"
+         cy="50"
+         r="8"
+         class="icon-sil"
+         id="circle80" />
     </g>
-
-    <!-- Scatter (100% - Selected / Highlighted) -->
-    <g transform="translate(540, 220)">
-        <rect width="230" height="85" class="box-highlight" />
-        <text x="15" y="32" class="text-title">SCATTER</text>
-        <text x="215" y="32" class="text-value" text-anchor="end">100%</text>
-        <text x="32" y="64" class="text-minmax" text-anchor="end">MIN</text>
-        <text x="198" y="64" class="text-minmax" text-anchor="start">MAX</text>
-        <rect x="40" y="55" width="150" height="12" class="track-bg" />
-        <rect x="42" y="57" width="146" height="8" class="track-fill" />
+    <!-- 10. Large Deciduous Tree -->
+    <g
+       transform="translate(509, 45)"
+       id="g81">
+      <rect
+         width="46"
+         height="75"
+         class="slot"
+         id="rect80" />
+      <rect
+         x="20"
+         y="45"
+         width="6"
+         height="20"
+         class="icon-sil"
+         id="rect81" />
+      <circle
+         cx="23"
+         cy="30"
+         r="15"
+         class="icon-sil"
+         id="circle81" />
     </g>
-
-    <!-- ROW 3 -->
-    <!-- Length (0%) -->
-    <g transform="translate(30, 320)">
-        <rect width="230" height="85" class="box" />
-        <text x="15" y="32" class="text-title">LENGTH</text>
-        <text x="215" y="32" class="text-value" text-anchor="end">0%</text>
-        <text x="32" y="64" class="text-minmax" text-anchor="end">MIN</text>
-        <text x="198" y="64" class="text-minmax" text-anchor="start">MAX</text>
-        <rect x="40" y="55" width="150" height="12" class="track-bg" />
-        <!-- No track-fill rect since value is 0% -->
+    <!-- 11. Torii Gate -->
+    <g
+       transform="translate(563, 45)"
+       id="g86">
+      <rect
+         width="46"
+         height="75"
+         class="slot"
+         id="rect82" />
+      <rect
+         x="10"
+         y="25"
+         width="4"
+         height="40"
+         class="icon-sil"
+         id="rect83" />
+      <rect
+         x="32"
+         y="25"
+         width="4"
+         height="40"
+         class="icon-sil"
+         id="rect84" />
+      <rect
+         x="4"
+         y="30"
+         width="38"
+         height="4"
+         class="icon-sil"
+         id="rect85" />
+      <rect
+         x="7"
+         y="38"
+         width="32"
+         height="3"
+         class="icon-sil"
+         id="rect86" />
     </g>
-
-    <!-- Difficulty (69) -->
-    <g transform="translate(285, 320)">
-        <rect width="230" height="85" class="box" />
-        <text x="15" y="32" class="text-title">DIFFICULTY</text>
-        <text x="215" y="32" class="text-value" text-anchor="end">69</text>
-        <text x="32" y="64" class="text-minmax" text-anchor="end">MIN</text>
-        <text x="198" y="64" class="text-minmax" text-anchor="start">MAX</text>
-        <rect x="40" y="55" width="150" height="12" class="track-bg" />
-        <rect x="42" y="57" width="101" height="8" class="track-fill" />
+    <!-- 12. Windsock -->
+    <g
+       transform="translate(617, 45)"
+       id="g88">
+      <rect
+         width="46"
+         height="75"
+         class="slot"
+         id="rect87" />
+      <rect
+         x="15"
+         y="20"
+         width="4"
+         height="45"
+         class="icon-sil"
+         id="rect88" />
+      <polygon
+         points="19,25 39,32 39,42 19,47"
+         class="icon-sil"
+         id="polygon88" />
     </g>
-
-    <!-- Obstacles (44%) -->
-    <g transform="translate(540, 320)">
-        <rect width="230" height="85" class="box" />
-        <text x="15" y="32" class="text-title">OBSTACLES</text>
-        <text x="215" y="32" class="text-value" text-anchor="end">44%</text>
-        <text x="32" y="64" class="text-minmax" text-anchor="end">MIN</text>
-        <text x="198" y="64" class="text-minmax" text-anchor="start">MAX</text>
-        <rect x="40" y="55" width="150" height="12" class="track-bg" />
-        <rect x="42" y="57" width="64" height="8" class="track-fill" />
+    <!-- 13. Dense Rounded Tree -->
+    <g
+       transform="translate(671, 45)"
+       id="g93">
+      <rect
+         width="46"
+         height="75"
+         class="slot"
+         id="rect89" />
+      <rect
+         x="20"
+         y="50"
+         width="6"
+         height="15"
+         class="icon-sil"
+         id="rect90" />
+      <circle
+         cx="23"
+         cy="40"
+         r="10"
+         class="icon-sil"
+         id="circle90" />
+      <circle
+         cx="15"
+         cy="30"
+         r="8"
+         class="icon-sil"
+         id="circle91" />
+      <circle
+         cx="31"
+         cy="30"
+         r="8"
+         class="icon-sil"
+         id="circle92" />
+      <circle
+         cx="23"
+         cy="20"
+         r="9"
+         class="icon-sil"
+         id="circle93" />
     </g>
-
-
-    <!-- ========================================== -->
-    <!-- BOTTOM TRAY: SCENARIO SELECTION            -->
-    <!-- ========================================== -->
-    
-    <g transform="translate(30, 430)">
-        <rect width="740" height="140" class="box" />
-        <text x="15" y="30" class="text-title">SCENARIO</text>
-
-        <!-- 13 Icons inside the Tray -->
-        <!-- Starting X = 23, width = 46, gap = 8 => stride = 54 -->
-        
-        <!-- 1. City / Castle -->
-        <g transform="translate(23, 45)">
-            <rect width="46" height="75" class="slot" />
-            <path d="M 5,60 v-20 h6 v5 h5 v-5 h5 v15 h8 v-25 h5 v25 h5 v-10 h5 v15 z" class="icon-sil"/>
-        </g>
-
-        <!-- 2. Space / Planet -->
-        <g transform="translate(77, 45)">
-            <rect width="46" height="75" class="slot" />
-            <circle cx="23" cy="37" r="10" class="icon-sil"/>
-            <ellipse cx="23" cy="37" rx="16" ry="4" fill="none" stroke="#151515" stroke-width="3" transform="rotate(-15 23 37)"/>
-        </g>
-
-        <!-- 3. Crescent Moon -->
-        <g transform="translate(131, 45)">
-            <rect width="46" height="75" class="slot" />
-            <path d="M 28,25 a 15,15 0 1,0 10,25 a 18,18 0 1,1 -10,-25 z" class="icon-sil"/>
-        </g>
-
-        <!-- 4. Crystal / Explosion -->
-        <g transform="translate(185, 45)">
-            <rect width="46" height="75" class="slot" />
-            <polygon points="23,20 27,32 39,36 27,40 23,52 19,40 7,36 19,32" class="icon-sil"/>
-        </g>
-
-        <!-- 5. Mountain -->
-        <g transform="translate(239, 45)">
-            <rect width="46" height="75" class="slot" />
-            <polygon points="23,25 43,60 3,60" class="icon-sil"/>
-            <polygon points="35,40 45,60 25,60" class="icon-sil"/>
-        </g>
-
-        <!-- 6. Tree with Cloud -->
-        <g transform="translate(293, 45)">
-            <rect width="46" height="75" class="slot" />
-            <circle cx="15" cy="30" r="7" class="icon-sil"/>
-            <circle cx="25" cy="30" r="9" class="icon-sil"/>
-            <circle cx="35" cy="32" r="6" class="icon-sil"/>
-            <rect x="17" y="50" width="6" height="15" class="icon-sil"/>
-            <circle cx="20" cy="40" r="10" class="icon-sil"/>
-        </g>
-
-        <!-- 7. Warning Sign (SELECTED) -->
-        <g transform="translate(347, 45)">
-            <rect width="46" height="75" class="slot-selected" />
-            <polygon points="23,15 3,60 43,60" fill="#fbc02d" stroke="#c1272d" stroke-width="3" stroke-linejoin="round"/>
-            <path d="M 15,38 l 5,10 l -5,10 M 20,48 l 5,-5 M 31,38 l -5,10 l 5,10 M 26,48 l -5,-5" stroke="#111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-        </g>
-
-        <!-- 8. Cloud over Hill -->
-        <g transform="translate(401, 45)">
-            <rect width="46" height="75" class="slot" />
-            <path d="M 5,65 q 18,-25 36,0" class="icon-sil"/>
-            <circle cx="15" cy="30" r="7" class="icon-sil"/>
-            <circle cx="25" cy="28" r="9" class="icon-sil"/>
-            <circle cx="35" cy="32" r="6" class="icon-sil"/>
-        </g>
-
-        <!-- 9. Circular Bush -->
-        <g transform="translate(455, 45)">
-            <rect width="46" height="75" class="slot" />
-            <circle cx="23" cy="45" r="10" class="icon-sil"/>
-            <circle cx="13" cy="50" r="8" class="icon-sil"/>
-            <circle cx="33" cy="50" r="8" class="icon-sil"/>
-        </g>
-
-        <!-- 10. Large Deciduous Tree -->
-        <g transform="translate(509, 45)">
-            <rect width="46" height="75" class="slot" />
-            <rect x="20" y="45" width="6" height="20" class="icon-sil"/>
-            <circle cx="23" cy="30" r="15" class="icon-sil"/>
-        </g>
-
-        <!-- 11. Torii Gate -->
-        <g transform="translate(563, 45)">
-            <rect width="46" height="75" class="slot" />
-            <rect x="10" y="25" width="4" height="40" class="icon-sil"/>
-            <rect x="32" y="25" width="4" height="40" class="icon-sil"/>
-            <rect x="4" y="30" width="38" height="4" class="icon-sil"/>
-            <rect x="7" y="38" width="32" height="3" class="icon-sil"/>
-        </g>
-
-        <!-- 12. Windsock -->
-        <g transform="translate(617, 45)">
-            <rect width="46" height="75" class="slot" />
-            <rect x="15" y="20" width="4" height="45" class="icon-sil"/>
-            <polygon points="19,25 39,32 39,42 19,47" class="icon-sil"/>
-        </g>
-
-        <!-- 13. Dense Rounded Tree -->
-        <g transform="translate(671, 45)">
-            <rect width="46" height="75" class="slot" />
-            <rect x="20" y="50" width="6" height="15" class="icon-sil"/>
-            <circle cx="23" cy="40" r="10" class="icon-sil"/>
-            <circle cx="15" cy="30" r="8" class="icon-sil"/>
-            <circle cx="31" cy="30" r="8" class="icon-sil"/>
-            <circle cx="23" cy="20" r="9" class="icon-sil"/>
-        </g>
-
-    </g>
-
-    <!-- CRT Scanline Pattern Overlay -->
-    <rect width="100%" height="100%" fill="url(#scanlines)" pointer-events="none" />
+  </g>
+  <!-- CRT Scanline Pattern Overlay -->
+  <rect
+     width="100%"
+     height="100%"
+     fill="url(#scanlines)"
+     pointer-events="none"
+     id="rect94" />
 </svg>

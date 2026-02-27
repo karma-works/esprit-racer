@@ -433,25 +433,8 @@ export const MUSIC_TRACKS: MusicTrack[] = [
 
 const MUSIC_CHANNELS = MUSIC_TRACKS;
 
-const THEME_LIST = [
-  { id: "night", name: "NIGHT" },
-  { id: "fog", name: "FOG" },
-  { id: "snow", name: "SNOW" },
-  { id: "storm", name: "STORM" },
-  { id: "desert", name: "DESERT" },
-  { id: "future", name: "FUTURE" },
-  { id: "marsh", name: "MARSH" },
-  { id: "mountains", name: "MOUNTAINS" },
-  { id: "lakes", name: "LAKES" },
-  { id: "country", name: "COUNTRY" },
-  { id: "city", name: "CITY" },
-  { id: "roadworks", name: "ROADWORKS" },
-  { id: "windy", name: "WINDY" },
-];
-
 export class MusicSelectionScreen implements UIScreen {
   private selectedIndex: number = 0;
-  private themeIndex: number = 0;
 
   constructor(
     private width: number,
@@ -464,10 +447,6 @@ export class MusicSelectionScreen implements UIScreen {
 
   getSelectedChannel(): string {
     return this.getSelectedTrack().id;
-  }
-
-  getSelectedThemeId(): string {
-    return THEME_LIST[this.themeIndex]?.id ?? "night";
   }
 
   render(ctx: CanvasRenderingContext2D, state: TimeChallengeState): void {
@@ -484,12 +463,12 @@ export class MusicSelectionScreen implements UIScreen {
 
     const currentChannel = MUSIC_CHANNELS[this.selectedIndex];
     if (currentChannel) {
-      const displayY = 80 * (this.height / 600);
+      const displayY = 110 * (this.height / 600);
 
       ctx.fillStyle = "rgba(0, 0, 0, 0.6)";
       ctx.fillRect(centerX - 200, displayY - 30, 400, 50);
 
-      ctx.font = `bold ${24 * (this.height / 600)}px monospace`;
+      ctx.font = `bold ${28 * (this.height / 600)}px monospace`;
       ctx.fillStyle = "#ff8c00";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
@@ -499,33 +478,16 @@ export class MusicSelectionScreen implements UIScreen {
       ctx.shadowBlur = 0;
     }
 
-    const currentTheme = THEME_LIST[this.themeIndex];
-    if (currentTheme) {
-      const displayY = 150 * (this.height / 600);
-
-      ctx.fillStyle = "rgba(0, 0, 0, 0.6)";
-      ctx.fillRect(centerX - 200, displayY - 30, 400, 50);
-
-      ctx.font = `bold ${24 * (this.height / 600)}px monospace`;
-      ctx.fillStyle = "#00ff88";
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      ctx.shadowColor = "#00ff88";
-      ctx.shadowBlur = 10;
-      ctx.fillText(`TRACK: ${currentTheme.name}`, centerX, displayY);
-      ctx.shadowBlur = 0;
-    }
-
     ctx.fillStyle = "rgba(0, 0, 0, 0.7)";
-    ctx.fillRect(this.width / 2 - 200, this.height - 80, 400, 50);
-    ctx.font = `bold ${14 * (this.height / 600)}px monospace`;
+    ctx.fillRect(this.width / 2 - 160, this.height - 80, 320, 40);
+    ctx.font = `bold ${16 * (this.height / 600)}px monospace`;
     ctx.fillStyle = "#ff8c00";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.fillText(
-      "UP/DOWN: THEME   LEFT/RIGHT: MUSIC   SPACE: START",
+      "LEFT/RIGHT: SELECT   SPACE/ENTER: START",
       this.width / 2,
-      this.height - 55,
+      this.height - 60,
     );
   }
 
@@ -534,11 +496,9 @@ export class MusicSelectionScreen implements UIScreen {
   }
 
   handleKeyDown(keyCode: number): string | null {
-    const { LEFT, RIGHT, UP, DOWN, SPACE } = {
+    const { LEFT, RIGHT, SPACE } = {
       LEFT: 37,
       RIGHT: 39,
-      UP: 38,
-      DOWN: 40,
       SPACE: 32,
     };
 
@@ -552,11 +512,6 @@ export class MusicSelectionScreen implements UIScreen {
         MUSIC_CHANNELS.length;
     } else if (keyCode === RIGHT) {
       this.selectedIndex = (this.selectedIndex + 1) % MUSIC_CHANNELS.length;
-    } else if (keyCode === UP) {
-      this.themeIndex =
-        (this.themeIndex - 1 + THEME_LIST.length) % THEME_LIST.length;
-    } else if (keyCode === DOWN) {
-      this.themeIndex = (this.themeIndex + 1) % THEME_LIST.length;
     }
 
     return null;
@@ -566,6 +521,391 @@ export class MusicSelectionScreen implements UIScreen {
 
   getZones(): MenuZone[] {
     return [];
+  }
+}
+
+export interface RECSConfig {
+  themeId: string;
+  curves: number;
+  hills: number;
+  scenery: number;
+  sharpness: number;
+  steepness: number;
+  scatter: number;
+  length: number;
+  difficulty: number;
+  obstacles: number;
+}
+
+const THEME_LIST = [
+  { id: "night", name: "NIGHT", icon: "theme-night.svg" },
+  { id: "fog", name: "FOG", icon: "theme-fog.svg" },
+  { id: "snow", name: "SNOW", icon: "theme-snow.svg" },
+  { id: "storm", name: "STORM", icon: "theme-storm.svg" },
+  { id: "desert", name: "DESERT", icon: "theme-desert.svg" },
+  { id: "future", name: "FUTURE", icon: "theme-future.svg" },
+  { id: "marsh", name: "MARSH", icon: "theme-marsh.svg" },
+  { id: "mountains", name: "MOUNTAINS", icon: "theme-mountains.svg" },
+  { id: "lakes", name: "LAKES", icon: "theme-lakes.svg" },
+  { id: "country", name: "COUNTRY", icon: "theme-country.svg" },
+  { id: "city", name: "CITY", icon: "theme-city.svg" },
+  { id: "roadworks", name: "ROADWORKS", icon: "theme-roadworks.svg" },
+  { id: "windy", name: "WINDY", icon: "theme-windy.svg" },
+];
+
+const RECS_SLIDERS = [
+  { id: "curves", name: "CURVES", row: 0, col: 0 },
+  { id: "hills", name: "HILLS", row: 0, col: 1 },
+  { id: "scenery", name: "SCENERY", row: 0, col: 2 },
+  { id: "sharpness", name: "SHARPNESS", row: 1, col: 0 },
+  { id: "steepness", name: "STEEPNESS", row: 1, col: 1 },
+  { id: "scatter", name: "SCATTER", row: 1, col: 2 },
+  { id: "length", name: "LENGTH", row: 2, col: 0 },
+  { id: "difficulty", name: "DIFFICULTY", row: 2, col: 1 },
+  { id: "obstacles", name: "OBSTACLES", row: 2, col: 2 },
+];
+
+const RECS_TOP_BUTTONS = [
+  { id: "type", name: "TYPE", x: 30 },
+  { id: "exit", name: "EXIT", x: 285 },
+  { id: "start", name: "START", x: 540 },
+];
+
+export class RECSScreen implements UIScreen {
+  private config: RECSConfig;
+  private selectedRow: number = 0;
+  private selectedCol: number = 0;
+  private mode: "sliders" | "scenario" | "top" = "top";
+
+  constructor(
+    private width: number,
+    private height: number,
+  ) {
+    this.config = {
+      themeId: "night",
+      curves: 50,
+      hills: 50,
+      scenery: 50,
+      sharpness: 50,
+      steepness: 50,
+      scatter: 50,
+      length: 50,
+      difficulty: 50,
+      obstacles: 50,
+    };
+  }
+
+  getConfig(): RECSConfig {
+    return this.config;
+  }
+
+  getSelectedThemeId(): string {
+    return this.config.themeId;
+  }
+
+  private getSliderValue(id: string): number {
+    const key = id as keyof RECSConfig;
+    const value = this.config[key];
+    return typeof value === "number" ? value : 50;
+  }
+
+  private setSliderValue(id: string, value: number): void {
+    const key = id as keyof RECSConfig;
+    if (key in this.config) {
+      (this.config as unknown as Record<string, unknown>)[key] = Math.max(
+        0,
+        Math.min(100, value),
+      );
+    }
+  }
+
+  render(ctx: CanvasRenderingContext2D, _state: TimeChallengeState): void {
+    const scale = this.width / 800;
+    const recsSvg = globalSpriteCache.get("track-builder.svg", scale);
+    if (recsSvg) {
+      ctx.drawImage(recsSvg.canvas, 0, 0, this.width, this.height);
+    } else {
+      ctx.fillStyle = "#1a1a1a";
+      ctx.fillRect(0, 0, this.width, this.height);
+    }
+
+    const scaleX = this.width / 800;
+    const scaleY = this.height / 600;
+
+    for (const slider of RECS_SLIDERS) {
+      const x = (30 + slider.col * 255) * scaleX;
+      const y = (120 + slider.row * 100) * scaleY;
+      const value = this.getSliderValue(slider.id);
+
+      const isSelected =
+        this.mode === "sliders" &&
+        this.selectedRow === slider.row &&
+        this.selectedCol === slider.col;
+
+      if (isSelected) {
+        ctx.strokeStyle = "#c1272d";
+        ctx.lineWidth = 3;
+        ctx.strokeRect(x, y, 230 * scaleX, 85 * scaleY);
+      }
+
+      ctx.fillStyle = "#ffca28";
+      ctx.font = `bold ${14 * Math.min(scaleX, scaleY)}px monospace`;
+      ctx.textAlign = "right";
+      ctx.fillText(`${value}%`, x + 215 * scaleX, y + 32 * scaleY);
+
+      const trackX = x + 40 * scaleX;
+      const trackY = y + 55 * scaleY;
+      const trackW = 150 * scaleX;
+      const trackH = 12 * scaleY;
+      const fillW = (value / 100) * trackW;
+
+      ctx.fillStyle = "#c1272d";
+      ctx.fillRect(trackX + 2, trackY + 2, fillW - 4, 8 * scaleY);
+    }
+
+    const scenarioY = 430 * scaleY;
+    const slotWidth = 46 * scaleX;
+    const slotHeight = 75 * scaleY;
+    const gap = 54 * scaleX;
+    const startX = 53 * scaleX;
+
+    const themeIndex = THEME_LIST.findIndex(
+      (t) => t.id === this.config.themeId,
+    );
+
+    for (let i = 0; i < THEME_LIST.length; i++) {
+      const x = startX + i * gap;
+      const y = scenarioY + 45 * scaleY;
+      const theme = THEME_LIST[i];
+
+      if (theme) {
+        const iconSvg = globalSpriteCache.get(
+          theme.icon,
+          Math.min(scaleX, scaleY),
+        );
+        if (iconSvg) {
+          ctx.drawImage(iconSvg.canvas, x, y, slotWidth, slotHeight);
+        } else {
+          ctx.fillStyle = "#222222";
+          ctx.fillRect(x, y, slotWidth, slotHeight);
+        }
+      }
+
+      if (this.mode === "scenario" && i === this.selectedCol) {
+        ctx.strokeStyle = "#c1272d";
+        ctx.lineWidth = 3;
+        ctx.strokeRect(x - 2, y - 2, slotWidth + 4, slotHeight + 4);
+      } else if (i === themeIndex) {
+        ctx.strokeStyle = "#00ff88";
+        ctx.lineWidth = 2;
+        ctx.strokeRect(x - 1, y - 1, slotWidth + 2, slotHeight + 2);
+      }
+    }
+
+    for (let i = 0; i < RECS_TOP_BUTTONS.length; i++) {
+      const btn = RECS_TOP_BUTTONS[i];
+      if (!btn) continue;
+      const x = btn.x * scaleX;
+      const y = 20 * scaleY;
+      const isSelected = this.mode === "top" && this.selectedCol === i;
+
+      if (isSelected) {
+        ctx.strokeStyle = "#c1272d";
+        ctx.lineWidth = 3;
+        ctx.strokeRect(x, y, 230 * scaleX, 80 * scaleY);
+      }
+    }
+
+    ctx.fillStyle = "rgba(0, 0, 0, 0.7)";
+    ctx.fillRect(this.width / 2 - 300, this.height - 35, 600, 30);
+    ctx.font = `bold ${11 * Math.min(scaleX, scaleY)}px monospace`;
+    ctx.fillStyle = "#ffca28";
+    ctx.textAlign = "center";
+    ctx.fillText(
+      "TAB: MODE   ARROWS: NAVIGATE   A/D: ADJUST   ENTER: SELECT",
+      this.width / 2,
+      this.height - 15,
+    );
+  }
+
+  handleClick(x: number, y: number): string | null {
+    const scaleX = this.width / 800;
+    const scaleY = this.height / 600;
+
+    for (let i = 0; i < RECS_TOP_BUTTONS.length; i++) {
+      const btn = RECS_TOP_BUTTONS[i];
+      if (!btn) continue;
+      const btnX = btn.x * scaleX;
+      const btnY = 20 * scaleY;
+      const btnW = 230 * scaleX;
+      const btnH = 80 * scaleY;
+
+      if (x >= btnX && x <= btnX + btnW && y >= btnY && y <= btnY + btnH) {
+        if (btn.id === "exit") {
+          return "back";
+        } else if (btn.id === "start") {
+          return "start_game";
+        }
+        return null;
+      }
+    }
+
+    for (const slider of RECS_SLIDERS) {
+      const sliderX = (30 + slider.col * 255) * scaleX;
+      const sliderY = (120 + slider.row * 100) * scaleY;
+      const sliderW = 230 * scaleX;
+      const sliderH = 85 * scaleY;
+
+      if (
+        x >= sliderX &&
+        x <= sliderX + sliderW &&
+        y >= sliderY &&
+        y <= sliderY + sliderH
+      ) {
+        const trackX = sliderX + 40 * scaleX;
+        const trackW = 150 * scaleX;
+        const relativeX = x - trackX;
+        const newValue = Math.round((relativeX / trackW) * 100);
+        this.setSliderValue(slider.id, Math.max(0, Math.min(100, newValue)));
+        return null;
+      }
+    }
+
+    const scenarioY = (430 + 45) * scaleY;
+    const slotWidth = 46 * scaleX;
+    const slotHeight = 75 * scaleY;
+    const gap = 54 * scaleX;
+    const startX = 53 * scaleX;
+
+    for (let i = 0; i < THEME_LIST.length; i++) {
+      const iconX = startX + i * gap;
+
+      if (
+        x >= iconX &&
+        x <= iconX + slotWidth &&
+        y >= scenarioY &&
+        y <= scenarioY + slotHeight
+      ) {
+        const theme = THEME_LIST[i];
+        if (theme) {
+          this.config.themeId = theme.id;
+        }
+        return null;
+      }
+    }
+
+    return null;
+  }
+
+  handleMouseMove(x: number, y: number): void {
+    const scaleX = this.width / 800;
+    const scaleY = this.height / 600;
+
+    for (const btn of RECS_TOP_BUTTONS) {
+      if (!btn) continue;
+      const btnX = btn.x * scaleX;
+      const btnY = 20 * scaleY;
+      const btnW = 230 * scaleX;
+      const btnH = 80 * scaleY;
+
+      if (x >= btnX && x <= btnX + btnW && y >= btnY && y <= btnY + btnH) {
+        this.mode = "top";
+        this.selectedCol = RECS_TOP_BUTTONS.indexOf(btn);
+        return;
+      }
+    }
+
+    for (const slider of RECS_SLIDERS) {
+      const sliderX = (30 + slider.col * 255) * scaleX;
+      const sliderY = (120 + slider.row * 100) * scaleY;
+      const sliderW = 230 * scaleX;
+      const sliderH = 85 * scaleY;
+
+      if (
+        x >= sliderX &&
+        x <= sliderX + sliderW &&
+        y >= sliderY &&
+        y <= sliderY + sliderH
+      ) {
+        this.mode = "sliders";
+        this.selectedRow = slider.row;
+        this.selectedCol = slider.col;
+        return;
+      }
+    }
+
+    const scenarioY = (430 + 45) * scaleY;
+    const slotWidth = 46 * scaleX;
+    const slotHeight = 75 * scaleY;
+    const gap = 54 * scaleX;
+    const startX = 53 * scaleX;
+
+    for (let i = 0; i < THEME_LIST.length; i++) {
+      const iconX = startX + i * gap;
+
+      if (
+        x >= iconX &&
+        x <= iconX + slotWidth &&
+        y >= scenarioY &&
+        y <= scenarioY + slotHeight
+      ) {
+        this.mode = "scenario";
+        this.selectedCol = i;
+        return;
+      }
+    }
+  }
+
+  getZones(): MenuZone[] {
+    const scaleX = this.width / 800;
+    const scaleY = this.height / 600;
+    const zones: MenuZone[] = [];
+
+    for (let i = 0; i < RECS_TOP_BUTTONS.length; i++) {
+      const btn = RECS_TOP_BUTTONS[i];
+      if (!btn) continue;
+      zones.push({
+        x: btn.x * scaleX,
+        y: 20 * scaleY,
+        width: 230 * scaleX,
+        height: 80 * scaleY,
+        action: btn.id,
+        row: 0,
+        col: i,
+      });
+    }
+
+    for (const slider of RECS_SLIDERS) {
+      zones.push({
+        x: (30 + slider.col * 255) * scaleX,
+        y: (120 + slider.row * 100) * scaleY,
+        width: 230 * scaleX,
+        height: 85 * scaleY,
+        action: slider.id,
+        row: slider.row + 1,
+        col: slider.col,
+      });
+    }
+
+    const scenarioY = (430 + 45) * scaleY;
+    const slotWidth = 46 * scaleX;
+    const slotHeight = 75 * scaleY;
+    const gap = 54 * scaleX;
+    const startX = 53 * scaleX;
+
+    for (let i = 0; i < THEME_LIST.length; i++) {
+      zones.push({
+        x: startX + i * gap,
+        y: scenarioY,
+        width: slotWidth,
+        height: slotHeight,
+        action: `theme_${i}`,
+        row: 4,
+        col: i,
+      });
+    }
+
+    return zones;
   }
 }
 
@@ -647,6 +987,7 @@ export const createScreens = (
   const screens = new Map<GameScreen, UIScreen>();
   screens.set("main-menu", new MainMenuScreen(width, height));
   screens.set("music-select", new MusicSelectionScreen(width, height));
+  screens.set("recs", new RECSScreen(width, height));
   screens.set("results", new ResultsScreen(width, height));
   return screens;
 };

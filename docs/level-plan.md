@@ -1041,3 +1041,71 @@ src/
 5. **Phase 5:** Wind system (Windy)
 6. **Phase 6:** Jump system (Lakes)
 7. **Phase 7:** Advanced (Future - turbo zones + lasers)
+
+---
+
+## RECS Menu Implementation
+
+The RECS (Racing Environment Construction Set) menu allows players to customize their track experience.
+
+### Access
+
+- From the **Main Menu**, select **"CONSTRUCTOR"** button
+- This opens the RECS screen with track-builder.svg background
+
+### Navigation Controls
+
+- **TAB**: Switch between modes (top buttons → sliders → scenario)
+- **UP/DOWN**: Navigate rows
+- **LEFT/RIGHT**: Navigate columns
+- **A/D** or **+/-**: Adjust slider values
+- **ENTER**: Select/confirm
+
+### UI Elements
+
+**Top Row:**
+
+- **TYPE**: Track type (currently fixed to circuit)
+- **EXIT**: Return to main menu
+- **START**: Begin race with current settings
+
+**Slider Grid (3x3):**
+| Row | Col 0 | Col 1 | Col 2 |
+|-----|-------|-------|-------|
+| 0 | CURVES | HILLS | SCENERY |
+| 1 | SHARPNESS | STEEPNESS | SCATTER |
+| 2 | LENGTH | DIFFICULTY | OBSTACLES |
+
+**Scenario Selection:**
+
+- 13 theme icons at bottom
+- Use LEFT/RIGHT to navigate, ENTER to select
+- Selected theme is highlighted with green border
+- Current selection is highlighted with red border
+
+### Theme Icons
+
+Each scenario has a dedicated SVG icon (46x75 pixels):
+
+| Icon File             | Theme     | Visual                                      |
+| --------------------- | --------- | ------------------------------------------- |
+| `theme-night.svg`     | Night     | Crescent moon with stars on dark background |
+| `theme-fog.svg`       | Fog       | Layered clouds with fog lines               |
+| `theme-snow.svg`      | Snow      | Snowflake with six arms                     |
+| `theme-storm.svg`     | Storm     | Lightning bolt with dark clouds             |
+| `theme-desert.svg`    | Desert    | Sun with radiating rays and sand dunes      |
+| `theme-future.svg`    | Future    | Planet with orbital ring (neon colors)      |
+| `theme-marsh.svg`     | Marsh     | Swamp with reeds and murky water            |
+| `theme-mountains.svg` | Mountains | Mountain peaks with snow caps               |
+| `theme-lakes.svg`     | Lakes     | Blue water with splash and tree             |
+| `theme-country.svg`   | Country   | Green tree with clouds                      |
+| `theme-city.svg`      | City      | Urban skyline with lit windows              |
+| `theme-roadworks.svg` | Roadworks | Warning triangle with traffic cones         |
+| `theme-windy.svg`     | Windy     | Windsock with wind lines                    |
+
+### Implementation Files
+
+- `src/ui/screens/screens.ts`: RECSScreen class
+- `src/game/modes/time-challenge.ts`: "recs" screen added to GameScreen type
+- `src/main.ts`: Navigation handlers for RECS screen
+- `public/sprites/track-builder.svg`: Background image

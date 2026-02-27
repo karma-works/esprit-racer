@@ -1,6 +1,11 @@
 import type { WorldState } from "../../engine/world";
 
-export type GameScreen = "main-menu" | "music-select" | "racing" | "results";
+export type GameScreen =
+  | "main-menu"
+  | "music-select"
+  | "recs"
+  | "racing"
+  | "results";
 
 export interface TimeChallengeState {
   screen: GameScreen;
