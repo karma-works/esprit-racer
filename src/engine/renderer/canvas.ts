@@ -320,3 +320,40 @@ export const renderTumbleweed = (
   ctx.drawImage(cachedSprite.canvas, -size / 2, -size / 2, size, size);
   ctx.restore();
 };
+
+export interface Viewport {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  playerIndex: number;
+}
+
+export const renderViewport = (
+  ctx: CanvasRenderingContext2D,
+  viewport: Viewport,
+  renderFn: () => void,
+): void => {
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(viewport.x, viewport.y, viewport.width, viewport.height);
+  ctx.clip();
+
+  ctx.translate(viewport.x, viewport.y);
+
+  renderFn();
+
+  ctx.restore();
+};
+
+export const drawSplitScreenDivider = (
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  height: number,
+  color: string = "#000000",
+  width: number = 4,
+): void => {
+  ctx.fillStyle = color;
+  ctx.fillRect(x - width / 2, y, width, height);
+};

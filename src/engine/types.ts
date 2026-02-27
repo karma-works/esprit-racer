@@ -101,6 +101,72 @@ export interface InputState {
   slower: boolean;
 }
 
+export interface InputMapping {
+  left: number[];
+  right: number[];
+  faster: number[];
+  slower: number[];
+}
+
+export interface PlayerConfig {
+  id: number;
+  name: string;
+  inputMapping: InputMapping;
+  color: string;
+  spriteColor: string;
+}
+
+export interface PlayerRaceState {
+  playerId: number;
+  position: number;
+  lap: number;
+  lastLapTime: number | null;
+  finished: boolean;
+  finishTime: number | null;
+  rank: number;
+}
+
+export interface RaceState {
+  playerStates: PlayerRaceState[];
+  winner: number | null;
+  isPaused: boolean;
+  countdown: number;
+  countdownTimer: number;
+}
+
+export interface InputMapping {
+  left: number[];
+  right: number[];
+  faster: number[];
+  slower: number[];
+}
+
+export interface PlayerConfig {
+  id: number;
+  name: string;
+  inputMapping: InputMapping;
+  color: string;
+  spriteColor: string;
+}
+
+export interface PlayerRaceState {
+  playerId: number;
+  position: number;
+  lap: number;
+  lastLapTime: number | null;
+  finished: boolean;
+  finishTime: number | null;
+  rank: number;
+}
+
+export interface RaceState {
+  playerStates: PlayerRaceState[];
+  winner: number | null;
+  isPaused: boolean;
+  countdown: number;
+  countdownTimer: number;
+}
+
 export interface HudValues {
   speed: number;
   currentTime: number;
@@ -239,4 +305,20 @@ export interface JumpZone {
   z: number;
   length: number;
   height: number;
+}
+
+export interface Viewport {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  playerIndex: number;
+}
+
+export interface Viewport {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  playerIndex: number;
 }

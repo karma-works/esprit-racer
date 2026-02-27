@@ -22,6 +22,8 @@ export interface WorldState {
   baseConfig: GameConfig;
   player: PlayerState;
   input: InputState;
+  players: PlayerState[];
+  inputs: InputState[];
   cars: Car[];
   segments: Segment[];
   trackLength: number;
@@ -39,6 +41,7 @@ export interface WorldState {
   slideVelocity: number;
   lightningActive: boolean;
   lightningTimer: number;
+  playerCount: number;
 }
 
 export const createDefaultConfig = (): GameConfig => ({
@@ -299,7 +302,7 @@ export const createDefaultJumpState = (): JumpState => ({
   peakHeight: 0,
 });
 
-export const createWorld = (): WorldState => {
+export const createWorld = (playerCount: number = 1): WorldState => {
   const config = createDefaultConfig();
   const cameraDepth = 1 / Math.tan(((100 / 2) * Math.PI) / 180);
   const playerZ = Camera.getPlayerZ(1000, cameraDepth);
@@ -311,11 +314,24 @@ export const createWorld = (): WorldState => {
   );
   const segments = Segments.getSegments();
 
+  const players: PlayerState[] = [];
+  const inputs: InputState[] = [];
+
+  for (let i = 0; i < playerCount; i++) {
+    players.push(createDefaultPlayer(playerZ));
+    inputs.push(createDefaultInput());
+  }
+
+  const player = players[0] ?? createDefaultPlayer(playerZ);
+  const input = inputs[0] ?? createDefaultInput();
+
   return {
     config,
     baseConfig: { ...config },
-    player: createDefaultPlayer(playerZ),
-    input: createDefaultInput(),
+    player,
+    input,
+    players,
+    inputs,
     cars: [],
     segments,
     trackLength,
@@ -333,6 +349,7 @@ export const createWorld = (): WorldState => {
     slideVelocity: 0,
     lightningActive: false,
     lightningTimer: 0,
+    playerCount,
   };
 };
 

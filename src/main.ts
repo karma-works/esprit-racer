@@ -44,16 +44,34 @@ import {
   calculateTimeLimit,
 } from "./game/modes/time-challenge";
 import {
+  createMultiplayerRaceState,
+  type MultiplayerRaceState,
+  startRace as startMultiplayerRace,
+  updateRaceCountdown,
+  checkLapComplete,
+  isCountdownActive,
+  getCountdownDisplay,
+} from "./game/modes/race";
+import {
+  InputManager,
+  DEFAULT_P1_INPUT,
+  DEFAULT_P2_INPUT,
+} from "./engine/input";
+import { resolveAllPlayerCollisions } from "./engine/collision";
+import type { Viewport } from "./engine/types";
+import {
   createScreens,
   type Button,
   type MenuZone,
   type UIScreen,
   MusicSelectionScreen,
   RECSScreen,
+  MainMenuScreen,
   MUSIC_TRACKS,
 } from "./ui/screens/screens";
 import {
   renderHud,
+  renderSplitScreenHud,
   renderPauseOverlay,
   renderCountdown,
   createDefaultHudState,
@@ -91,6 +109,10 @@ let gameState = createTimeChallengeState(
 );
 let screens = createScreens(world.config.width, world.config.height);
 let hudState = createDefaultHudState();
+
+let playerCount: 1 | 2 = 1;
+let inputManager = new InputManager(playerCount);
+let multiRaceState = createMultiplayerRaceState(playerCount);
 
 const cameraDepth = 1 / Math.tan(((100 / 2) * Math.PI) / 180);
 const cameraHeight = 1000;
@@ -578,11 +600,423 @@ const renderRacing = () => {
   }
 };
 
+const renderSplitScreen = () => {
+  const { width, height } = world.config;
+  const viewportWidth = width / 2;
+  const viewportHeight = height;
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Draw divider
+  Render.drawSplitScreenDivider(ctx, width / 2, 0, height);
+
+  // Render each player's viewport
+  for (let i = 0; i < playerCount; i++) {
+    const player = world.players[i];
+    if (!player) continue;
+
+    const viewportX = i === 0 ? 0 : width / 2;
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(viewportX, 0, viewportWidth, viewportHeight);
+    ctx.clip();
+
+    // Store original player
+    const originalPlayer = world.player;
+    world.player = player;
+
+    // Render the world from this player's perspective
+    renderRacingForViewport(viewportX, viewportWidth, viewportHeight, i);
+
+    // Restore original player
+    world.player = originalPlayer;
+
+    ctx.restore();
+  }
+};
+
+const renderRacingForViewport = (
+  viewportX: number,
+  viewportWidth: number,
+  viewportHeight: number,
+  playerIndex: number,
+) => {
+  const { config, player, skyOffset, currentTheme } = world;
+  const { lanes, roadWidth, segmentLength, drawDistance, fogDensity } = config;
+
+  const theme = currentTheme ?? getSelectedTheme();
+  const fogColor = theme.colors.fog;
+  const skyColor = theme.colors.sky;
+
+  // Scale everything to fit the viewport
+  const scaleX = viewportWidth / 1024;
+  const scaleY = viewportHeight / 768;
+  const scale = Math.min(scaleX, scaleY);
+
+  // Translate context so all rendering is relative to this viewport
+  ctx.save();
+  ctx.translate(viewportX, 0);
+
+  ctx.fillStyle = skyColor;
+  ctx.fillRect(0, 0, viewportWidth, viewportHeight / 2);
+
+  const baseSegment = Segments.findSegment(player.position, segmentLength);
+  const basePercent = Util.percentRemaining(player.position, segmentLength);
+  const playerSegment = Segments.findSegment(
+    player.position + playerZ,
+    segmentLength,
+  );
+  const playerPercent = Util.percentRemaining(
+    player.position + playerZ,
+    segmentLength,
+  );
+  const playerY = Util.interpolate(
+    playerSegment.p1.world.y,
+    playerSegment.p2.world.y,
+    playerPercent,
+  );
+  let maxy = viewportHeight;
+
+  let x = 0;
+  let dx = -(baseSegment.curve * basePercent);
+
+  if (svgBackground) {
+    ctx.save();
+    if (theme.filters.background) {
+      ctx.filter = theme.filters.background;
+    }
+    SvgRender.svgBackground(
+      ctx,
+      svgBackground,
+      viewportWidth,
+      viewportHeight,
+      skyOffset,
+      resolution * 0.001 * playerY,
+    );
+    ctx.restore();
+  }
+
+  const themeColors = {
+    light: theme.colors.road,
+    dark: {
+      ...theme.colors.road,
+      road: adjustColor(theme.colors.road.road, -15),
+      grass: adjustColor(theme.colors.road.grass, -15),
+      rumble: adjustColor(theme.colors.road.rumble, -15),
+    },
+  };
+
+  // Render road segments
+  for (let n = 0; n < drawDistance; n++) {
+    const segmentIndex = (baseSegment.index + n) % world.segments.length;
+    const segment = world.segments[segmentIndex];
+    if (!segment) continue;
+
+    segment.looped = segment.index < baseSegment.index;
+    segment.fog = Util.exponentialFog(
+      n / drawDistance,
+      theme.effects.fogDensity,
+    );
+    segment.clip = maxy;
+
+    Util.project(
+      segment.p1,
+      player.x * roadWidth - x,
+      playerY + cameraHeight - (world.jumpState.peakHeight || 0) * 50,
+      player.position - (segment.looped ? world.trackLength : 0),
+      cameraDepth,
+      viewportWidth,
+      viewportHeight,
+      roadWidth,
+    );
+    Util.project(
+      segment.p2,
+      player.x * roadWidth - x - dx,
+      playerY + cameraHeight - (world.jumpState.peakHeight || 0) * 50,
+      player.position - (segment.looped ? world.trackLength : 0),
+      cameraDepth,
+      viewportWidth,
+      viewportHeight,
+      roadWidth,
+    );
+
+    x += dx;
+    dx += segment.curve;
+
+    if (
+      segment.p1.camera.z <= cameraDepth ||
+      segment.p2.screen.y >= segment.p1.screen.y ||
+      segment.p2.screen.y >= maxy
+    ) {
+      continue;
+    }
+
+    const segmentColor =
+      Math.floor(segment.index / config.rumbleLength) % 2
+        ? themeColors.light
+        : themeColors.dark;
+
+    Render.segment(
+      ctx,
+      viewportWidth,
+      lanes,
+      segment.p1.screen.x,
+      segment.p1.screen.y,
+      segment.p1.screen.w ?? 0,
+      segment.p2.screen.x,
+      segment.p2.screen.y,
+      segment.p2.screen.w ?? 0,
+      segment.fog ?? 0,
+      segmentColor,
+    );
+
+    maxy = segment.p1.screen.y;
+  }
+
+  // Render sprites and cars
+  for (let n = drawDistance - 1; n > 0; n--) {
+    const segmentIndex = (baseSegment.index + n) % world.segments.length;
+    const segment = world.segments[segmentIndex];
+    if (!segment) continue;
+
+    // Render traffic cars
+    for (const car of segment.cars) {
+      const spriteScale = Util.interpolate(
+        segment.p1.screen.scale,
+        segment.p2.screen.scale,
+        car.percent ?? 0,
+      );
+      const spriteX =
+        Util.interpolate(
+          segment.p1.screen.x,
+          segment.p2.screen.x,
+          car.percent ?? 0,
+        ) +
+        (spriteScale * car.offset * roadWidth * viewportWidth) / 2;
+      const spriteY = Util.interpolate(
+        segment.p1.screen.y,
+        segment.p2.screen.y,
+        car.percent ?? 0,
+      );
+
+      const spriteName = getSpriteName(
+        car.sprite,
+        world.currentTheme?.spriteOverrides,
+      );
+      if (spriteName) {
+        const cachedSprite = getSpriteByName(spriteName, spriteScale);
+        if (cachedSprite) {
+          SvgRender.svgSprite(
+            ctx,
+            cachedSprite,
+            viewportWidth,
+            roadWidth,
+            spriteScale,
+            spriteX,
+            spriteY,
+            -0.5,
+            -1,
+            segment.clip ?? 0,
+            car.sprite.w,
+            car.sprite.h,
+          );
+        }
+      }
+    }
+
+    // Render scenery sprites
+    for (const sprite of segment.sprites) {
+      const spriteScale = segment.p1.screen.scale;
+      const spriteX =
+        segment.p1.screen.x +
+        (spriteScale * sprite.offset * roadWidth * viewportWidth) / 2;
+      const spriteY = segment.p1.screen.y;
+
+      const spriteName = getSpriteName(
+        sprite.source,
+        world.currentTheme?.spriteOverrides,
+      );
+      if (spriteName) {
+        const cachedSprite = getSpriteByName(spriteName, spriteScale);
+        if (cachedSprite) {
+          SvgRender.svgSprite(
+            ctx,
+            cachedSprite,
+            viewportWidth,
+            roadWidth,
+            spriteScale,
+            spriteX,
+            spriteY,
+            sprite.offset < 0 ? -1 : 0,
+            -1,
+            segment.clip ?? 0,
+            sprite.source.w,
+            sprite.source.h,
+          );
+        }
+      }
+    }
+
+    // Render current player car if on this segment
+    if (segment === playerSegment) {
+      const playerScale = cameraDepth / playerZ;
+      const playerScreenY =
+        viewportHeight / 2 -
+        (playerScale *
+          Util.interpolate(
+            playerSegment.p1.camera.y,
+            playerSegment.p2.camera.y,
+            playerPercent,
+          ) *
+          viewportHeight) /
+          2;
+      const speedPercent = player.speed / config.maxSpeed;
+      const bounce =
+        1.5 *
+        Math.random() *
+        speedPercent *
+        resolution *
+        (Math.random() > 0.5 ? 1 : -1);
+      const input = world.inputs[playerIndex] ?? world.input;
+      const steer = player.speed * (input.left ? -1 : input.right ? 1 : 0);
+
+      const playerSprite = getPlayerCarSprite(steer);
+
+      if (playerSprite) {
+        SvgRender.svgPlayer(
+          ctx,
+          playerSprite,
+          viewportWidth,
+          viewportHeight,
+          roadWidth,
+          speedPercent,
+          playerScale,
+          viewportWidth / 2,
+          playerScreenY,
+          steer,
+          bounce,
+        );
+      }
+    }
+
+    // Render other players' cars if they are on this segment
+    if (playerCount > 1) {
+      for (let otherIndex = 0; otherIndex < playerCount; otherIndex++) {
+        if (otherIndex === playerIndex) continue;
+
+        const otherPlayer = world.players[otherIndex];
+        const otherInput = world.inputs[otherIndex];
+        if (!otherPlayer || !otherInput) continue;
+
+        const otherPlayerSegment = Segments.findSegment(
+          otherPlayer.position + playerZ,
+          segmentLength,
+        );
+
+        if (segment === otherPlayerSegment) {
+          const otherPlayerPercent = Util.percentRemaining(
+            otherPlayer.position + playerZ,
+            segmentLength,
+          );
+          const otherPlayerScale = cameraDepth / playerZ;
+          const otherPlayerScreenY =
+            viewportHeight / 2 -
+            (otherPlayerScale *
+              Util.interpolate(
+                otherPlayerSegment.p1.camera.y,
+                otherPlayerSegment.p2.camera.y,
+                otherPlayerPercent,
+              ) *
+              viewportHeight) /
+              2;
+          const otherSpeedPercent = otherPlayer.speed / config.maxSpeed;
+          const otherBounce =
+            1.5 *
+            Math.random() *
+            otherSpeedPercent *
+            resolution *
+            (Math.random() > 0.5 ? 1 : -1);
+          const otherSteer =
+            otherPlayer.speed *
+            (otherInput.left ? -1 : otherInput.right ? 1 : 0);
+
+          const otherPlayerSprite = getPlayerCarSprite(otherSteer);
+
+          if (otherPlayerSprite) {
+            // Calculate lateral position based on the difference in x positions
+            const xOffset =
+              (otherPlayer.x - player.x) * roadWidth * otherPlayerScale;
+            SvgRender.svgPlayer(
+              ctx,
+              otherPlayerSprite,
+              viewportWidth,
+              viewportHeight,
+              roadWidth,
+              otherSpeedPercent,
+              otherPlayerScale,
+              viewportWidth / 2 + xOffset,
+              otherPlayerScreenY,
+              otherSteer,
+              otherBounce,
+            );
+          }
+        }
+      }
+    }
+  }
+
+  // Render HUD for this player
+  const speed = (player.speed / config.maxSpeed) * 300;
+  const mirrorRange = world.trackLength * 0.08;
+  const mirrorCars = getMirrorCars(
+    world.cars,
+    player.position,
+    world.trackLength,
+    mirrorRange,
+    3,
+  );
+
+  let playerPosition = 1;
+  for (const car of world.cars) {
+    if (car.z > player.position) {
+      playerPosition++;
+    }
+  }
+
+  renderSplitScreenHud(
+    ctx,
+    gameState,
+    speed,
+    {
+      width: viewportWidth,
+      height: viewportHeight,
+      x: viewportX,
+      y: 0,
+      playerIndex,
+    },
+    {
+      speed,
+      maxSpeed: 300,
+      position: Math.min(playerPosition, TRAFFIC_CAR_COUNT + 1),
+      totalPositions: TRAFFIC_CAR_COUNT + 1,
+      mirrorCars: mirrorCars.slice(0, 3),
+      boostMeter: Math.min(1, gameState.currentTime / DEFAULT_TIME_LIMIT),
+    },
+  );
+
+  ctx.restore();
+};
+
 const render = () => {
   const { width, height } = world.config;
 
   if (gameState.screen === "racing") {
-    renderRacing();
+    if (playerCount === 1) {
+      renderRacing();
+    } else {
+      renderSplitScreen();
+    }
   } else {
     const screen = screens.get(gameState.screen);
     if (screen) {
@@ -600,28 +1034,75 @@ const updateGame = (dt: number) => {
 
   gameState = updateTimer(gameState, dt);
 
-  const prevLap = world.currentLapTime;
-  update(world, dt);
-  const speedPercent = world.player.speed / world.config.maxSpeed;
-  updateWind(world, dt, speedPercent);
-  updateJump(world, dt);
-  updateParticles(world, dt);
-  updateTumbleweeds(world, dt);
-  updateLightning(world, dt);
-  updateSlidePhysics(world, dt);
+  if (playerCount === 1) {
+    const prevLap = world.currentLapTime;
+    update(world, dt);
+    const speedPercent = world.player.speed / world.config.maxSpeed;
+    updateWind(world, dt, speedPercent);
+    updateJump(world, dt);
+    updateParticles(world, dt);
+    updateTumbleweeds(world, dt);
+    updateLightning(world, dt);
+    updateSlidePhysics(world, dt);
 
-  const checkpointResult = checkCheckpoint(
-    gameState,
-    world.player.position,
-    world.trackLength,
-    world.config.segmentLength,
-  );
-  if (checkpointResult.bonusAwarded > 0) {
-    gameState = checkpointResult.state;
-  }
+    const checkpointResult = checkCheckpoint(
+      gameState,
+      world.player.position,
+      world.trackLength,
+      world.config.segmentLength,
+    );
+    if (checkpointResult.bonusAwarded > 0) {
+      gameState = checkpointResult.state;
+    }
 
-  if (prevLap > 0 && world.currentLapTime === 0 && world.lastLapTime !== null) {
-    gameState = completeLap(gameState, world);
+    if (
+      prevLap > 0 &&
+      world.currentLapTime === 0 &&
+      world.lastLapTime !== null
+    ) {
+      gameState = completeLap(gameState, world);
+    }
+  } else {
+    // Multiplayer mode - update each player
+    for (let i = 0; i < playerCount; i++) {
+      const player = world.players[i];
+      const input = world.inputs[i];
+      if (!player || !input) continue;
+
+      // Temporarily set the main player/input for the update function
+      world.player = player;
+      world.input = input;
+
+      const prevLap = world.currentLapTime;
+      update(world, dt);
+
+      const speedPercent = player.speed / world.config.maxSpeed;
+      updateWind(world, dt, speedPercent);
+      updateJump(world, dt);
+      updateParticles(world, dt);
+      updateTumbleweeds(world, dt);
+      updateLightning(world, dt);
+      updateSlidePhysics(world, dt);
+
+      // Check lap completion for each player
+      if (
+        prevLap > 0 &&
+        world.currentLapTime === 0 &&
+        world.lastLapTime !== null
+      ) {
+        multiRaceState = checkLapComplete(multiRaceState, i, world);
+      }
+    }
+
+    // Handle player-player collisions
+    resolveAllPlayerCollisions(world.players);
+
+    // Restore first player as default
+    world.player = world.players[0]!;
+    world.input = world.inputs[0]!;
+
+    // Update race countdown
+    multiRaceState = updateRaceCountdown(multiRaceState, dt);
   }
 };
 
@@ -661,7 +1142,7 @@ const goToMusicSelection = async () => {
 };
 
 const startGame = async (themeId?: string) => {
-  world = createWorld();
+  world = createWorld(playerCount);
 
   const musicScreen = screens.get("music-select") as
     | MusicSelectionScreen
@@ -673,6 +1154,18 @@ const startGame = async (themeId?: string) => {
   setTheme(world, theme);
   canvas.style.filter = theme.filters.global;
   resetCars(world, TRAFFIC_CAR_COUNT);
+
+  // Position players for multiplayer
+  if (playerCount > 1) {
+    // Position players side by side
+    if (world.players[0]) world.players[0].x = -0.5;
+    if (world.players[1]) world.players[1].x = 0.5;
+
+    // Initialize input manager
+    inputManager = new InputManager(playerCount);
+    multiRaceState = startMultiplayerRace(multiRaceState, playerCount);
+  }
+
   gameState = startRace(gameState);
   countdown = 3;
   countdownTimer = 0;
@@ -694,7 +1187,20 @@ const handleMenuKeyDown = async (keyCode: number) => {
   const screen = screens.get(gameState.screen) as UIScreen | undefined;
 
   if (gameState.screen === "main-menu") {
+    const mainMenuScreen = screen as MainMenuScreen | undefined;
+
+    // Get current player count before handling the action
+    if (mainMenuScreen) {
+      playerCount = mainMenuScreen.getPlayerCount();
+    }
+
     const action = screen?.handleKeyDown?.(keyCode);
+
+    // Check if player count was toggled (action will be null if toggle happened)
+    if (mainMenuScreen) {
+      playerCount = mainMenuScreen.getPlayerCount();
+    }
+
     if (action === "start" || action === "game") {
       await goToMusicSelection();
     } else if (action === "constructor") {
@@ -751,14 +1257,22 @@ document.addEventListener("keydown", (ev) => {
   }
 
   if (gameState.screen === "racing" && !gameState.isPaused && countdown === 0) {
-    handleKeyDown(world, ev.keyCode);
+    if (playerCount === 1) {
+      handleKeyDown(world, ev.keyCode);
+    } else {
+      inputManager.handleKeyDown(world.inputs, ev.keyCode);
+    }
   }
   handleMenuKeyDown(ev.keyCode);
 });
 
 document.addEventListener("keyup", (ev) => {
   if (gameState.screen === "racing") {
-    handleKeyUp(world, ev.keyCode);
+    if (playerCount === 1) {
+      handleKeyUp(world, ev.keyCode);
+    } else {
+      inputManager.handleKeyUp(world.inputs, ev.keyCode);
+    }
   }
 });
 
@@ -770,7 +1284,20 @@ canvas.addEventListener("click", async (ev) => {
   const screen = screens.get(gameState.screen) as UIScreen | undefined;
 
   if (gameState.screen === "main-menu") {
+    const mainMenuScreen = screen as MainMenuScreen | undefined;
+
+    // Get current player count before handling the action
+    if (mainMenuScreen) {
+      playerCount = mainMenuScreen.getPlayerCount();
+    }
+
     const action = screen?.handleClick?.(x, y);
+
+    // Check if player count was toggled (action will be null if toggle happened)
+    if (mainMenuScreen) {
+      playerCount = mainMenuScreen.getPlayerCount();
+    }
+
     if (action === "start" || action === "game") {
       await goToMusicSelection();
     } else if (action === "constructor") {

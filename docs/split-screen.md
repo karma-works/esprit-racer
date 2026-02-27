@@ -6,16 +6,16 @@ Implement a vertical split-screen mode (left/right) for two players racing simul
 
 ## Requirements Summary
 
-| Requirement      | Decision                                        |
-| ---------------- | ----------------------------------------------- |
-| Layout           | Vertical (left/right split)                     |
-| World            | Shared track and traffic                        |
-| Camera           | Same as current single-player view              |
-| Input            | P1: WASD, P2: Arrow keys (configurable in menu) |
-| Activation       | Main menu option                                |
-| Player Collision | Yes, players can collide                        |
-| Game Mode        | Race mode (first to complete laps wins)         |
-| Scope            | Full implementation                             |
+| Requirement      | Decision                                         |
+| ---------------- | ------------------------------------------------ |
+| Layout           | Vertical (left/right split)                      |
+| World            | Shared track and traffic                         |
+| Camera           | Same as current single-player view               |
+| Input            | P1: WASD, P2: Arrow keys (configurable in menu)  |
+| Activation       | "Players" button in main menu toggles 1P/2P mode |
+| Player Collision | Yes, players can collide                         |
+| Game Mode        | Race mode (first to complete laps wins)          |
+| Scope            | Full implementation                              |
 
 ## Architecture Changes
 
@@ -234,6 +234,50 @@ export class InputConfigScreen implements UIScreen {
 }
 ```
 
+## Menu Integration
+
+### "Players" Button Toggle (1P/2P)
+
+The existing "players" zone in `MainMenuScreen` will toggle between 1-player and 2-player modes:
+
+**File: `src/ui/screens/screens.ts`**
+
+```typescript
+export class MainMenuScreen implements UIScreen {
+  private playerCount: 1 | 2 = 1;
+
+  // Toggle when "players" action is triggered
+  handleAction(action: string): void {
+    if (action === "players") {
+      this.playerCount = this.playerCount === 1 ? 2 : 1;
+    }
+  }
+
+  getPlayerCount(): 1 | 2 {
+    return this.playerCount;
+  }
+
+  // Render "1 PLAYER" or "2 PLAYERS" in the zone
+  render(ctx: CanvasRenderingContext2D): void {
+    // ... render SVG background ...
+
+    // Render player count indicator
+    const playersZone = this.zones.find((z) => z.action === "players");
+    if (playersZone) {
+      const text = this.playerCount === 1 ? "1 PLAYER" : "2 PLAYERS";
+      // Render text in the zone
+    }
+  }
+}
+```
+
+**User Flow:**
+
+1. User navigates to "players" button in main menu
+2. Press SPACE/ENTER or click to toggle
+3. Display updates to show "1 PLAYER" or "2 PLAYERS"
+4. Selection persists when starting game
+
 ## Implementation Phases
 
 ### Phase 1: Core Multi-Player Infrastructure
@@ -277,7 +321,8 @@ export class InputConfigScreen implements UIScreen {
 ### Phase 4: Menu & UI
 
 8. **Menu Updates** (`screens.ts`)
-   - Add player count selector
+   - Make "players" zone toggle 1P/2P mode
+   - Render player count indicator
    - Add input configuration screen
    - Update navigation for new options
 

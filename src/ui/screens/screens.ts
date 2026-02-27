@@ -271,6 +271,7 @@ export class MainMenuScreen implements UIScreen {
   private buttons: Button[];
   private zones: MenuZone[];
   private selectedIndex: number = 0;
+  private playerCount: 1 | 2 = 1;
 
   constructor(
     private width: number,
@@ -282,6 +283,14 @@ export class MainMenuScreen implements UIScreen {
       NAVIGABLE_ZONES.includes(z.action),
     );
     if (this.selectedIndex < 0) this.selectedIndex = 0;
+  }
+
+  getPlayerCount(): 1 | 2 {
+    return this.playerCount;
+  }
+
+  togglePlayerCount(): void {
+    this.playerCount = this.playerCount === 1 ? 2 : 1;
   }
 
   private calculateZones(): MenuZone[] {
@@ -318,6 +327,21 @@ export class MainMenuScreen implements UIScreen {
     if (selectedZone) {
       drawSelectionBox(ctx, selectedZone);
     }
+
+    const playersZone = this.zones.find((z) => z.action === "players");
+    if (playersZone) {
+      const text = this.playerCount === 1 ? "1 PLAYER" : "2 PLAYERS";
+      drawCenteredText(
+        ctx,
+        text,
+        playersZone.x + playersZone.width / 2,
+        playersZone.y + playersZone.height / 2,
+        {
+          font: `bold ${14 * scale}px monospace`,
+          color: "#ffcc00",
+        },
+      );
+    }
   }
 
   private findZoneIndex(x: number, y: number): number {
@@ -330,7 +354,13 @@ export class MainMenuScreen implements UIScreen {
     const idx = this.findZoneIndex(x, y);
     if (idx >= 0) {
       const zone = this.zones[idx];
-      if (zone) return zone.action;
+      if (zone) {
+        if (zone.action === "players") {
+          this.togglePlayerCount();
+          return null;
+        }
+        return zone.action;
+      }
     }
     return null;
   }
@@ -356,6 +386,10 @@ export class MainMenuScreen implements UIScreen {
     };
 
     if (keyCode === SPACE || keyCode === 13) {
+      if (currentZone.action === "players") {
+        this.togglePlayerCount();
+        return null;
+      }
       return currentZone.action;
     }
 

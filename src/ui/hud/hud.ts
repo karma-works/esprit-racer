@@ -456,6 +456,255 @@ export const renderLapComplete = (
   ctx.fillText(`LAP ${lap} COMPLETE!`, canvasWidth / 2, y);
 };
 
+export interface SplitScreenHudConfig {
+  width: number;
+  height: number;
+  x: number;
+  y: number;
+  playerIndex: number;
+}
+
+export const renderSplitScreenHud = (
+  ctx: CanvasRenderingContext2D,
+  state: TimeChallengeState,
+  speed: number,
+  config: SplitScreenHudConfig,
+  hudState: Partial<HudState> = {},
+): void => {
+  const { width, height, x: viewportX, y: viewportY } = config;
+  const hs = { ...DEFAULT_HUD_STATE, ...hudState, speed };
+
+  ctx.save();
+  ctx.translate(viewportX, viewportY);
+
+  const scaleX = width / 1024;
+  const scaleY = height / 768;
+  const scale = Math.min(scaleX, scaleY);
+
+  const padding = Math.max(8, 15 * scale);
+  const mirrorWidth = Math.max(110, 220 * scale);
+  const mirrorHeight = Math.max(50, 100 * scale);
+  const mirrorX = width / 2 - mirrorWidth / 2;
+  const mirrorY = padding;
+
+  renderRearViewMirror(
+    ctx,
+    mirrorX,
+    mirrorY,
+    mirrorWidth,
+    mirrorHeight,
+    hs.mirrorCars,
+  );
+
+  const leftColumnX = padding;
+  const rightColumnX = width - padding;
+  const row1Y = mirrorY + mirrorHeight + padding;
+  const row2Y = row1Y + 90 * scale;
+  const row3Y = row2Y + 55 * scale;
+
+  const speedPanelWidth = Math.max(100, 180 * scale);
+  const speedPanelHeight = Math.max(45, 80 * scale);
+  renderCompactSpeedPanel(
+    ctx,
+    leftColumnX,
+    row1Y,
+    speedPanelWidth,
+    speedPanelHeight,
+    hs.speed,
+    hs.maxSpeed,
+  );
+
+  renderCompactPositionPanel(
+    ctx,
+    leftColumnX,
+    row2Y,
+    Math.max(70, 120 * scale),
+    Math.max(45, 80 * scale),
+    hs.position,
+    hs.totalPositions,
+  );
+
+  renderCompactTimerPanel(
+    ctx,
+    state,
+    rightColumnX - Math.max(80, 160 * scale),
+    row1Y,
+    Math.max(80, 160 * scale),
+    Math.max(40, 70 * scale),
+  );
+
+  renderCompactLapPanel(
+    ctx,
+    state.lap,
+    state.totalLaps,
+    rightColumnX - Math.max(60, 120 * scale),
+    row2Y,
+    Math.max(60, 120 * scale),
+    Math.max(30, 45 * scale),
+  );
+
+  ctx.restore();
+};
+
+const renderCompactSpeedPanel = (
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  panelWidth: number,
+  panelHeight: number,
+  speed: number,
+  maxSpeed: number,
+): void => {
+  ctx.fillStyle = COLORS.background;
+  ctx.fillRect(x, y, panelWidth, panelHeight);
+  ctx.strokeStyle = "#555";
+  ctx.lineWidth = 1;
+  ctx.strokeRect(x, y, panelWidth, panelHeight);
+
+  const speedKmh = Math.round(speed);
+  const percent = speed / maxSpeed;
+  const fontSize = Math.max(14, panelHeight * 0.35);
+
+  drawBlockyText(
+    ctx,
+    `${speedKmh.toString().padStart(3, "0")}`,
+    x + panelWidth * 0.5,
+    y + panelHeight * 0.25,
+    fontSize,
+    COLORS.speed,
+    "center",
+  );
+
+  const barX = x + panelWidth * 0.1;
+  const barY = y + panelHeight * 0.6;
+  const barWidth = panelWidth * 0.8;
+  const barHeight = panelHeight * 0.2;
+
+  ctx.fillStyle = COLORS.barBg;
+  ctx.fillRect(barX, barY, barWidth, barHeight);
+
+  const fillColor =
+    percent > 0.8
+      ? COLORS.barRed
+      : percent > 0.5
+        ? COLORS.barYellow
+        : COLORS.barGreen;
+  const fillWidth = Math.max(0, Math.min(1, percent)) * barWidth;
+  ctx.fillStyle = fillColor;
+  ctx.fillRect(barX, barY, fillWidth, barHeight);
+
+  ctx.strokeStyle = "#666";
+  ctx.strokeRect(barX, barY, barWidth, barHeight);
+};
+
+const renderCompactPositionPanel = (
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  panelWidth: number,
+  panelHeight: number,
+  position: number,
+  totalPositions: number,
+): void => {
+  ctx.fillStyle = COLORS.background;
+  ctx.fillRect(x, y, panelWidth, panelHeight);
+  ctx.strokeStyle = "#555";
+  ctx.lineWidth = 1;
+  ctx.strokeRect(x, y, panelWidth, panelHeight);
+
+  const posText = `${position}${getPositionSuffix(position)}`;
+  const posColor = position === 1 ? COLORS.barYellow : COLORS.position;
+  const fontSize = Math.max(18, panelHeight * 0.5);
+
+  ctx.font = `bold ${fontSize}px "Courier New", monospace`;
+  ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "top";
+  ctx.fillText(posText, x + panelWidth / 2 + 2, y + 8);
+
+  ctx.fillStyle = posColor;
+  ctx.fillText(posText, x + panelWidth / 2, y + 6);
+
+  const labelFontSize = Math.max(10, panelHeight * 0.2);
+  ctx.font = `${labelFontSize}px "Courier New", monospace`;
+  ctx.fillStyle = "#888888";
+  ctx.fillText(
+    `OF ${totalPositions}`,
+    x + panelWidth / 2,
+    y + panelHeight - labelFontSize - 5,
+  );
+};
+
+const renderCompactTimerPanel = (
+  ctx: CanvasRenderingContext2D,
+  state: TimeChallengeState,
+  x: number,
+  y: number,
+  panelWidth: number,
+  panelHeight: number,
+): void => {
+  ctx.fillStyle = COLORS.background;
+  ctx.fillRect(x, y, panelWidth, panelHeight);
+  ctx.strokeStyle = "#555";
+  ctx.lineWidth = 1;
+  ctx.strokeRect(x, y, panelWidth, panelHeight);
+
+  const timerColor = state.currentTime < 10 ? COLORS.timerLow : COLORS.timer;
+  const fontSize = Math.max(12, panelHeight * 0.45);
+
+  drawBlockyText(
+    ctx,
+    "TIME",
+    x + panelWidth * 0.1,
+    y + panelHeight * 0.1,
+    fontSize * 0.5,
+    "#888888",
+  );
+  drawBlockyText(
+    ctx,
+    formatTimeDisplay(state.currentTime),
+    x + panelWidth * 0.1,
+    y + panelHeight * 0.4,
+    fontSize,
+    timerColor,
+  );
+};
+
+const renderCompactLapPanel = (
+  ctx: CanvasRenderingContext2D,
+  lap: number,
+  totalLaps: number,
+  x: number,
+  y: number,
+  panelWidth: number,
+  panelHeight: number,
+): void => {
+  ctx.fillStyle = COLORS.background;
+  ctx.fillRect(x, y, panelWidth, panelHeight);
+  ctx.strokeStyle = "#555";
+  ctx.lineWidth = 1;
+  ctx.strokeRect(x, y, panelWidth, panelHeight);
+
+  const fontSize = Math.max(12, panelHeight * 0.5);
+
+  drawBlockyText(
+    ctx,
+    "LAP",
+    x + panelWidth * 0.1,
+    y + panelHeight * 0.1,
+    fontSize * 0.5,
+    "#888888",
+  );
+  drawBlockyText(
+    ctx,
+    `${lap}/${totalLaps}`,
+    x + panelWidth * 0.1,
+    y + panelHeight * 0.4,
+    fontSize,
+    COLORS.lap,
+  );
+};
+
 export const createDefaultHudState = (): HudState => ({ ...DEFAULT_HUD_STATE });
 
 export type { HudState as HudStateType };
