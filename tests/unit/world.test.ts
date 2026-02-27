@@ -9,6 +9,7 @@ import {
   handleKeyDown,
   handleKeyUp,
   resetCars,
+  getMirrorCars,
 } from "../../src/engine/world";
 import { KEY } from "../../src/engine/constants";
 
@@ -363,6 +364,77 @@ describe("world", () => {
         carsOnSegments += segment.cars.length;
       }
       expect(carsOnSegments).toBe(10);
+    });
+  });
+
+  describe("getMirrorCars", () => {
+    const createMockCar = (z: number, offset: number = 0) => ({
+      z,
+      offset,
+      sprite: { x: 0, y: 0, w: 80, h: 56 },
+      speed: 100,
+    });
+
+    it("returns empty array when no cars are behind", () => {
+      const cars = [createMockCar(1000), createMockCar(2000)];
+      const result = getMirrorCars(cars, 500, 10000, 1000);
+      expect(result).toHaveLength(0);
+    });
+
+    it("returns cars that are behind the player", () => {
+      const cars = [createMockCar(400), createMockCar(300)];
+      const result = getMirrorCars(cars, 500, 10000, 1000);
+      expect(result).toHaveLength(2);
+    });
+
+    it("limits to maxCars", () => {
+      const cars = [
+        createMockCar(400),
+        createMockCar(350),
+        createMockCar(300),
+        createMockCar(250),
+      ];
+      const result = getMirrorCars(cars, 500, 10000, 1000, 2);
+      expect(result).toHaveLength(2);
+    });
+
+    it("handles track wraparound", () => {
+      const trackLength = 10000;
+      const cars = [createMockCar(trackLength - 100)];
+      const result = getMirrorCars(cars, 50, trackLength, 200);
+      expect(result).toHaveLength(1);
+      expect(result[0]?.distance).toBeGreaterThan(0);
+    });
+
+    it("sorts by distance descending", () => {
+      const cars = [createMockCar(400), createMockCar(200)];
+      const result = getMirrorCars(cars, 500, 10000, 1000);
+      expect(result[0]?.distance).toBeGreaterThan(result[1]?.distance ?? 0);
+    });
+
+    it("normalizes distance correctly", () => {
+      const mirrorRange = 1000;
+      const cars = [createMockCar(400)];
+      const result = getMirrorCars(cars, 500, 10000, mirrorRange);
+      expect(result[0]?.distance).toBe(0.1);
+    });
+
+    it("excludes cars outside mirror range", () => {
+      const mirrorRange = 100;
+      const cars = [createMockCar(300)];
+      const result = getMirrorCars(cars, 500, 10000, mirrorRange);
+      expect(result).toHaveLength(0);
+    });
+
+    it("assigns colors based on offset", () => {
+      const cars = [
+        createMockCar(400, 0.1),
+        createMockCar(350, 0.2),
+        createMockCar(300, 0.3),
+      ];
+      const result = getMirrorCars(cars, 500, 10000, 1000);
+      const colors = result.map((c) => c.color);
+      expect(new Set(colors).size).toBeGreaterThan(1);
     });
   });
 });

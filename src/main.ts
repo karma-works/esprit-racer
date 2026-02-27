@@ -5,6 +5,7 @@ import {
   handleKeyDown,
   handleKeyUp,
   resetCars,
+  getMirrorCars,
 } from "./engine/world";
 import * as Render from "./engine/renderer/canvas";
 import * as SvgRender from "./engine/renderer/sprite";
@@ -309,8 +310,6 @@ const renderRacing = () => {
     maxy = segment.p1.screen.y;
   }
 
-  const mirrorCars: { offset: number; distance: number; color: string }[] = [];
-
   for (let n = drawDistance - 1; n > 0; n--) {
     const segmentIndex = (baseSegment.index + n) % world.segments.length;
     const segment = world.segments[segmentIndex];
@@ -354,22 +353,6 @@ const renderRacing = () => {
             car.sprite.h,
           );
         }
-      }
-
-      const distanceBehind = player.position - car.z;
-      if (distanceBehind > 0 && distanceBehind < world.trackLength * 0.08) {
-        const carColors = ["#dc2626", "#3b82f6", "#f59e0b", "#10b981"];
-        const colorIndex =
-          Math.floor(Math.abs(car.offset * 10)) % carColors.length;
-        const normalizedDistance = Math.min(
-          1,
-          distanceBehind / (world.trackLength * 0.08),
-        );
-        mirrorCars.push({
-          offset: car.offset,
-          distance: normalizedDistance,
-          color: carColors[colorIndex] ?? "#dc2626",
-        });
       }
     }
 
@@ -443,6 +426,15 @@ const renderRacing = () => {
       }
     }
   }
+
+  const mirrorRange = world.trackLength * 0.08;
+  const mirrorCars = getMirrorCars(
+    world.cars,
+    player.position,
+    world.trackLength,
+    mirrorRange,
+    3,
+  );
 
   const speed = (player.speed / config.maxSpeed) * 300;
 

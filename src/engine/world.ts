@@ -329,3 +329,40 @@ export const handleKeyUp = (world: WorldState, keyCode: number): void => {
   if (keyCode === KEY.UP || keyCode === KEY.W) world.input.faster = false;
   if (keyCode === KEY.DOWN || keyCode === KEY.S) world.input.slower = false;
 };
+
+export interface MirrorCar {
+  offset: number;
+  distance: number;
+  color: string;
+}
+
+export const getMirrorCars = (
+  cars: Car[],
+  playerPosition: number,
+  trackLength: number,
+  mirrorRange: number,
+  maxCars: number = 3,
+): MirrorCar[] => {
+  const carColors = ["#dc2626", "#3b82f6", "#f59e0b", "#10b981"];
+  const mirrorCars: MirrorCar[] = [];
+
+  for (const car of cars) {
+    let distanceBehind = playerPosition - car.z;
+    if (distanceBehind < 0) {
+      distanceBehind += trackLength;
+    }
+    if (distanceBehind > 0 && distanceBehind < mirrorRange) {
+      const colorIndex =
+        Math.floor(Math.abs(car.offset * 10)) % carColors.length;
+      const normalizedDistance = Math.min(1, distanceBehind / mirrorRange);
+      mirrorCars.push({
+        offset: car.offset,
+        distance: normalizedDistance,
+        color: carColors[colorIndex] ?? "#dc2626",
+      });
+    }
+  }
+
+  mirrorCars.sort((a, b) => b.distance - a.distance);
+  return mirrorCars.slice(0, maxCars);
+};
