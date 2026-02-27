@@ -316,6 +316,8 @@ export const resetSprites = (): void => {
   }
 };
 
+export const CHECKPOINTS_PER_LAP = 4;
+
 export const resetRoad = (
   segmentLength: number,
   rumbleLength: number,
@@ -334,9 +336,8 @@ export const resetRoad = (
     rumbleLength,
   );
   addBumps(segmentLength, rumbleLength);
-  addLowRollingHills(segmentLength, rumbleLength);
   addCurve(
-    ROAD.LENGTH.LONG * 2,
+    ROAD.LENGTH.LONG,
     ROAD.CURVE.MEDIUM,
     ROAD.HILL.MEDIUM,
     segmentLength,
@@ -344,26 +345,13 @@ export const resetRoad = (
   );
   addStraight(ROAD.LENGTH.MEDIUM, segmentLength, rumbleLength);
   addHill(ROAD.LENGTH.MEDIUM, ROAD.HILL.HIGH, segmentLength, rumbleLength);
-  addSCurves(segmentLength, rumbleLength);
   addCurve(
-    ROAD.LENGTH.LONG,
+    ROAD.LENGTH.MEDIUM,
     -ROAD.CURVE.MEDIUM,
     ROAD.HILL.NONE,
     segmentLength,
     rumbleLength,
   );
-  addHill(ROAD.LENGTH.LONG, ROAD.HILL.HIGH, segmentLength, rumbleLength);
-  addCurve(
-    ROAD.LENGTH.LONG,
-    ROAD.CURVE.MEDIUM,
-    -ROAD.HILL.LOW,
-    segmentLength,
-    rumbleLength,
-  );
-  addBumps(segmentLength, rumbleLength);
-  addHill(ROAD.LENGTH.LONG, -ROAD.HILL.MEDIUM, segmentLength, rumbleLength);
-  addStraight(ROAD.LENGTH.MEDIUM, segmentLength, rumbleLength);
-  addSCurves(segmentLength, rumbleLength);
   addDownhillToEnd(segmentLength, rumbleLength);
 
   resetSprites();
@@ -371,9 +359,24 @@ export const resetRoad = (
   const playerSegment = findSegment(playerZ, segmentLength);
   segments[playerSegment.index + 2]!.color = COLORS.START;
   segments[playerSegment.index + 3]!.color = COLORS.START;
+
+  const totalSegments = segments.length;
+  const segmentsPerCheckpoint = Math.floor(
+    totalSegments / (CHECKPOINTS_PER_LAP + 1),
+  );
+
+  for (let i = 1; i <= CHECKPOINTS_PER_LAP; i++) {
+    const checkpointIndex = segmentsPerCheckpoint * i;
+    if (checkpointIndex < totalSegments - rumbleLength) {
+      segments[checkpointIndex]!.color = COLORS.CHECKPOINT;
+      addSprite(checkpointIndex, SPRITES.CHECKPOINT_BANNER, 0);
+    }
+  }
+
   for (let n = 0; n < rumbleLength; n++) {
     segments[segments.length - 1 - n]!.color = COLORS.FINISH;
   }
+  addSprite(segments.length - rumbleLength - 5, SPRITES.FINISH_BANNER, 0);
 
   return segments.length * segmentLength;
 };

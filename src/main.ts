@@ -33,6 +33,7 @@ import {
   completeLap,
   checkCheckpoint,
   DEFAULT_TIME_LIMIT,
+  calculateTimeLimit,
 } from "./game/modes/time-challenge";
 import {
   createScreens,
@@ -75,7 +76,10 @@ let svgPlayerCarRight: CachedSprite | null = null;
 let last = Util.timestamp();
 let gdt = 0;
 
-let gameState = createTimeChallengeState();
+let gameState = createTimeChallengeState(
+  world.trackLength,
+  world.config.segmentLength,
+);
 let screens = createScreens(world.config.width, world.config.height);
 let hudState = createDefaultHudState();
 

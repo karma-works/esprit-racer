@@ -56,6 +56,12 @@ describe("constants", () => {
       expect(COLORS.FINISH.road).toBe("black");
       expect(COLORS.FINISH.grass).toBe("black");
     });
+
+    it("has checkpoint color", () => {
+      expect(COLORS.CHECKPOINT.road).toBe("#FFFF88");
+      expect(COLORS.CHECKPOINT.grass).toBe("#FFFF88");
+      expect(COLORS.CHECKPOINT.rumble).toBe("#FFFF88");
+    });
   });
 
   describe("SPRITES", () => {
@@ -78,6 +84,13 @@ describe("constants", () => {
       expect(SPRITES.TREE2).toBeDefined();
       expect(SPRITES.PALM_TREE).toBeDefined();
       expect(SPRITES.BOULDER1).toBeDefined();
+    });
+
+    it("has banner sprites", () => {
+      expect(SPRITES.CHECKPOINT_BANNER).toBeDefined();
+      expect(SPRITES.FINISH_BANNER).toBeDefined();
+      expect(SPRITES.CHECKPOINT_BANNER.w).toBe(400);
+      expect(SPRITES.FINISH_BANNER.w).toBe(400);
     });
 
     it("sprites have required properties", () => {

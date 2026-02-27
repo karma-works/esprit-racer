@@ -26,6 +26,7 @@ export const COLORS = {
   },
   DARK: { road: "#696969", grass: "#009A00", rumble: "#BBBBBB" },
   START: { road: "white", grass: "white", rumble: "white" },
+  CHECKPOINT: { road: "#FFFF88", grass: "#FFFF88", rumble: "#FFFF88" },
   FINISH: { road: "black", grass: "black", rumble: "black" },
 } as const satisfies Record<string, SegmentColor | string>;
 
@@ -36,6 +37,8 @@ export const BACKGROUND = {
 } as const satisfies Record<string, BackgroundLayer>;
 
 export const SPRITES = {
+  CHECKPOINT_BANNER: { x: 5, y: 5, w: 400, h: 120 },
+  FINISH_BANNER: { x: 410, y: 5, w: 400, h: 120 },
   PALM_TREE: { x: 5, y: 5, w: 215, h: 540 },
   BILLBOARD08: { x: 230, y: 5, w: 385, h: 265 },
   TREE1: { x: 625, y: 5, w: 360, h: 360 },

@@ -254,5 +254,22 @@ describe("segments", () => {
         expect(segments[segments.length - 1 - i]!.color).toEqual(COLORS.FINISH);
       }
     });
+
+    it("marks checkpoint segments", () => {
+      resetRoad(segmentLength, rumbleLength, playerZ);
+      const segments = getSegments();
+      const totalSegments = segments.length;
+      const segmentsPerCheckpoint = Math.floor(totalSegments / 5);
+
+      let checkpointCount = 0;
+      for (let i = 1; i <= 4; i++) {
+        const checkpointIndex = segmentsPerCheckpoint * i;
+        if (checkpointIndex < totalSegments - rumbleLength) {
+          expect(segments[checkpointIndex]!.color).toEqual(COLORS.CHECKPOINT);
+          checkpointCount++;
+        }
+      }
+      expect(checkpointCount).toBeGreaterThan(0);
+    });
   });
 });

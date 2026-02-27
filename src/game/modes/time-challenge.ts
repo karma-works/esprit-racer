@@ -28,25 +28,46 @@ export const LAP_TIME_BONUS = 20;
 export const CHECKPOINT_SCORE_BONUS = 25;
 export const LAP_SCORE_BONUS = 100;
 export const CHECKPOINTS_PER_LAP = 4;
+export const BASE_TIME_PER_SEGMENT = 0.15;
+export const MIN_TIME_LIMIT = 30;
 
-export const createTimeChallengeState = (): TimeChallengeState => ({
-  screen: "main-menu",
-  playerName: "PLAYER 1",
-  selectedTrack: 0,
-  timeLimit: DEFAULT_TIME_LIMIT,
-  currentTime: DEFAULT_TIME_LIMIT,
-  score: 0,
-  lap: 1,
-  totalLaps: DEFAULT_LAPS,
-  checkpointsPassed: 0,
-  totalCheckpoints: CHECKPOINTS_PER_LAP,
-  lastCheckpointSegment: -1,
-  isPaused: false,
-  isGameOver: false,
-  bestTime: null,
-  bestScore: null,
-  timeBonusFlash: 0,
-});
+export const calculateTimeLimit = (
+  trackLength: number,
+  segmentLength: number,
+): number => {
+  const totalSegments = Math.floor(trackLength / segmentLength);
+  const calculatedTime = Math.floor(totalSegments * BASE_TIME_PER_SEGMENT);
+  return Math.max(MIN_TIME_LIMIT, calculatedTime);
+};
+
+export const createTimeChallengeState = (
+  trackLength: number = 0,
+  segmentLength: number = 200,
+): TimeChallengeState => {
+  const timeLimit =
+    trackLength > 0
+      ? calculateTimeLimit(trackLength, segmentLength)
+      : DEFAULT_TIME_LIMIT;
+
+  return {
+    screen: "main-menu",
+    playerName: "PLAYER 1",
+    selectedTrack: 0,
+    timeLimit,
+    currentTime: timeLimit,
+    score: 0,
+    lap: 1,
+    totalLaps: DEFAULT_LAPS,
+    checkpointsPassed: 0,
+    totalCheckpoints: CHECKPOINTS_PER_LAP,
+    lastCheckpointSegment: -1,
+    isPaused: false,
+    isGameOver: false,
+    bestTime: null,
+    bestScore: null,
+    timeBonusFlash: 0,
+  };
+};
 
 export const updateTimer = (
   state: TimeChallengeState,
