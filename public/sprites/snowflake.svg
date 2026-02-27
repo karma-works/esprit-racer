@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" width="100%" height="100%">
+  <defs>
+    <filter id="snow-glow">
+      <feGaussianBlur stdDeviation="0.5" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <g filter="url(#snow-glow)" shape-rendering="crispEdges">
+    <!-- Central circle -->
+    <circle cx="10" cy="10" r="2" fill="#FFFFFF"/>
+    
+    <!-- Six arms -->
+    <line x1="10" y1="2" x2="10" y2="18" stroke="#FFFFFF" stroke-width="1.5"/>
+    <line x1="2.3" y1="5.5" x2="17.7" y2="14.5" stroke="#FFFFFF" stroke-width="1.5"/>
+    <line x1="2.3" y1="14.5" x2="17.7" y2="5.5" stroke="#FFFFFF" stroke-width="1.5"/>
+    
+    <!-- Small branches -->
+    <line x1="10" y1="5" x2="7" y2="3" stroke="#E8F4FC" stroke-width="1"/>
+    <line x1="10" y1="5" x2="13" y2="3" stroke="#E8F4FC" stroke-width="1"/>
+    <line x1="10" y1="15" x2="7" y2="17" stroke="#E8F4FC" stroke-width="1"/>
+    <line x1="10" y1="15" x2="13" y2="17" stroke="#E8F4FC" stroke-width="1"/>
+    
+    <line x1="6" y1="7.5" x2="3" y2="6" stroke="#E8F4FC" stroke-width="1"/>
+    <line x1="14" y1="12.5" x2="17" y2="14" stroke="#E8F4FC" stroke-width="1"/>
+    <line x1="6" y1="12.5" x2="3" y2="14" stroke="#E8F4FC" stroke-width="1"/>
+    <line x1="14" y1="7.5" x2="17" y2="6" stroke="#E8F4FC" stroke-width="1"/>
+  </g>
+</svg>

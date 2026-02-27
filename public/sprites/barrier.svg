@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 80" width="100%" height="100%">
+  <defs>
+    <filter id="barrier-outline">
+      <feMorphology in="SourceAlpha" result="DILATED" operator="dilate" radius="1.5"></feMorphology>
+      <feFlood flood-color="#0A0A0A" result="BLACK"></feFlood>
+      <feComposite in="BLACK" in2="DILATED" operator="in" result="OUTLINE"></feComposite>
+      <feMerge>
+        <feMergeNode in="OUTLINE" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+    
+    <pattern id="dither-barrier" width="4" height="4" patternUnits="userSpaceOnUse">
+      <rect width="2" height="2" fill="#0A0A0A" opacity="0.25"/>
+      <rect x="2" y="2" width="2" height="2" fill="#0A0A0A" opacity="0.25"/>
+    </pattern>
+  </defs>
+  
+  <!-- Ground Shadow -->
+  <ellipse cx="75" cy="75" rx="70" ry="5" fill="#000000" opacity="0.4"/>
+  
+  <!-- Barrier Group -->
+  <g filter="url(#barrier-outline)" shape-rendering="crispEdges">
+    
+    <!-- Main Barrier Body -->
+    <polygon points="10,30 140,30 145,55 5,55" fill="#FF6600"/>
+    <polygon points="10,30 140,30 145,55 5,55" fill="url(#dither-barrier)"/>
+    
+    <!-- White Diagonal Stripes -->
+    <polygon points="10,30 25,30 40,55 25,55" fill="#FFFFFF"/>
+    <polygon points="45,30 60,30 75,55 60,55" fill="#FFFFFF"/>
+    <polygon points="80,30 95,30 110,55 95,55" fill="#FFFFFF"/>
+    <polygon points="115,30 130,30 145,55 130,55" fill="#FFFFFF"/>
+    
+    <!-- Top Edge -->
+    <polygon points="10,30 140,30 138,33 12,33" fill="#FFAA66"/>
+    
+    <!-- Reflectors -->
+    <rect x="20" y="38" width="8" height="12" rx="1" fill="#FFFFFF"/>
+    <rect x="55" y="38" width="8" height="12" rx="1" fill="#FFFFFF"/>
+    <rect x="87" y="38" width="8" height="12" rx="1" fill="#FFFFFF"/>
+    <rect x="122" y="38" width="8" height="12" rx="1" fill="#FFFFFF"/>
+    
+    <!-- Legs -->
+    <polygon points="15,55 25,55 28,70 12,70" fill="#333333"/>
+    <polygon points="125,55 135,55 138,70 122,70" fill="#333333"/>
+    
+    <!-- Leg Highlights -->
+    <polygon points="15,55 18,55 21,70 14,70" fill="#555555"/>
+    <polygon points="125,55 128,55 131,70 124,70" fill="#555555"/>
+    
+  </g>
+</svg>
