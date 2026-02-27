@@ -29,6 +29,12 @@ import {
   setMusicVolume,
   stopGameMusic,
   loadAndPlayTrack,
+  isSoundEnabled,
+  toggleSound,
+  startEngineSound,
+  stopEngineSound,
+  updateEngineSound,
+  playCollisionSound,
 } from "./audio/mod-player";
 import {
   createTimeChallengeState,
@@ -1072,6 +1078,7 @@ const updateGame = (dt: number) => {
     updateTumbleweeds(world, dt);
     updateLightning(world, dt);
     updateSlidePhysics(world, dt);
+    updateEngineSound(speedPercent);
 
     const checkpointResult = checkCheckpoint(
       gameState,
@@ -1112,6 +1119,11 @@ const updateGame = (dt: number) => {
       updateLightning(world, dt);
       updateSlidePhysics(world, dt);
 
+      // Update engine sound for player 1 only
+      if (i === 0) {
+        updateEngineSound(speedPercent);
+      }
+
       // Check lap completion for each player
       if (
         prevLap > 0 &&
@@ -1123,7 +1135,11 @@ const updateGame = (dt: number) => {
     }
 
     // Handle player-player collisions
-    resolveAllPlayerCollisions(world.players, world.config.segmentLength);
+    resolveAllPlayerCollisions(
+      world.players,
+      world.config.segmentLength,
+      playCollisionSound,
+    );
 
     // Restore first player as default
     world.player = world.players[0]!;
@@ -1163,14 +1179,17 @@ const goToMusicSelection = async () => {
     | MusicSelectionScreen
     | undefined;
   const selectedTrack = musicScreen?.getSelectedTrack();
-  if (selectedTrack) {
+  if (selectedTrack && selectedTrack.file) {
     await loadAndPlayTrack(selectedTrack.file);
     setMusicVolume(0.3);
+  } else {
+    stopGameMusic();
   }
 };
 
 const startGame = async (themeId?: string) => {
   world = createWorld(playerCount);
+  world.onCollision = playCollisionSound;
 
   const musicScreen = screens.get("music-select") as
     | MusicSelectionScreen
@@ -1200,11 +1219,16 @@ const startGame = async (themeId?: string) => {
   hudState = createDefaultHudState();
 
   const selectedTrack = musicScreen?.getSelectedTrack();
-  if (selectedTrack) {
+  if (selectedTrack && selectedTrack.file) {
     stopGameMusic();
     await loadAndPlayTrack(selectedTrack.file);
     setMusicVolume(0.3);
+  } else {
+    stopGameMusic();
   }
+
+  // Start engine sound
+  startEngineSound();
 };
 
 const goToRECS = () => {
@@ -1233,6 +1257,9 @@ const handleMenuKeyDown = async (keyCode: number) => {
       await goToMusicSelection();
     } else if (action === "constructor") {
       goToRECS();
+    } else if (action === "sound") {
+      const isEnabled = toggleSound();
+      console.log(`Sound ${isEnabled ? "enabled" : "disabled"}`);
     }
   } else if (gameState.screen === "recs") {
     const recsScreen = screen as RECSScreen | undefined;
@@ -1253,14 +1280,19 @@ const handleMenuKeyDown = async (keyCode: number) => {
     if (action === "start_game") {
       startGame();
     } else if (prevTrack?.id !== newTrack?.id && newTrack) {
-      await loadAndPlayTrack(newTrack.file);
-      setMusicVolume(0.3);
+      if (newTrack.file) {
+        await loadAndPlayTrack(newTrack.file);
+        setMusicVolume(0.3);
+      } else {
+        stopGameMusic();
+      }
     }
   } else if (gameState.screen === "results") {
     if (keyCode === KEY.SPACE) {
       gameState = returnToMenu(gameState);
+      stopEngineSound();
       const titleTrack = MUSIC_TRACKS[0];
-      if (titleTrack) {
+      if (titleTrack && titleTrack.file) {
         await loadAndPlayTrack(titleTrack.file);
         setMusicVolume(0.3);
       }
@@ -1330,6 +1362,9 @@ canvas.addEventListener("click", async (ev) => {
       await goToMusicSelection();
     } else if (action === "constructor") {
       goToRECS();
+    } else if (action === "sound") {
+      const isEnabled = toggleSound();
+      console.log(`Sound ${isEnabled ? "enabled" : "disabled"}`);
     }
   } else if (gameState.screen === "music-select") {
     const action = screen?.handleClick?.(x, y);

@@ -105,6 +105,7 @@ export const checkAllPlayerCollisions = (
 export const resolveAllPlayerCollisions = (
   players: PlayerState[],
   segmentLength: number = 200,
+  onCollision?: (intensity: number) => void,
 ): void => {
   const collisions = checkAllPlayerCollisions(players, segmentLength);
 
@@ -113,6 +114,9 @@ export const resolveAllPlayerCollisions = (
     const p2 = players[collision.p2];
     if (p1 && p2) {
       resolvePlayerCollision(p1, p2);
+      if (onCollision) {
+        onCollision(0.8);
+      }
     }
   }
 };

@@ -3,6 +3,7 @@ import type {
   GameScreen,
 } from "../../game/modes/time-challenge";
 import { globalSpriteCache } from "../../assets/svg-loader";
+import { isSoundEnabled } from "../../audio/mod-player";
 
 export interface UIScreen {
   render(ctx: CanvasRenderingContext2D, state: TimeChallengeState): void;
@@ -342,6 +343,84 @@ export class MainMenuScreen implements UIScreen {
         },
       );
     }
+
+    // Draw speaker icon based on sound state
+    this.drawSpeakerIcon(ctx, scale);
+  }
+
+  private drawSpeakerIcon(ctx: CanvasRenderingContext2D, scale: number): void {
+    const soundZone = this.zones.find((z) => z.action === "sound");
+    if (!soundZone) return;
+
+    const centerX = soundZone.x + soundZone.width / 2;
+    const centerY = soundZone.y + soundZone.height / 2 + 10 * scale;
+    const size = 30 * scale;
+
+    ctx.save();
+    ctx.strokeStyle = "#fdd835";
+    ctx.fillStyle = "#fdd835";
+    ctx.lineWidth = 3 * scale;
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+
+    // Draw speaker cone (base part)
+    ctx.beginPath();
+    ctx.moveTo(centerX - size * 0.5, centerY + size * 0.4);
+    ctx.lineTo(centerX - size * 0.5, centerY - size * 0.4);
+    ctx.lineTo(centerX + size * 0.2, centerY - size * 0.5);
+    ctx.lineTo(centerX + size * 0.2, centerY + size * 0.5);
+    ctx.closePath();
+    ctx.fill();
+
+    // Draw speaker box (back part)
+    ctx.fillRect(
+      centerX - size * 0.7,
+      centerY - size * 0.25,
+      size * 0.25,
+      size * 0.5,
+    );
+
+    if (isSoundEnabled()) {
+      // Draw sound waves
+      ctx.strokeStyle = "#fff";
+      ctx.lineWidth = 2 * scale;
+      ctx.beginPath();
+      ctx.arc(
+        centerX + size * 0.3,
+        centerY,
+        size * 0.25,
+        -Math.PI / 3,
+        Math.PI / 3,
+      );
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(
+        centerX + size * 0.3,
+        centerY,
+        size * 0.45,
+        -Math.PI / 3,
+        Math.PI / 3,
+      );
+      ctx.stroke();
+    } else {
+      // Draw X (muted)
+      ctx.strokeStyle = "#e53935";
+      ctx.lineWidth = 4 * scale;
+      ctx.beginPath();
+      ctx.moveTo(centerX + size * 0.1, centerY - size * 0.35);
+      ctx.lineTo(centerX + size * 0.7, centerY + size * 0.35);
+      ctx.moveTo(centerX + size * 0.7, centerY - size * 0.35);
+      ctx.lineTo(centerX + size * 0.1, centerY + size * 0.35);
+      ctx.stroke();
+
+      // Draw "OFF" text
+      ctx.fillStyle = "#e53935";
+      ctx.font = `bold ${10 * scale}px monospace`;
+      ctx.textAlign = "center";
+      ctx.fillText("OFF", centerX + size * 0.5, centerY + size * 0.6);
+    }
+
+    ctx.restore();
   }
 
   private findZoneIndex(x: number, y: number): number {
@@ -463,12 +542,30 @@ export const MUSIC_TRACKS: MusicTrack[] = [
     name: "VELOCITY VORTEX",
     file: "/sound/Velocity_Vortex.mp3",
   },
+  {
+    id: "nebula",
+    name: "NEBULA NAVIGATOR",
+    file: "/sound/Nebula_Navigator.mp3",
+  },
+  {
+    id: "neon",
+    name: "NEON DRIVE",
+    file: "/sound/Neon_Drive.mp3",
+  },
+  {
+    id: "neon2",
+    name: "NEON VELOCITY",
+    file: "/sound/Neon_Velocity.mp3",
+  },
+  {
+    id: "silent",
+    name: "NO MUSIC",
+    file: "",
+  },
 ];
 
-const MUSIC_CHANNELS = MUSIC_TRACKS;
-
 export class MusicSelectionScreen implements UIScreen {
-  private selectedIndex: number = 0;
+  private selectedIndex: number = 4; // Default to NEON VELOCITY
 
   constructor(
     private width: number,
@@ -495,8 +592,8 @@ export class MusicSelectionScreen implements UIScreen {
 
     const centerX = this.width / 2;
 
-    const currentChannel = MUSIC_CHANNELS[this.selectedIndex];
-    if (currentChannel) {
+    const currentTrack = MUSIC_TRACKS[this.selectedIndex];
+    if (currentTrack) {
       const displayY = 110 * (this.height / 600);
 
       ctx.fillStyle = "rgba(0, 0, 0, 0.6)";
@@ -508,7 +605,7 @@ export class MusicSelectionScreen implements UIScreen {
       ctx.textBaseline = "middle";
       ctx.shadowColor = "#ff8c00";
       ctx.shadowBlur = 10;
-      ctx.fillText(currentChannel.name, centerX, displayY);
+      ctx.fillText(currentTrack.name, centerX, displayY);
       ctx.shadowBlur = 0;
     }
 
@@ -542,10 +639,9 @@ export class MusicSelectionScreen implements UIScreen {
 
     if (keyCode === LEFT) {
       this.selectedIndex =
-        (this.selectedIndex - 1 + MUSIC_CHANNELS.length) %
-        MUSIC_CHANNELS.length;
+        (this.selectedIndex - 1 + MUSIC_TRACKS.length) % MUSIC_TRACKS.length;
     } else if (keyCode === RIGHT) {
-      this.selectedIndex = (this.selectedIndex + 1) % MUSIC_CHANNELS.length;
+      this.selectedIndex = (this.selectedIndex + 1) % MUSIC_TRACKS.length;
     }
 
     return null;

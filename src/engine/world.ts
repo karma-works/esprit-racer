@@ -42,6 +42,7 @@ export interface WorldState {
   lightningActive: boolean;
   lightningTimer: number;
   playerCount: number;
+  onCollision?: (intensity: number) => void;
 }
 
 export const createDefaultConfig = (): GameConfig => ({
@@ -55,12 +56,12 @@ export const createDefaultConfig = (): GameConfig => ({
   drawDistance: 300,
   fogDensity: 5,
   centrifugal: 0.3,
-  maxSpeed: 200 / (1 / 60),
-  accel: 200 / (1 / 60) / 5,
-  braking: -(200 / (1 / 60)),
-  decel: -(200 / (1 / 60)) / 5,
-  offRoadDecel: -(200 / (1 / 60)) / 2,
-  offRoadLimit: 200 / (1 / 60) / 4,
+  maxSpeed: (200 / (1 / 60)) * 1.5, // 50% faster
+  accel: (200 / (1 / 60) / 5) * 1.5,
+  braking: -(200 / (1 / 60)) * 1.5,
+  decel: -(200 / (1 / 60) / 5) * 1.5,
+  offRoadDecel: -(200 / (1 / 60) / 2) * 1.5,
+  offRoadLimit: (200 / (1 / 60) / 4) * 1.5,
 });
 
 export const createDefaultPlayer = (playerZ: number): PlayerState => ({
@@ -538,6 +539,10 @@ export const update = (world: WorldState, dt: number): void => {
     ) {
       player.speed = car.speed * (car.speed / player.speed);
       player.position = Util.increase(car.z, -player.z, world.trackLength);
+      // Trigger collision event for sound
+      if (world.onCollision) {
+        world.onCollision(0.7);
+      }
       break;
     }
   }

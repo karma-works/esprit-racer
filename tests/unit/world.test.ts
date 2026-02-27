@@ -32,7 +32,7 @@ describe("world", () => {
     it("calculates physics values correctly", () => {
       const config = createDefaultConfig();
 
-      expect(config.maxSpeed).toBe(200 / (1 / 60));
+      expect(config.maxSpeed).toBe((200 / (1 / 60)) * 1.5);
       expect(config.accel).toBe(config.maxSpeed / 5);
       expect(config.braking).toBe(-config.maxSpeed);
     });

@@ -7,10 +7,13 @@ export type GameScreen =
   | "racing"
   | "results";
 
+export type GameMode = "time" | "race";
+
 export interface TimeChallengeState {
   screen: GameScreen;
   playerName: string;
   selectedTrack: number;
+  gameMode: GameMode;
   timeLimit: number;
   currentTime: number;
   score: number;
