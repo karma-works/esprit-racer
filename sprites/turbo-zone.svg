@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 40" width="100%" height="100%">
+  <defs>
+    <linearGradient id="turbo-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#00FFFF;stop-opacity:0"/>
+      <stop offset="50%" style="stop-color:#00FFFF;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#FF00FF;stop-opacity:0"/>
+    </linearGradient>
+    
+    <filter id="turbo-glow">
+      <feGaussianBlur stdDeviation="2" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    
+    <pattern id="turbo-arrows" width="30" height="40" patternUnits="userSpaceOnUse">
+      <polygon points="0,20 15,5 15,15 30,15 30,25 15,25 15,35" fill="#00FFFF" opacity="0.8"/>
+    </pattern>
+  </defs>
+  
+  <g filter="url(#turbo-glow)" shape-rendering="crispEdges">
+    <!-- Base zone -->
+    <rect x="0" y="5" width="120" height="30" fill="#0a0a2e" opacity="0.7"/>
+    
+    <!-- Arrow pattern -->
+    <rect x="0" y="5" width="120" height="30" fill="url(#turbo-arrows)"/>
+    
+    <!-- Edge glow lines -->
+    <rect x="0" y="4" width="120" height="2" fill="#00FFFF"/>
+    <rect x="0" y="34" width="120" height="2" fill="#FF00FF"/>
+    
+    <!-- Animated feel chevrons -->
+    <polygon points="10,20 25,10 25,16 40,16 40,24 25,24 25,30" fill="#FFFFFF" opacity="0.3"/>
+    <polygon points="50,20 65,10 65,16 80,16 80,24 65,24 65,30" fill="#FFFFFF" opacity="0.3"/>
+    <polygon points="90,20 105,10 105,16 120,16 120,24 105,24 105,30" fill="#FFFFFF" opacity="0.3"/>
+  </g>
+</svg>

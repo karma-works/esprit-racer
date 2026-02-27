@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 40" width="100%" height="100%">
+  <defs>
+    <linearGradient id="oil-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#1a1a2e"/>
+      <stop offset="25%" style="stop-color:#2d1b4e"/>
+      <stop offset="50%" style="stop-color:#1a3a5c"/>
+      <stop offset="75%" style="stop-color:#1b4d3e"/>
+      <stop offset="100%" style="stop-color:#1a1a2e"/>
+    </linearGradient>
+    
+    <filter id="oil-shimmer">
+      <feTurbulence type="turbulence" baseFrequency="0.02" numOctaves="2" result="turbulence"/>
+      <feDisplacementMap in="SourceGraphic" in2="turbulence" scale="2" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+  </defs>
+  
+  <g shape-rendering="crispEdges">
+    <!-- Oil slick puddle -->
+    <ellipse cx="50" cy="20" rx="48" ry="18" fill="url(#oil-grad)" opacity="0.8"/>
+    
+    <!-- Iridescent highlights -->
+    <ellipse cx="30" cy="15" rx="20" ry="8" fill="#4B0082" opacity="0.4"/>
+    <ellipse cx="60" cy="22" rx="25" ry="10" fill="#006400" opacity="0.3"/>
+    <ellipse cx="45" cy="25" rx="15" ry="6" fill="#00008B" opacity="0.3"/>
+    
+    <!-- Shine spots -->
+    <ellipse cx="35" cy="12" rx="8" ry="3" fill="#FFFFFF" opacity="0.2"/>
+    <ellipse cx="65" cy="18" rx="6" ry="2" fill="#FFFFFF" opacity="0.15"/>
+  </g>
+</svg>

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Esprit Racer</title>
+  <link rel="icon" type="image/svg+xml" href="/esprit-racer/sprites/player-car.svg">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #000;
+    }
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    #app {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      height: 100%;
+    }
+    #hud {
+      display: none;
+    }
+    #canvas {
+      display: block;
+    }
+  </style>
+  <script type="module" crossorigin src="/esprit-racer/assets/main-Bu8z2snK.js"></script>
+</head>
+<body>
+  <div id="app">
+    <div id="hud">
+      <span id="speed" class="hud"><span id="speed-value" class="value">0</span> km/h</span>
+      <span id="timer" class="hud">Time: <span id="timer-value" class="value">60.0</span></span>
+      <span id="lap" class="hud">Lap: <span id="lap-value" class="value">1/3</span></span>
+    </div>
+    <canvas id="canvas">
+      Your browser does not support the canvas element.
+    </canvas>
+  </div>
+</body>
+</html>

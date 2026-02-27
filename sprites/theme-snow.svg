@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 46 75" width="100%" height="100%">
+  <defs>
+    <filter id="snow-glow">
+      <feGaussianBlur stdDeviation="0.5"/>
+    </filter>
+  </defs>
+  <rect width="46" height="75" fill="#e8f4fc" rx="3"/>
+  <g filter="url(#snow-glow)">
+    <line x1="23" y1="8" x2="23" y2="67" stroke="#87ceeb" stroke-width="2"/>
+    <line x1="6" y1="22" x2="40" y2="53" stroke="#87ceeb" stroke-width="2"/>
+    <line x1="6" y1="53" x2="40" y2="22" stroke="#87ceeb" stroke-width="2"/>
+    <line x1="23" y1="8" x2="15" y2="18" stroke="#b0e0e6" stroke-width="1.5"/>
+    <line x1="23" y1="8" x2="31" y2="18" stroke="#b0e0e6" stroke-width="1.5"/>
+    <line x1="23" y1="67" x2="15" y2="57" stroke="#b0e0e6" stroke-width="1.5"/>
+    <line x1="23" y1="67" x2="31" y2="57" stroke="#b0e0e6" stroke-width="1.5"/>
+    <line x1="11" y1="28" x2="6" y2="22" stroke="#b0e0e6" stroke-width="1.5"/>
+    <line x1="11" y1="28" x2="6" y2="35" stroke="#b0e0e6" stroke-width="1.5"/>
+    <line x1="35" y1="28" x2="40" y2="22" stroke="#b0e0e6" stroke-width="1.5"/>
+    <line x1="35" y1="28" x2="40" y2="35" stroke="#b0e0e6" stroke-width="1.5"/>
+    <line x1="11" y1="47" x2="6" y2="40" stroke="#b0e0e6" stroke-width="1.5"/>
+    <line x1="11" y1="47" x2="6" y2="53" stroke="#b0e0e6" stroke-width="1.5"/>
+    <line x1="35" y1="47" x2="40" y2="40" stroke="#b0e0e6" stroke-width="1.5"/>
+    <line x1="35" y1="47" x2="40" y2="53" stroke="#b0e0e6" stroke-width="1.5"/>
+    <circle cx="23" cy="37" r="4" fill="#ffffff"/>
+  </g>
+</svg>
