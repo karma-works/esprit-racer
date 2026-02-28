@@ -52,6 +52,12 @@ import {
 } from "./game/modes/time-challenge";
 import { initChampionshipAI } from "./game/modes/championship-ai";
 import {
+  initRaceOpponents,
+  updateRaceOpponents,
+  getRacePosition,
+  getVisibleOpponents,
+} from "./game/modes/race-opponents";
+import {
   createMultiplayerRaceState,
   type MultiplayerRaceState,
   startRace as startMultiplayerRace,
@@ -466,6 +472,53 @@ const renderRacing = () => {
       }
     }
 
+    // Render race opponents that are on this segment
+    if (gameState.gameMode === "race") {
+      for (const opp of world.raceOpponents) {
+        const oppAbsZ = opp.position % world.trackLength;
+        const oppSegIndex =
+          Math.floor(oppAbsZ / config.segmentLength) % world.segments.length;
+        if (oppSegIndex !== segment.index) continue;
+
+        const oppPercent = (oppAbsZ % config.segmentLength) / config.segmentLength;
+        const spriteScale = Util.interpolate(
+          segment.p1.screen.scale,
+          segment.p2.screen.scale,
+          oppPercent,
+        );
+        const spriteX =
+          Util.interpolate(
+            segment.p1.screen.x,
+            segment.p2.screen.x,
+            oppPercent,
+          ) +
+          (spriteScale * opp.x * roadWidth * width) / 2;
+        const spriteY = Util.interpolate(
+          segment.p1.screen.y,
+          segment.p2.screen.y,
+          oppPercent,
+        );
+
+        const oppSprite = globalSpriteCache.get(opp.spriteName, spriteScale);
+        if (oppSprite) {
+          SvgRender.svgSprite(
+            ctx,
+            oppSprite,
+            width,
+            roadWidth,
+            spriteScale,
+            spriteX,
+            spriteY,
+            -0.5,
+            -1,
+            segment.clip ?? 0,
+            oppSprite.width,
+            oppSprite.height,
+          );
+        }
+      }
+    }
+
     for (const sprite of segment.sprites) {
       const spriteScale = segment.p1.screen.scale;
       const spriteX =
@@ -551,12 +604,20 @@ const renderRacing = () => {
 
   const speed = (player.speed / config.maxSpeed) * 300;
 
+  // Position tracking: ONLY count race opponents (not traffic cars)
   let playerPosition = 1;
-  for (const car of world.cars) {
-    if (car.z > player.position) {
-      playerPosition++;
+  let totalRacers = 1;
+  if (gameState.gameMode === "race" && world.raceOpponents.length > 0) {
+    playerPosition = getRacePosition(world);
+    totalRacers = world.raceOpponents.length + 1; // 10 opponents + player
+  } else if (gameState.gameMode === "championship") {
+    // Championship: count only AI cars in world.cars (no traffic)
+    for (const car of world.cars) {
+      if (car.z > player.position) playerPosition++;
     }
+    totalRacers = world.cars.length + 1;
   }
+  // Time trial: no position display (leave at 1/1)
 
   Render.renderParticles(ctx, world.particles, new Map());
 
@@ -591,11 +652,12 @@ const renderRacing = () => {
     ...hudState,
     speed,
     maxSpeed: 300,
-    position: Math.min(playerPosition, world.cars.length + 1),
-    totalPositions: world.cars.length + 1,
+    position: playerPosition,
+    totalPositions: totalRacers,
     mirrorCars: mirrorCars.slice(0, 3),
     boostMeter: Math.min(1, gameState.currentTime / DEFAULT_TIME_LIMIT),
   };
+
 
   renderHud(
     ctx,
@@ -1082,6 +1144,9 @@ const updateGame = (dt: number) => {
   if (playerCount === 1) {
     const prevLap = world.currentLapTime;
     update(world, dt);
+    if (gameState.gameMode === "race") {
+      updateRaceOpponents(world, dt);
+    }
     const speedPercent = world.player.speed / world.config.maxSpeed;
     updateWind(world, dt, speedPercent);
     updateJump(world, dt);
@@ -1241,7 +1306,15 @@ const startGame = async (themeId?: string) => {
   }
 
   canvas.style.filter = theme.filters.global;
-  resetCars(world, TRAFFIC_CAR_COUNT);
+
+  // In race mode: use 10 race opponents + light traffic (5 slow cars for ambience)
+  // In other modes: full traffic, no race opponents
+  if (gameState.gameMode === "race") {
+    resetCars(world, 5); // light background traffic only
+    initRaceOpponents(world);
+  } else if (!championshipState) {
+    resetCars(world, TRAFFIC_CAR_COUNT);
+  }
 
   // Position players for multiplayer
   if (playerCount > 1) {

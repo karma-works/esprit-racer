@@ -20,6 +20,16 @@ import * as Segments from "./segments";
 import * as Render from "./renderer/canvas";
 import * as Camera from "./camera";
 
+export interface RaceOpponent {
+  id: number;
+  name: string;
+  position: number;   // track position same units as player.position
+  x: number;          // lateral offset
+  speed: number;
+  spriteName: string; // e.g. "car-esprit-road.svg"
+  skill: number;      // 0.7–1.0
+}
+
 export interface WorldState {
   config: GameConfig;
   baseConfig: GameConfig;
@@ -28,6 +38,7 @@ export interface WorldState {
   players: PlayerState[];
   inputs: InputState[];
   cars: Car[];
+  raceOpponents: RaceOpponent[];
   segments: Segment[];
   trackLength: number;
   skyOffset: number;
@@ -349,6 +360,7 @@ export const createWorld = (playerCount: number = 1, playerNames: string[] = [])
     players,
     inputs,
     cars: [],
+    raceOpponents: [],
     segments,
     trackLength,
     skyOffset: 0,
