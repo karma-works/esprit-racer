@@ -1,0 +1,44 @@
+<svg viewBox="0 0 60 80" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="magneticField" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#FF00FF" stop-opacity="0"/>
+      <stop offset="50%" style="stop-color:#00FFFF" stop-opacity="0.8"/>
+      <stop offset="100%" style="stop-color:#FF00FF" stop-opacity="0"/>
+    </linearGradient>
+    <filter id="magneticGlow">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <g filter="url(#magneticGlow)">
+    <path d="M10 0 L10 80" stroke="#00FFFF" stroke-width="2" opacity="0.3">
+      <animate attributeName="opacity" values="0.3;0.6;0.3" dur="1s" repeatCount="indefinite"/>
+    </path>
+    <path d="M30 0 L30 80" stroke="#FF00FF" stroke-width="2" opacity="0.5">
+      <animate attributeName="opacity" values="0.5;0.8;0.5" dur="0.8s" repeatCount="indefinite"/>
+    </path>
+    <path d="M50 0 L50 80" stroke="#00FFFF" stroke-width="2" opacity="0.3">
+      <animate attributeName="opacity" values="0.3;0.6;0.3" dur="1.2s" repeatCount="indefinite"/>
+    </path>
+  </g>
+  
+  <g opacity="0.6">
+    <path d="M5 20 Q30 10 55 20" stroke="#FF00FF" stroke-width="1" fill="none">
+      <animate attributeName="d" values="M5 20 Q30 10 55 20;M5 20 Q30 30 55 20;M5 20 Q30 10 55 20" dur="2s" repeatCount="indefinite"/>
+    </path>
+    <path d="M5 40 Q30 30 55 40" stroke="#00FFFF" stroke-width="1" fill="none">
+      <animate attributeName="d" values="M5 40 Q30 30 55 40;M5 40 Q30 50 55 40;M5 40 Q30 30 55 40" dur="1.5s" repeatCount="indefinite"/>
+    </path>
+    <path d="M5 60 Q30 50 55 60" stroke="#FF00FF" stroke-width="1" fill="none">
+      <animate attributeName="d" values="M5 60 Q30 50 55 60;M5 60 Q30 70 55 60;M5 60 Q30 50 55 60" dur="1.8s" repeatCount="indefinite"/>
+    </path>
+  </g>
+  
+  <text x="30" y="75" font-family="sans-serif" font-size="8" fill="#FF00FF" text-anchor="middle" opacity="0.7">
+    <tspan>MAGNETIC</tspan>
+  </text>
+</svg>

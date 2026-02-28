@@ -111,3 +111,47 @@ The hud for Nitro seems to be displayed twice with a strong overlap (should only
 
 
 There seems to be a refresh problem when the race is started. after the radio-menu, when entering the game, there are strange atrifacts on the right and side and bellow the game area. when resizing the window manually the artifacts disappear. please check.
+
+
+
+In *Lotus III: The Ultimate Challenge*, **Turbo Zones** only change **speed**, not **handling**: they temporarily **raise your top‑speed cap** for a short section of track, but the car’s steering, slip, and braking behavior stay the same. [gamefaqs.gamespot](https://gamefaqs.gamespot.com/amiga/921772-lotus-iii-the-ultimate-challenge/faqs/31112)
+
+***
+
+### 1. How Turbo Zones affect speed
+
+- **What happens:**  
+  - When you enter the Turbo Zone, your **maximum possible speed is increased** for the duration of that short straight or downhill segment. [speedrun](https://www.speedrun.com/lotus3/guides/u6gus)
+  - There is **no extra boost button**; you simply keep the throttle down and the car can reach **~290 km/h or higher** in that section. [en.wikipedia](https://en.wikipedia.org/wiki/Lotus_III:_The_Ultimate_Challenge)
+
+- **Difference from normal track:**  
+  - Outside the Turbo Zone, the same Turbo‑style track has a **lower speed‑limit**, so you feel like you’re “bottoming out” faster. [speedrun](https://www.speedrun.com/lotus3/guides/u6gus)
+  - Inside the Turbo Zone, staying on the **ideal line** and **avoiding collisions** lets you exploit that extra speed window fully. [amigareviews.leveluphost](https://www.amigareviews.leveluphost.com/lotus3.htm)
+
+***
+
+### 2. How Turbo Zones affect handling
+
+- **No direct handling change:**  
+  - The game **does not alter** steering sensitivity, understeer/oversteer, or slip when you trigger the Turbo Zone. [gamefaqs.gamespot](https://gamefaqs.gamespot.com/amiga/921772-lotus-iii-the-ultimate-challenge/faqs/31112)
+  - You must still **brake sooner and earlier** for the next bend because the car is **going faster**, but the underlying physics stay identical. [speedrun](https://www.speedrun.com/lotus3/guides/u6gus)
+
+- **Indirect handling effect:**  
+  - At higher speed, **any steering input feels more sensitive**, so:
+    - Small over‑steer becomes more dangerous.  
+    - Any clip of a shock‑tower or barrier causes a **larger momentum loss**. [amigareviews.leveluphost](https://www.amigareviews.leveluphost.com/lotus3.htm)
+  - The net feeling is that **Turbo Zones tighten the margin for error**: the same steering and braking line that works elsewhere can now lead to a spin or shock‑tower hit if you’re not precise. [amigareviews.leveluphost](https://www.amigareviews.leveluphost.com/lotus3.htm)
+
+***
+
+### 3. Practical driving behavior in Turbo Zones
+
+- **Acceleration and gears:**  
+  - Use **full throttle** and an **optimal gear** (usually high‑gearing on the Turbo‑style road) so you can **hit the new top‑speed as soon as possible**. [speedrun](https://www.speedrun.com/lotus3/guides/u6gus)
+  - Manual‑gear players often **shift up earlier** to stay in the power band and avoid hitting the lower speed‑ceiling before the Turbo Zone. [speedrun](https://www.speedrun.com/lotus3/guides/u6gus)
+
+- **Braking and transitions:**  
+  - Plan your **braking point further ahead** than on a normal straight because the car carries more speed into the corner. [speedrun](https://www.speedrun.com/lotus3/guides/u6gus)
+  - If the Turbo Zone ends before a sharp S‑curve or shock‑towers, you must **transition from “flat‑out” to controlled braking** in a very short window. [amigareviews.leveluphost](https://www.amigareviews.leveluphost.com/lotus3.htm)
+
+In short: **Turbo Zones make your car faster, not stickier**, so the main change is that you must drive with **much more precise braking and line‑control** to avoid crashing at the higher speed, while the raw handling model itself stays unchanged. [gamefaqs.gamespot](https://gamefaqs.gamespot.com/amiga/921772-lotus-iii-the-ultimate-challenge/faqs/31112)

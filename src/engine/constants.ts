@@ -537,6 +537,71 @@ export const THEMES: Record<string, LevelTheme> = {
       TREE2: "DEAD_TREE2",
     },
   },
+
+  rally: {
+    id: "rally",
+    name: "Rally",
+    description:
+      "Muddy off-road. Very low grip, water pools, slippery surface.",
+    colors: {
+      sky: "#8B7355",
+      fog: "#6B5344",
+      road: {
+        road: "#8B4513",
+        grass: "#A0522D",
+        rumble: "#654321",
+        lane: "#D2B48C",
+      },
+    },
+    effects: { fogDensity: 4, fogStart: 0.6 },
+    physics: {
+      grip: 0.5,
+      offRoadGrip: 0.25,
+      maxSpeed: 0.85,
+      acceleration: 0.75,
+      brakeForce: 0.6,
+      slippery: true,
+    },
+    filters: {
+      global: "sepia(0.3) saturate(0.8) brightness(0.9)",
+      background: "",
+      road: "",
+    },
+    background: "background-rally.svg",
+    obstacles: ["mud_pool", "water_puddle", "rock"],
+  },
+
+  forest: {
+    id: "forest",
+    name: "Forest",
+    description: "Dense tree-lined road. Logs can be jumped over.",
+    colors: {
+      sky: "#87CEEB",
+      fog: "#90B090",
+      road: {
+        road: "#4A4A4A",
+        grass: "#228B22",
+        rumble: "#654321",
+        lane: "#FFFFFF",
+      },
+    },
+    effects: { fogDensity: 3, fogStart: 0.6 },
+    physics: {
+      grip: 1.0,
+      offRoadGrip: 0.5,
+      maxSpeed: 0.95,
+      acceleration: 1.0,
+      brakeForce: 1.0,
+    },
+    filters: {
+      global: "saturate(1.2) brightness(0.95)",
+      background: "",
+      road: "",
+    },
+    background: "background-forest.svg",
+    obstacles: ["log", "tree", "rock"],
+    specialFeatures: ["jumpable_logs"],
+  },
 };
 
 export const THEME_ORDER = [
@@ -553,4 +618,6 @@ export const THEME_ORDER = [
   "city",
   "roadworks",
   "windy",
+  "rally",
+  "forest",
 ] as const;

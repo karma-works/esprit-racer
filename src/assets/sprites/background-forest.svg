@@ -1,0 +1,68 @@
+<svg viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="forestSky" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#87CEEB"/>
+      <stop offset="50%" style="stop-color:#98D8C8"/>
+      <stop offset="100%" style="stop-color:#A0C0A0"/>
+    </linearGradient>
+    <linearGradient id="forestHills" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#2E5A1C"/>
+      <stop offset="100%" style="stop-color:#1E4A0C"/>
+    </linearGradient>
+    <linearGradient id="forestGround" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#3A5A24"/>
+      <stop offset="100%" style="stop-color:#2E4A1C"/>
+    </linearGradient>
+  </defs>
+  
+  <rect width="800" height="600" fill="url(#forestSky)"/>
+  
+  <g id="sun" opacity="0.8">
+    <circle cx="650" cy="80" r="40" fill="#FFF8DC"/>
+    <circle cx="650" cy="80" r="50" fill="#FFF8DC" opacity="0.3"/>
+  </g>
+  
+  <g id="distant-forest" opacity="0.5">
+    <path d="M0 200 L50 150 L100 200 L150 140 L200 200 L250 130 L300 200 L350 145 L400 200 L450 135 L500 200 L550 140 L600 200 L650 130 L700 200 L750 145 L800 200 L800 300 L0 300 Z" fill="#1E3A0C"/>
+  </g>
+  
+  <g id="mid-forest" opacity="0.7">
+    <path d="M0 250 L40 180 L80 250 L130 170 L180 250 L230 160 L280 250 L340 175 L400 250 L460 165 L520 250 L580 180 L640 250 L700 170 L760 250 L800 220 L800 350 L0 350 Z" fill="url(#forestHills)"/>
+  </g>
+  
+  <g id="foreground-trees">
+    <path d="M20 350 L20 200 L-10 220 L20 160 L-20 180 L20 100 L-30 130 L20 50 L50 50 L50 350 Z" fill="#1E4A0C"/>
+    <path d="M20 350 L20 200 L50 220 L20 160 L60 180 L20 100 L70 130 L20 50 L50 350 Z" fill="#2E5A1C" opacity="0.5"/>
+    
+    <path d="M180 360 L180 220 L150 240 L180 180 L140 200 L180 120 L130 150 L180 70 L210 70 L210 360 Z" fill="#1E4A0C"/>
+    <path d="M180 360 L180 220 L210 240 L180 180 L220 200 L180 120 L230 150 L180 70 L210 360 Z" fill="#2E5A1C" opacity="0.5"/>
+    
+    <path d="M620 340 L620 200 L590 220 L620 160 L580 180 L620 100 L570 130 L620 50 L650 50 L650 340 Z" fill="#1E4A0C"/>
+    <path d="M620 340 L620 200 L650 220 L620 160 L660 180 L620 100 L670 130 L620 50 L650 340 Z" fill="#2E5A1C" opacity="0.5"/>
+    
+    <path d="M780 355 L780 210 L750 230 L780 170 L740 190 L780 110 L730 140 L780 60 L810 60 L810 355 Z" fill="#1E4A0C"/>
+    <path d="M780 355 L780 210 L810 230 L780 170 L820 190 L780 110 L830 140 L780 60 L810 355 Z" fill="#2E5A1C" opacity="0.5"/>
+  </g>
+  
+  <rect y="380" width="800" height="220" fill="url(#forestGround)"/>
+  
+  <g id="forest-floor-details">
+    <ellipse cx="100" cy="420" rx="30" ry="8" fill="#4A3728"/>
+    <ellipse cx="350" cy="450" rx="40" ry="10" fill="#3D2E1F"/>
+    <ellipse cx="550" cy="430" rx="35" ry="9" fill="#4A3728"/>
+    <ellipse cx="720" cy="460" rx="25" ry="6" fill="#3D2E1F"/>
+  </g>
+  
+  <g id="fallen-logs" opacity="0.9">
+    <rect x="200" y="480" width="80" height="12" rx="6" fill="#5D4037"/>
+    <rect x="450" y="500" width="60" height="10" rx="5" fill="#4E342E"/>
+    <rect x="650" y="490" width="70" height="11" rx="5" fill="#5D4037"/>
+  </g>
+  
+  <g id="ferns" opacity="0.8">
+    <path d="M50 520 Q60 490 70 520 Q80 485 90 520" stroke="#228B22" stroke-width="3" fill="none"/>
+    <path d="M280 530 Q290 500 300 530 Q310 495 320 530" stroke="#228B22" stroke-width="3" fill="none"/>
+    <path d="M580 525 Q590 495 600 525 Q610 490 620 525" stroke="#228B22" stroke-width="3" fill="none"/>
+    <path d="M750 535 Q760 505 770 535 Q780 500 790 535" stroke="#228B22" stroke-width="3" fill="none"/>
+  </g>
+</svg>

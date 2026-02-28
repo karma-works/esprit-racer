@@ -1,0 +1,61 @@
+<svg viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="rallySky" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#8B7355"/>
+      <stop offset="50%" style="stop-color:#A0522D"/>
+      <stop offset="100%" style="stop-color:#D2691E"/>
+    </linearGradient>
+    <linearGradient id="rallyHills" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#6B4423"/>
+      <stop offset="100%" style="stop-color:#8B4513"/>
+    </linearGradient>
+    <linearGradient id="rallyGround" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#A0522D"/>
+      <stop offset="100%" style="stop-color:#8B4513"/>
+    </linearGradient>
+  </defs>
+  
+  <rect width="800" height="600" fill="url(#rallySky)"/>
+  
+  <g id="distant-hills">
+    <path d="M0 200 Q100 150 200 180 Q300 140 400 170 Q500 130 600 160 Q700 120 800 150 L800 300 L0 300 Z" fill="#5D4037" opacity="0.6"/>
+    <path d="M0 220 Q150 170 300 200 Q450 160 600 190 Q750 150 800 180 L800 320 L0 320 Z" fill="#6B4423" opacity="0.7"/>
+  </g>
+  
+  <g id="mid-hills">
+    <path d="M0 280 Q80 240 160 260 Q240 230 320 250 Q400 220 480 240 Q560 210 640 230 Q720 200 800 220 L800 380 L0 380 Z" fill="url(#rallyHills)"/>
+  </g>
+  
+  <g id="foreground-hills">
+    <path d="M0 350 Q100 320 200 340 Q300 310 400 330 Q500 300 600 320 Q700 290 800 310 L800 450 L0 450 Z" fill="#8B4513"/>
+  </g>
+  
+  <g id="mud-puddles" opacity="0.7">
+    <ellipse cx="150" cy="420" rx="80" ry="15" fill="#4A3728"/>
+    <ellipse cx="450" cy="400" rx="100" ry="20" fill="#3D2E1F"/>
+    <ellipse cx="700" cy="430" rx="60" ry="12" fill="#4A3728"/>
+    <ellipse cx="300" cy="440" rx="70" ry="14" fill="#3D2E1F"/>
+  </g>
+  
+  <g id="trees" opacity="0.8">
+    <path d="M50 350 L50 280 L30 290 L50 260 L25 270 L50 230 L20 250 L50 200 L60 200 L60 350 Z" fill="#2E4A1C"/>
+    <path d="M180 340 L180 290 L160 295 L180 270 L155 275 L180 245 L150 255 L180 220 L190 220 L190 340 Z" fill="#3A5A24"/>
+    <path d="M620 330 L620 285 L600 290 L620 265 L595 270 L620 240 L590 250 L620 215 L630 215 L630 330 Z" fill="#2E4A1C"/>
+    <path d="M750 345 L750 295 L730 300 L750 275 L725 280 L750 250 L720 260 L750 225 L760 225 L760 345 Z" fill="#3A5A24"/>
+  </g>
+  
+  <rect y="450" width="800" height="150" fill="url(#rallyGround)"/>
+  
+  <g id="water-reflection" opacity="0.3">
+    <ellipse cx="200" cy="480" rx="40" ry="8" fill="#87CEEB"/>
+    <ellipse cx="500" cy="500" rx="50" ry="10" fill="#87CEEB"/>
+    <ellipse cx="650" cy="470" rx="35" ry="7" fill="#87CEEB"/>
+  </g>
+  
+  <g id="rocks">
+    <ellipse cx="100" cy="520" rx="25" ry="12" fill="#696969"/>
+    <ellipse cx="300" cy="540" rx="30" ry="15" fill="#778899"/>
+    <ellipse cx="550" cy="510" rx="20" ry="10" fill="#696969"/>
+    <ellipse cx="720" cy="530" rx="28" ry="14" fill="#778899"/>
+  </g>
+</svg>
