@@ -246,6 +246,8 @@ export interface LevelTheme {
   filters: ThemeFilters;
   background: string;
   spriteOverrides?: Record<string, string>;
+  obstacles?: string[];
+  specialFeatures?: string[];
 }
 
 export interface WindState {
