@@ -1,0 +1,45 @@
+<svg viewBox="0 0 120 70" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="espritS4Body" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#CD5C5C"/>
+      <stop offset="50%" style="stop-color:#B22222"/>
+      <stop offset="100%" style="stop-color:#8B0000"/>
+    </linearGradient>
+    <linearGradient id="espritS4Window" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#3A5A7A"/>
+      <stop offset="100%" style="stop-color:#1A3A5A"/>
+    </linearGradient>
+  </defs>
+  
+  <g id="esprit-s4">
+    <rect x="5" y="48" width="20" height="14" rx="3" fill="#1a1a1a"/>
+    <rect x="95" y="48" width="20" height="14" rx="3" fill="#1a1a1a"/>
+    
+    <path d="M0 35 L12 30 L22 18 L42 15 L78 15 L98 20 L112 32 L118 42 L115 50 L8 50 L2 42 Z" fill="url(#espritS4Body)"/>
+    
+    <path d="M10 45 L108 45 L105 52 L12 52 Z" fill="#600000"/>
+    
+    <rect x="8" y="42" width="14" height="6" rx="1" fill="#ff3333"/>
+    <rect x="98" y="42" width="14" height="6" rx="1" fill="#ff3333"/>
+    
+    <rect x="32" y="35" width="10" height="4" rx="1" fill="#222"/>
+    <rect x="78" y="35" width="10" height="4" rx="1" fill="#222"/>
+    
+    <path d="M25 15 L95 15 L88 32 L32 32 Z" fill="#700000"/>
+    
+    <path d="M30 17 L90 17 L84 30 L36 30 Z" fill="url(#espritS4Window)"/>
+    
+    <line x1="60" y1="17" x2="60" y2="30" stroke="#700000" stroke-width="1.5"/>
+    
+    <path d="M45 15 L52 10 L68 10 L75 15" fill="#500000" opacity="0.7"/>
+    
+    <circle cx="52" cy="45" r="3.5" fill="#500000"/>
+    <circle cx="68" cy="45" r="3.5" fill="#500000"/>
+    
+    <path d="M112 33 L118 36 L118 46 L112 50 Z" fill="#200000"/>
+    
+    <rect x="58" y="25" width="4" height="3" fill="#ffcc00" opacity="0.8"/>
+    
+    <text x="60" y="55" font-family="sans-serif" font-size="6" fill="#ffcccc" text-anchor="middle" font-weight="bold">S4</text>
+  </g>
+</svg>

@@ -1,0 +1,41 @@
+<svg viewBox="0 0 120 70" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="espritRoadBody" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#C0C0C0"/>
+      <stop offset="50%" style="stop-color:#A0A0A0"/>
+      <stop offset="100%" style="stop-color:#808080"/>
+    </linearGradient>
+    <linearGradient id="espritRoadWindow" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#4A6B8A"/>
+      <stop offset="100%" style="stop-color:#2A4B6A"/>
+    </linearGradient>
+  </defs>
+  
+  <g id="esprit-road">
+    <rect x="5" y="48" width="20" height="14" rx="3" fill="#1a1a1a"/>
+    <rect x="95" y="48" width="20" height="14" rx="3" fill="#1a1a1a"/>
+    
+    <path d="M0 35 L15 28 L25 20 L45 18 L75 18 L95 22 L110 32 L115 42 L110 50 L10 50 L5 42 Z" fill="url(#espritRoadBody)"/>
+    
+    <path d="M10 45 L105 45 L102 52 L12 52 Z" fill="#505050"/>
+    
+    <rect x="8" y="42" width="12" height="6" rx="1" fill="#ff3333"/>
+    <rect x="100" y="42" width="12" height="6" rx="1" fill="#ff3333"/>
+    
+    <rect x="35" y="35" width="8" height="4" rx="1" fill="#333"/>
+    <rect x="77" y="35" width="8" height="4" rx="1" fill="#333"/>
+    
+    <path d="M28 18 L92 18 L85 32 L35 32 Z" fill="#606060"/>
+    
+    <path d="M32 20 L88 20 L82 30 L38 30 Z" fill="url(#espritRoadWindow)"/>
+    
+    <line x1="60" y1="20" x2="60" y2="30" stroke="#606060" stroke-width="1"/>
+    
+    <circle cx="55" cy="45" r="3" fill="#666"/>
+    <circle cx="65" cy="45" r="3" fill="#666"/>
+    
+    <path d="M110 35 L115 38 L115 45 L110 48 Z" fill="#303030"/>
+    
+    <text x="60" y="55" font-family="sans-serif" font-size="6" fill="#333" text-anchor="middle" font-weight="bold">ESPRIT</text>
+  </g>
+</svg>

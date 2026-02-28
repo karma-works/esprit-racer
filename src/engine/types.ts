@@ -33,6 +33,47 @@ export interface SegmentSprite {
   offset: number;
 }
 
+export interface CarType {
+  id: string;
+  name: string;
+  topSpeed: number; // multiplier: 0.85 - 1.1
+  acceleration: number; // multiplier: 0.8 - 1.2
+  handling: number; // grip multiplier: 0.7 - 1.0
+  braking: number; // multiplier: 0.8 - 1.1
+  sprite: string; // SVG sprite name
+  spriteLeft: string;
+  spriteRight: string;
+}
+
+export interface ChampionshipState {
+  difficulty: "easy" | "medium" | "hard";
+  currentRace: number;
+  totalRaces: number;
+  points: number;
+  positionHistory: number[];
+  gridPosition: number;
+  trackSequence: string[]; // theme IDs
+  passwords: string[];
+  eliminated: boolean;
+}
+
+export interface ArcadeStage {
+  themeId: string;
+  timeLimit: number; // seconds
+  trackLength: number; // derived from RECS params
+  parTime: number; // target time for bonus
+}
+
+export interface ArcadeState {
+  difficulty: "easy" | "medium" | "hard";
+  currentStage: number;
+  totalStages: number;
+  score: number;
+  timeLimit: number;
+  stageSequence: ArcadeStage[];
+  password: string;
+}
+
 export interface SegmentColor {
   road: string;
   grass: string;
@@ -53,6 +94,16 @@ export interface Car {
   sprite: Sprite;
   speed: number;
   percent?: number;
+  ai?: RacingAI;
+}
+
+export interface RacingAI {
+  carId: number;
+  skill: number; // 0.5-1.0
+  aggressiveness: number; // 0.0-1.0
+  currentLine: "racing" | "defensive" | "overtake";
+  targetSpeed: number;
+  mistakesRemaining: number;
 }
 
 export interface BackgroundLayer {
@@ -92,6 +143,8 @@ export interface PlayerState {
   z: number;
   position: number;
   speed: number;
+  selectedCar?: CarType;
+  name: string;
 }
 
 export interface InputState {

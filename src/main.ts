@@ -50,6 +50,7 @@ import {
   DEFAULT_TIME_LIMIT,
   calculateTimeLimit,
 } from "./game/modes/time-challenge";
+import { initChampionshipAI } from "./game/modes/championship-ai";
 import {
   createMultiplayerRaceState,
   type MultiplayerRaceState,
@@ -72,10 +73,18 @@ import {
   type MenuZone,
   type UIScreen,
   MusicSelectionScreen,
+  CarSelectionScreen,
+  DifficultySelectionScreen,
+  ChampionshipStandingsScreen,
   RECSScreen,
   MainMenuScreen,
   MUSIC_TRACKS,
 } from "./ui/screens/screens";
+import {
+  createChampionshipState,
+  updateChampionshipStandings,
+} from "./game/modes/championship";
+import type { ChampionshipState } from "./engine/types";
 import {
   renderHud,
   renderSplitScreenHud,
@@ -116,6 +125,7 @@ let gameState = createTimeChallengeState(
 );
 let screens = createScreens(world.config.width, world.config.height);
 let hudState = createDefaultHudState();
+let championshipState: ChampionshipState | null = null;
 
 let playerCount: 1 | 2 = 1;
 let inputManager = new InputManager(playerCount);
@@ -203,8 +213,8 @@ const loadSvgSprites = async (): Promise<void> => {
   await preloadGameSprites();
   svgBackground = globalSpriteCache.get("background-level-1.svg", 1);
   svgPlayerCarStraight = globalSpriteCache.get("player-car.svg", 0.5);
-  svgPlayerCarLeft = globalSpriteCache.get("player-car-right.svg", 0.5);
-  svgPlayerCarRight = globalSpriteCache.get("player-car-left.svg", 0.5);
+  svgPlayerCarLeft = globalSpriteCache.get("player-car-left.svg", 0.5);
+  svgPlayerCarRight = globalSpriteCache.get("player-car-right.svg", 0.5);
 };
 
 const SPRITE_NAME_MAP = new Map<string, string>([
@@ -499,7 +509,7 @@ const renderRacing = () => {
             playerPercent,
           ) *
           height) /
-          2;
+        2;
       const speedPercent = player.speed / config.maxSpeed;
       const bounce =
         1.5 *
@@ -581,8 +591,8 @@ const renderRacing = () => {
     ...hudState,
     speed,
     maxSpeed: 300,
-    position: Math.min(playerPosition, TRAFFIC_CAR_COUNT + 1),
-    totalPositions: TRAFFIC_CAR_COUNT + 1,
+    position: Math.min(playerPosition, world.cars.length + 1),
+    totalPositions: world.cars.length + 1,
     mirrorCars: mirrorCars.slice(0, 3),
     boostMeter: Math.min(1, gameState.currentTime / DEFAULT_TIME_LIMIT),
   };
@@ -877,7 +887,7 @@ const renderRacingForViewport = (
             playerPercent,
           ) *
           viewportHeight) /
-          2;
+        2;
       const speedPercent = player.speed / config.maxSpeed;
       const bounce =
         1.5 *
@@ -944,7 +954,7 @@ const renderRacingForViewport = (
                 otherPlayerPercent,
               ) *
               viewportHeight) /
-              2;
+            2;
 
           const otherSpeedPercent = otherPlayer.speed / config.maxSpeed;
           const otherBounce =
@@ -1016,8 +1026,8 @@ const renderRacingForViewport = (
     }
   }
 
-  // Calculate total positions (traffic cars + all human players)
-  const totalPositions = TRAFFIC_CAR_COUNT + playerCount;
+  // Calculate total positions (traffic cars/AI + all human players)
+  const totalPositions = world.cars.length + playerCount;
 
   renderSplitScreenHud(
     ctx,
@@ -1174,6 +1184,10 @@ const frame = () => {
   requestAnimationFrame(frame);
 };
 
+const goToDifficultySelection = () => {
+  gameState = { ...gameState, screen: "difficulty-select" };
+};
+
 const goToMusicSelection = async () => {
   gameState = { ...gameState, screen: "music-select" };
   const musicScreen = screens.get("music-select") as
@@ -1188,8 +1202,14 @@ const goToMusicSelection = async () => {
   }
 };
 
+const goToCarSelection = () => {
+  gameState = { ...gameState, screen: "car-select" };
+};
+
 const startGame = async (themeId?: string) => {
-  world = createWorld(playerCount);
+  const mainMenuScreen = screens.get("main-menu") as MainMenuScreen | undefined;
+  const names = mainMenuScreen ? [mainMenuScreen.getPlayer1Name(), mainMenuScreen.getPlayer2Name()] : [];
+  world = createWorld(playerCount, names);
   world.onCollision = playCollisionSound;
 
   const musicScreen = screens.get("music-select") as
@@ -1200,6 +1220,26 @@ const startGame = async (themeId?: string) => {
 
   const theme = getSelectedTheme();
   setTheme(world, theme);
+
+  if (championshipState) {
+    world.player.position -= championshipState.gridPosition * 500; // rough start
+
+    // Replace generic traffic with AI opponents
+    for (const segment of world.segments) {
+      segment.cars = [];
+    }
+    world.cars = initChampionshipAI(world.trackLength, world.config.segmentLength);
+  }
+
+  const carScreen = screens.get("car-select") as CarSelectionScreen | undefined;
+  if (carScreen) {
+    const selectedCar = carScreen.getSelectedCar();
+    world.player.selectedCar = selectedCar;
+    svgPlayerCarStraight = globalSpriteCache.get(selectedCar.sprite, 0.5);
+    svgPlayerCarLeft = globalSpriteCache.get(selectedCar.spriteLeft, 0.5);
+    svgPlayerCarRight = globalSpriteCache.get(selectedCar.spriteRight, 0.5);
+  }
+
   canvas.style.filter = theme.filters.global;
   resetCars(world, TRAFFIC_CAR_COUNT);
 
@@ -1284,7 +1324,7 @@ const handleMenuKeyDown = async (keyCode: number) => {
     const newTrack = musicScreen?.getSelectedTrack();
 
     if (action === "start_game") {
-      startGame();
+      goToCarSelection();
     } else if (prevTrack?.id !== newTrack?.id && newTrack) {
       if (newTrack.file) {
         await loadAndPlayTrack(newTrack.file);
@@ -1293,14 +1333,50 @@ const handleMenuKeyDown = async (keyCode: number) => {
         stopGameMusic();
       }
     }
+  } else if (gameState.screen === "car-select") {
+    const action = screen?.handleKeyDown?.(keyCode);
+    if (action === "start_race") {
+      await startGame();
+    }
+  } else if (gameState.screen === "difficulty-select") {
+    const diffScreen = screen as DifficultySelectionScreen | undefined;
+    const action = screen?.handleKeyDown?.(keyCode);
+    if (action === "difficulty_selected") {
+      championshipState = createChampionshipState(diffScreen?.getSelectedDifficulty() ?? "medium");
+      await goToMusicSelection();
+    } else if (action === "password_accepted") {
+      // Could load fully from password, wait to implement parsePassword in details
+      await goToMusicSelection();
+    }
+  } else if (gameState.screen === "standings") {
+    if (keyCode === KEY.SPACE || keyCode === 13) {
+      if (championshipState && !championshipState.eliminated && championshipState.currentRace < championshipState.totalRaces) {
+        // Next race
+        await goToCarSelection();
+      } else {
+        // Championship over, return to menu
+        championshipState = null;
+        gameState = returnToMenu(gameState);
+        stopEngineSound();
+        startMenuMusic();
+      }
+    }
   } else if (gameState.screen === "results") {
     if (keyCode === KEY.SPACE) {
-      gameState = returnToMenu(gameState);
-      stopEngineSound();
-      const titleTrack = MUSIC_TRACKS[0];
-      if (titleTrack && titleTrack.file) {
-        await loadAndPlayTrack(titleTrack.file);
-        setMusicVolume(0.3);
+      // if championship mode, go to standings instead!
+      if (gameState.gameMode === "championship" && championshipState) {
+        // approximate position from player array
+        let playerPosition = 1;
+        for (const car of world.cars) {
+          if (car.z > world.player.position) playerPosition++;
+        }
+        championshipState = updateChampionshipStandings(championshipState, playerPosition);
+        gameState = { ...gameState, screen: "standings" };
+        screens.set("standings", new ChampionshipStandingsScreen(world.config.width, world.config.height, championshipState!));
+      } else {
+        gameState = returnToMenu(gameState);
+        stopEngineSound();
+        startMenuMusic();
       }
     }
   } else if (gameState.screen === "racing") {
@@ -1380,6 +1456,11 @@ canvas.addEventListener("click", async (ev) => {
   } else if (gameState.screen === "music-select") {
     const action = screen?.handleClick?.(x, y);
     if (action === "start_game") {
+      goToCarSelection();
+    }
+  } else if (gameState.screen === "car-select") {
+    const action = screen?.handleClick?.(x, y);
+    if (action === "start_race") {
       await startGame();
     }
   } else if (gameState.screen === "recs") {
@@ -1405,6 +1486,8 @@ canvas.addEventListener("mousemove", (ev) => {
   if (
     gameState.screen === "main-menu" ||
     gameState.screen === "music-select" ||
+    gameState.screen === "car-select" ||
+    gameState.screen === "difficulty-select" ||
     gameState.screen === "recs"
   ) {
     const zones = screen?.getZones?.() ?? [];

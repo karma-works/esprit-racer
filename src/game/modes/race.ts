@@ -8,6 +8,9 @@ import type { WorldState } from "../../engine/world";
 export type GameScreen =
   | "main-menu"
   | "music-select"
+  | "car-select"
+  | "difficulty-select"
+  | "standings"
   | "recs"
   | "racing"
   | "race-results";

@@ -10,7 +10,10 @@ import type {
   Particle,
   Tumbleweed,
   ThemePhysics,
+  CarType,
 } from "./types";
+import { DEFAULT_CAR } from "./cars";
+import { updateRacingAI } from "../game/modes/championship-ai";
 import { SPRITE_SCALE, SPRITE_GROUPS, KEY } from "./constants";
 import * as Util from "./utils/math";
 import * as Segments from "./segments";
@@ -64,18 +67,21 @@ export const createDefaultConfig = (): GameConfig => ({
   offRoadLimit: (200 / (1 / 60) / 4) * 1.5,
 });
 
-export const createDefaultPlayer = (playerZ: number): PlayerState => ({
+export const createDefaultPlayer = (playerZ: number, name: string = "PLAYER"): PlayerState => ({
   x: 0,
   z: playerZ,
   position: 0,
   speed: 0,
+  selectedCar: DEFAULT_CAR,
+  name,
 });
 
 export const applyThemePhysics = (
   baseConfig: GameConfig,
   physics: ThemePhysics,
+  car?: CarType,
 ): GameConfig => {
-  return {
+  const config = {
     ...baseConfig,
     maxSpeed: baseConfig.maxSpeed * physics.maxSpeed,
     accel: baseConfig.accel * physics.acceleration,
@@ -83,11 +89,20 @@ export const applyThemePhysics = (
     offRoadDecel: baseConfig.offRoadDecel * physics.offRoadGrip,
     centrifugal: baseConfig.centrifugal * physics.grip,
   };
+
+  if (car) {
+    config.maxSpeed *= car.topSpeed;
+    config.accel *= car.acceleration;
+    config.centrifugal *= car.handling;
+    config.braking *= car.braking;
+  }
+
+  return config;
 };
 
 export const setTheme = (world: WorldState, theme: LevelTheme): void => {
   world.currentTheme = theme;
-  world.config = applyThemePhysics(world.baseConfig, theme.physics);
+  world.config = applyThemePhysics(world.baseConfig, theme.physics, world.player.selectedCar);
   world.windState = createDefaultWindState();
   world.jumpState = createDefaultJumpState();
   world.particles = [];
@@ -303,7 +318,7 @@ export const createDefaultJumpState = (): JumpState => ({
   peakHeight: 0,
 });
 
-export const createWorld = (playerCount: number = 1): WorldState => {
+export const createWorld = (playerCount: number = 1, playerNames: string[] = []): WorldState => {
   const config = createDefaultConfig();
   const cameraDepth = 1 / Math.tan(((100 / 2) * Math.PI) / 180);
   const playerZ = Camera.getPlayerZ(1000, cameraDepth);
@@ -319,11 +334,11 @@ export const createWorld = (playerCount: number = 1): WorldState => {
   const inputs: InputState[] = [];
 
   for (let i = 0; i < playerCount; i++) {
-    players.push(createDefaultPlayer(playerZ));
+    players.push(createDefaultPlayer(playerZ, playerNames[i] || `PLAYER ${i + 1}`));
     inputs.push(createDefaultInput());
   }
 
-  const player = players[0] ?? createDefaultPlayer(playerZ);
+  const player = players[0] ?? createDefaultPlayer(playerZ, playerNames[0] || "PLAYER 1");
   const input = inputs[0] ?? createDefaultInput();
 
   return {
@@ -437,22 +452,27 @@ export const updateCars = (
   world: WorldState,
   playerSegment: Segment,
   playerW: number,
+  dt: number,
 ): void => {
   const { segmentLength, drawDistance, maxSpeed } = world.config;
 
   for (const car of world.cars) {
     const oldSegment = Segments.findSegment(car.z, segmentLength);
-    car.offset += updateCarOffset(
-      car,
-      oldSegment,
-      playerSegment,
-      world.player.x,
-      playerW,
-      world.player.speed,
-      maxSpeed,
-      drawDistance,
-      world.segments,
-    );
+    if (car.ai) {
+      updateRacingAI(car, oldSegment, world.player.position, world.player.z, dt, maxSpeed);
+    } else {
+      car.offset += updateCarOffset(
+        car,
+        oldSegment,
+        playerSegment,
+        world.player.x,
+        playerW,
+        world.player.speed,
+        maxSpeed,
+        drawDistance,
+        world.segments,
+      );
+    }
     car.z = Util.increase(
       car.z,
       (1 / world.config.fps) * car.speed,
@@ -492,7 +512,7 @@ export const update = (world: WorldState, dt: number): void => {
   const dx = dt * 2 * speedPercent;
   const startPosition = player.position;
 
-  updateCars(world, playerSegment, playerW);
+  updateCars(world, playerSegment, playerW, dt);
 
   player.position = Util.increase(
     player.position,

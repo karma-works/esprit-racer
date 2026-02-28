@@ -4,6 +4,10 @@ import type {
 } from "../../game/modes/time-challenge";
 import { globalSpriteCache } from "../../assets/svg-loader";
 import { isSoundEnabled } from "../../audio/mod-player";
+import { CarSelectionScreen } from "./car-selection";
+import { DifficultySelectionScreen, ChampionshipStandingsScreen } from "./championship-screens";
+
+export { CarSelectionScreen, DifficultySelectionScreen, ChampionshipStandingsScreen };
 
 export interface UIScreen {
   render(ctx: CanvasRenderingContext2D, state: TimeChallengeState): void;
@@ -143,118 +147,118 @@ const MAIN_MENU_ZONES: Array<{
   row: number;
   col: number;
 }> = [
-  {
-    svgX: 30,
-    svgY: 40,
-    svgW: 180,
-    svgH: 80,
-    action: "player1",
-    row: 0,
-    col: 0,
-  },
-  { svgX: 230, svgY: 40, svgW: 340, svgH: 80, action: "start", row: 0, col: 1 },
-  {
-    svgX: 590,
-    svgY: 40,
-    svgW: 180,
-    svgH: 80,
-    action: "player2",
-    row: 0,
-    col: 2,
-  },
-  {
-    svgX: 30,
-    svgY: 140,
-    svgW: 180,
-    svgH: 90,
-    action: "gears-p1",
-    row: 1,
-    col: 0,
-  },
-  { svgX: 230, svgY: 140, svgW: 340, svgH: 90, action: "game", row: 1, col: 1 },
-  {
-    svgX: 590,
-    svgY: 140,
-    svgW: 180,
-    svgH: 90,
-    action: "gears-p2",
-    row: 1,
-    col: 2,
-  },
-  {
-    svgX: 30,
-    svgY: 250,
-    svgW: 180,
-    svgH: 90,
-    action: "accel-p1",
-    row: 2,
-    col: 0,
-  },
-  {
-    svgX: 230,
-    svgY: 250,
-    svgW: 340,
-    svgH: 90,
-    action: "course",
-    row: 2,
-    col: 1,
-  },
-  {
-    svgX: 590,
-    svgY: 250,
-    svgW: 180,
-    svgH: 90,
-    action: "accel-p2",
-    row: 2,
-    col: 2,
-  },
-  {
-    svgX: 30,
-    svgY: 360,
-    svgW: 240,
-    svgH: 80,
-    action: "control",
-    row: 3,
-    col: 0,
-  },
-  {
-    svgX: 290,
-    svgY: 360,
-    svgW: 260,
-    svgH: 80,
-    action: "players",
-    row: 3,
-    col: 1,
-  },
-  {
-    svgX: 570,
-    svgY: 360,
-    svgW: 200,
-    svgH: 80,
-    action: "sound",
-    row: 3,
-    col: 2,
-  },
-  {
-    svgX: 30,
-    svgY: 460,
-    svgW: 240,
-    svgH: 80,
-    action: "constructor",
-    row: 4,
-    col: 0,
-  },
-  { svgX: 290, svgY: 460, svgW: 260, svgH: 80, action: "code", row: 4, col: 1 },
-  {
-    svgX: 570,
-    svgY: 460,
-    svgW: 200,
-    svgH: 80,
-    action: "define",
-    row: 4,
-    col: 2,
-  },
-];
+    {
+      svgX: 30,
+      svgY: 40,
+      svgW: 180,
+      svgH: 80,
+      action: "player1",
+      row: 0,
+      col: 0,
+    },
+    { svgX: 230, svgY: 40, svgW: 340, svgH: 80, action: "start", row: 0, col: 1 },
+    {
+      svgX: 590,
+      svgY: 40,
+      svgW: 180,
+      svgH: 80,
+      action: "player2",
+      row: 0,
+      col: 2,
+    },
+    {
+      svgX: 30,
+      svgY: 140,
+      svgW: 180,
+      svgH: 90,
+      action: "gears-p1",
+      row: 1,
+      col: 0,
+    },
+    { svgX: 230, svgY: 140, svgW: 340, svgH: 90, action: "game", row: 1, col: 1 },
+    {
+      svgX: 590,
+      svgY: 140,
+      svgW: 180,
+      svgH: 90,
+      action: "gears-p2",
+      row: 1,
+      col: 2,
+    },
+    {
+      svgX: 30,
+      svgY: 250,
+      svgW: 180,
+      svgH: 90,
+      action: "accel-p1",
+      row: 2,
+      col: 0,
+    },
+    {
+      svgX: 230,
+      svgY: 250,
+      svgW: 340,
+      svgH: 90,
+      action: "course",
+      row: 2,
+      col: 1,
+    },
+    {
+      svgX: 590,
+      svgY: 250,
+      svgW: 180,
+      svgH: 90,
+      action: "accel-p2",
+      row: 2,
+      col: 2,
+    },
+    {
+      svgX: 30,
+      svgY: 360,
+      svgW: 240,
+      svgH: 80,
+      action: "control",
+      row: 3,
+      col: 0,
+    },
+    {
+      svgX: 290,
+      svgY: 360,
+      svgW: 260,
+      svgH: 80,
+      action: "players",
+      row: 3,
+      col: 1,
+    },
+    {
+      svgX: 570,
+      svgY: 360,
+      svgW: 200,
+      svgH: 80,
+      action: "sound",
+      row: 3,
+      col: 2,
+    },
+    {
+      svgX: 30,
+      svgY: 460,
+      svgW: 240,
+      svgH: 80,
+      action: "constructor",
+      row: 4,
+      col: 0,
+    },
+    { svgX: 290, svgY: 460, svgW: 260, svgH: 80, action: "code", row: 4, col: 1 },
+    {
+      svgX: 570,
+      svgY: 460,
+      svgW: 200,
+      svgH: 80,
+      action: "define",
+      row: 4,
+      col: 2,
+    },
+  ];
 
 const NAVIGABLE_ZONES = [
   "start",
@@ -273,7 +277,11 @@ export class MainMenuScreen implements UIScreen {
   private zones: MenuZone[];
   private selectedIndex: number = 0;
   private playerCount: 1 | 2 = 1;
-  private gameMode: "time" | "race" = "time";
+  private gameMode: "time" | "race" | "championship" = "time";
+
+  private player1Name: string = "PLAYER 1";
+  private player2Name: string = "PLAYER 2";
+  private editingPlayer: 0 | 1 | 2 = 0;
 
   constructor(
     private width: number,
@@ -291,7 +299,15 @@ export class MainMenuScreen implements UIScreen {
     return this.playerCount;
   }
 
-  getGameMode(): "time" | "race" {
+  getPlayer1Name(): string {
+    return this.player1Name;
+  }
+
+  getPlayer2Name(): string {
+    return this.player2Name;
+  }
+
+  getGameMode(): "time" | "race" | "championship" {
     return this.gameMode;
   }
 
@@ -300,7 +316,9 @@ export class MainMenuScreen implements UIScreen {
   }
 
   toggleGameMode(): void {
-    this.gameMode = this.gameMode === "time" ? "race" : "time";
+    if (this.gameMode === "time") this.gameMode = "race";
+    else if (this.gameMode === "race") this.gameMode = "championship";
+    else this.gameMode = "time";
   }
 
   private calculateZones(): MenuZone[] {
@@ -345,18 +363,47 @@ export class MainMenuScreen implements UIScreen {
         ctx,
         text,
         playersZone.x + playersZone.width / 2,
-        playersZone.y + playersZone.height / 2,
+        playersZone.y + playersZone.height / 2 - 15 * scale,
         {
           font: `bold ${14 * scale}px monospace`,
           color: "#ffcc00",
         },
       );
+
+      const p1Text = (this.editingPlayer === 1 && Math.floor(Date.now() / 500) % 2 === 0) ? this.player1Name + "_" : this.player1Name;
+      drawCenteredText(
+        ctx,
+        p1Text,
+        playersZone.x + playersZone.width / 2,
+        playersZone.y + playersZone.height / 2 + 5 * scale,
+        {
+          font: `bold ${12 * scale}px monospace`,
+          color: this.editingPlayer === 1 ? "#ffffff" : "#aaaaaa",
+        },
+      );
+
+      if (this.playerCount === 2) {
+        const p2Text = (this.editingPlayer === 2 && Math.floor(Date.now() / 500) % 2 === 0) ? this.player2Name + "_" : this.player2Name;
+        drawCenteredText(
+          ctx,
+          p2Text,
+          playersZone.x + playersZone.width / 2,
+          playersZone.y + playersZone.height / 2 + 20 * scale,
+          {
+            font: `bold ${12 * scale}px monospace`,
+            color: this.editingPlayer === 2 ? "#ffffff" : "#aaaaaa",
+          },
+        );
+      }
     }
 
     // Draw game mode in GAME box
     const gameZone = this.zones.find((z) => z.action === "game");
     if (gameZone) {
-      const modeText = this.gameMode === "time" ? "TIME MODE" : "RACE MODE";
+      let modeText = "TIME MODE";
+      if (this.gameMode === "race") modeText = "RACE MODE";
+      if (this.gameMode === "championship") modeText = "CHAMPIONSHIP";
+
       drawCenteredText(
         ctx,
         modeText,
@@ -460,15 +507,30 @@ export class MainMenuScreen implements UIScreen {
       const zone = this.zones[idx];
       if (zone) {
         if (zone.action === "players") {
-          this.togglePlayerCount();
+          const localY = y - zone.y;
+          if (localY < zone.height * 0.4) {
+            this.togglePlayerCount();
+            this.editingPlayer = 0;
+          } else if (localY < zone.height * 0.7) {
+            this.editingPlayer = 1;
+          } else if (this.playerCount === 2) {
+            this.editingPlayer = 2;
+          } else {
+            this.editingPlayer = 1;
+          }
           return null;
         }
+
+        this.editingPlayer = 0;
+
         if (zone.action === "game") {
           this.toggleGameMode();
           return null;
         }
         return zone.action;
       }
+    } else {
+      this.editingPlayer = 0;
     }
     return null;
   }
@@ -482,6 +544,25 @@ export class MainMenuScreen implements UIScreen {
   }
 
   handleKeyDown(keyCode: number): string | null {
+    if (this.editingPlayer > 0) {
+      if (keyCode === 13 || keyCode === 27) { // Enter or escape
+        this.editingPlayer = 0;
+        return null;
+      }
+      if (keyCode === 8) { // Backspace
+        if (this.editingPlayer === 1) this.player1Name = this.player1Name.slice(0, -1);
+        if (this.editingPlayer === 2) this.player2Name = this.player2Name.slice(0, -1);
+        return null;
+      }
+
+      if ((keyCode >= 65 && keyCode <= 90) || keyCode === 32 || (keyCode >= 48 && keyCode <= 57)) {
+        const char = String.fromCharCode(keyCode);
+        if (this.editingPlayer === 1 && this.player1Name.length < 12) this.player1Name += char;
+        if (this.editingPlayer === 2 && this.player2Name.length < 12) this.player2Name += char;
+      }
+      return null;
+    }
+
     const currentZone = this.zones[this.selectedIndex];
     if (!currentZone) return null;
 
@@ -603,7 +684,7 @@ export class MusicSelectionScreen implements UIScreen {
   constructor(
     private width: number,
     private height: number,
-  ) {}
+  ) { }
 
   getSelectedTrack(): MusicTrack {
     return MUSIC_TRACKS[this.selectedIndex] ?? MUSIC_TRACKS[0]!;
@@ -680,7 +761,7 @@ export class MusicSelectionScreen implements UIScreen {
     return null;
   }
 
-  handleMouseMove(_x: number, _y: number): void {}
+  handleMouseMove(_x: number, _y: number): void { }
 
   getZones(): MenuZone[] {
     return [];
@@ -1076,7 +1157,7 @@ export class ResultsScreen implements UIScreen {
   constructor(
     private width: number,
     private height: number,
-  ) {}
+  ) { }
 
   render(ctx: CanvasRenderingContext2D, state: TimeChallengeState): void {
     ctx.fillStyle = COLORS.background;
@@ -1152,7 +1233,11 @@ export const createScreens = (
   const screens = new Map<GameScreen, UIScreen>();
   screens.set("main-menu", new MainMenuScreen(width, height));
   screens.set("music-select", new MusicSelectionScreen(width, height));
+  screens.set("car-select", new CarSelectionScreen(width, height));
+  screens.set("difficulty-select", new DifficultySelectionScreen(width, height));
+  // Championship standings needs state, so we just set a dummy one initially or create it dynamically in main.ts
   screens.set("recs", new RECSScreen(width, height));
   screens.set("results", new ResultsScreen(width, height));
+  // Add race-results for race mode later if needed, but the current UI screens don't use it or map handles it? 
   return screens;
 };
