@@ -1699,3 +1699,905 @@ src/
 └── audio/
     └── game-sounds.ts         (new)
 ```
+
+---
+
+## 17. SVG Assets Required
+
+### 17.1 Background SVGs Per Scenario
+
+| Scenario   | Background File            | Description                                      |
+| ---------- | -------------------------- | ------------------------------------------------ |
+| Rally      | `background-rally.svg`     | Brown/orange sky, muddy hills, water puddles     |
+| Forest     | `background-forest.svg`    | Green forest, dense trees, fallen logs           |
+| Futuristic | `background-future.svg`    | Neon cityscape, chequered patterns, energy beams |
+| Night      | `background-night.svg`     | Dark sky, Manhattan skyline, neon accents        |
+| Marsh      | `background-marsh.svg`     | Swampy, oily pools, murky colors                 |
+| Mountains  | `background-mountains.svg` | Cliff walls, rock faces, elevation layers        |
+| Snow       | `background-snow.svg`      | White/grey, snow-covered trees, icy peaks        |
+| Storm      | `background-storm.svg`     | Dark purple clouds, lightning, rain layers       |
+| Desert     | `background-desert.svg`    | Orange/tan dunes, heat haze effect               |
+| Fog        | `background-fog.svg`       | Grey wash, limited visibility layers             |
+| Motorway   | `background-motorway.svg`  | Urban skyline, gantries, barriers                |
+| Roadworks  | `background-roadworks.svg` | Construction site, orange barriers               |
+| Wind       | `background-windy.svg`     | Open plain, moving clouds, dust                  |
+
+### 17.2 Car SVGs (Player Selectable)
+
+| Car                 | File                  | Color         | Characteristics   |
+| ------------------- | --------------------- | ------------- | ----------------- |
+| Lotus Esprit (Road) | `car-esprit-road.svg` | Silver/Grey   | Stable, forgiving |
+| Lotus Esprit S4     | `car-esprit-s4.svg`   | Red           | Balanced, sporty  |
+| Lotus M200          | `car-m200.svg`        | Yellow/Orange | Fast, aggressive  |
+
+### 17.3 Obstacle SVGs
+
+| Obstacle      | File                         | Used In Scenarios        |
+| ------------- | ---------------------------- | ------------------------ |
+| Mud Pool      | `obstacle-mud-pool.svg`      | Rally, Marsh             |
+| Water Puddle  | `obstacle-water-puddle.svg`  | Rally, Marsh, Forest     |
+| Log           | `obstacle-log.svg`           | Forest, Country          |
+| Rock          | `obstacle-rock.svg`          | Mountains, Rally, Desert |
+| Shock Tower   | `obstacle-shock-tower.svg`   | Futuristic               |
+| Magnetic Zone | `obstacle-magnetic-zone.svg` | Futuristic               |
+| Laser Beam    | `obstacle-laser-beam.svg`    | Futuristic               |
+| Traffic Cone  | `traffic-cone.svg`           | Roadworks (existing)     |
+| Barrier       | `barrier.svg`                | Roadworks (existing)     |
+| Oil Slick     | `oil-slick.svg`              | Marsh, Lakes (existing)  |
+
+### 17.4 SVG Specifications
+
+```typescript
+interface SVGAssetSpec {
+  path: string;
+  viewBox: string;
+  layers: string[];
+  animated: boolean;
+  preloadScales: number[];
+}
+
+const BACKGROUND_SPECS: SVGAssetSpec[] = [
+  {
+    path: "background-rally.svg",
+    viewBox: "0 0 800 600",
+    layers: [
+      "sky",
+      "distant-hills",
+      "mid-hills",
+      "foreground-hills",
+      "mud-puddles",
+      "trees",
+    ],
+    animated: false,
+    preloadScales: [1, 2],
+  },
+  {
+    path: "background-forest.svg",
+    viewBox: "0 0 800 600",
+    layers: [
+      "sky",
+      "sun",
+      "distant-forest",
+      "mid-forest",
+      "foreground-trees",
+      "forest-floor",
+      "logs",
+      "ferns",
+    ],
+    animated: false,
+    preloadScales: [1, 2],
+  },
+];
+
+const CAR_SPECS: SVGAssetSpec[] = [
+  {
+    path: "car-esprit-road.svg",
+    viewBox: "0 0 120 70",
+    layers: ["body", "windows", "wheels", "lights", "details"],
+    animated: false,
+    preloadScales: [0.5, 1, 1.5, 2, 3, 4],
+  },
+  {
+    path: "car-esprit-s4.svg",
+    viewBox: "0 0 120 70",
+    layers: ["body", "windows", "wheels", "lights", "spoiler", "details"],
+    animated: false,
+    preloadScales: [0.5, 1, 1.5, 2, 3, 4],
+  },
+  {
+    path: "car-m200.svg",
+    viewBox: "0 0 120 70",
+    layers: ["body", "windows", "wheels", "lights", "intake", "details"],
+    animated: false,
+    preloadScales: [0.5, 1, 1.5, 2, 3, 4],
+  },
+];
+
+const OBSTACLE_SPECS: SVGAssetSpec[] = [
+  {
+    path: "obstacle-mud-pool.svg",
+    viewBox: "0 0 80 30",
+    layers: ["mud-center", "highlights", "shadow"],
+    animated: false,
+    preloadScales: [0.5, 1, 1.5, 2],
+  },
+  {
+    path: "obstacle-log.svg",
+    viewBox: "0 0 100 35",
+    layers: ["body", "bark-texture", "end-grain", "shadow"],
+    animated: false,
+    preloadScales: [0.5, 1, 1.5, 2],
+  },
+  {
+    path: "obstacle-shock-tower.svg",
+    viewBox: "0 0 40 100",
+    layers: ["tower-body", "electric-glow", "sparks"],
+    animated: true,
+    preloadScales: [0.5, 1, 1.5, 2],
+  },
+  {
+    path: "obstacle-magnetic-zone.svg",
+    viewBox: "0 0 60 80",
+    layers: ["field-lines", "glow", "label"],
+    animated: true,
+    preloadScales: [0.5, 1, 1.5, 2],
+  },
+  {
+    path: "obstacle-laser-beam.svg",
+    viewBox: "0 0 100 20",
+    layers: ["core", "glow", "particles"],
+    animated: true,
+    preloadScales: [0.5, 1, 1.5, 2],
+  },
+];
+```
+
+---
+
+## 18. Gameplay Effects Implementation
+
+### 18.1 Rally Scenario Effects
+
+```typescript
+interface RallyEffects {
+  mudPools: MudPool[];
+  waterPuddles: WaterPuddle[];
+  gripReduction: number; // 0.5x normal grip
+  recoveryTime: number; // Slower slide recovery
+  visual: {
+    splashParticles: boolean;
+    mudSpray: boolean;
+  };
+}
+
+interface MudPool {
+  segment: number;
+  offset: number;
+  width: number;
+  depth: number; // 0-1, affects speed reduction
+}
+
+const updateRallyPhysics = (
+  player: PlayerState,
+  segment: Segment,
+  config: GameConfig,
+): void => {
+  const inMud = segment.mudPools.some(
+    (pool) => Math.abs(player.x - pool.offset) < pool.width / 2,
+  );
+
+  if (inMud) {
+    // Apply heavy drag
+    player.speed *= 0.98;
+    // Reduce grip significantly
+    config.grip = config.baseGrip * 0.4;
+    // Slow recovery from slides
+    player.slideRecoveryRate = 0.02; // vs normal 0.1
+  }
+};
+
+const spawnMudSplash = (world: WorldState, x: number): void => {
+  for (let i = 0; i < 12; i++) {
+    world.particles.push({
+      x,
+      y: 0,
+      vx: (Math.random() - 0.5) * 4,
+      vy: -Math.random() * 8,
+      life: 0.6,
+      sprite: "mud-splash.svg",
+      size: 4 + Math.random() * 6,
+      color: "#4A3728",
+    });
+  }
+};
+```
+
+### 18.2 Futuristic Scenario Effects
+
+```typescript
+interface FuturisticEffects {
+  turboZones: TurboZone[];
+  shockTowers: ShockTower[];
+  magneticZones: MagneticZone[];
+  laserBeams: LaserBeam[];
+}
+
+interface ShockTower {
+  segment: number;
+  offset: number;
+  active: boolean;
+  pullForce: number; // 0.1-0.3
+  pullRange: number; // segments affected
+}
+
+interface MagneticZone {
+  segment: number;
+  offset: number;
+  width: number;
+  pullDirection: -1 | 1;
+  pullStrength: number;
+}
+
+const updateFuturisticHazards = (
+  player: PlayerState,
+  segment: Segment,
+  dt: number,
+): HazardResult => {
+  // Check shock towers
+  for (const tower of segment.shockTowers) {
+    const distance = Math.abs(player.x - tower.offset);
+    if (distance < tower.pullRange) {
+      // Magnetic pull toward tower
+      const pullStrength = tower.pullForce * (1 - distance / tower.pullRange);
+      player.x += Math.sign(tower.offset - player.x) * pullStrength * dt;
+
+      // If too close, shock effect
+      if (distance < 0.1) {
+        return { type: "shock", speedReduction: 0.3, duration: 0.5 };
+      }
+    }
+  }
+
+  // Check laser beams
+  for (const laser of segment.laserBeams) {
+    if (laser.active && Math.abs(player.x - laser.offset) < laser.width / 2) {
+      return { type: "laser", speedReduction: 0.5, duration: 0.3 };
+    }
+  }
+
+  return { type: "none" };
+};
+
+const updateTurboZone = (
+  player: PlayerState,
+  segment: Segment,
+  config: GameConfig,
+): GameConfig => {
+  if (segment.turboZone) {
+    return {
+      ...config,
+      maxSpeed: config.maxSpeed * 1.4,
+      acceleration: config.acceleration * 1.2,
+    };
+  }
+  return config;
+};
+```
+
+### 18.3 Forest Scenario Effects
+
+```typescript
+interface ForestEffects {
+  logs: Log[];
+  trees: Tree[];
+  visibilityReduction: number;
+}
+
+interface Log {
+  segment: number;
+  offset: number;
+  width: number;
+  jumpable: boolean; // Logs can be jumped over
+  jumpBoost: number; // Speed maintained when jumping
+}
+
+const updateForestLog = (
+  player: PlayerState,
+  log: Log,
+  jumpState: JumpState,
+): LogResult => {
+  const collision = Math.abs(player.x - log.offset) < log.width / 2;
+
+  if (collision) {
+    if (jumpState.active) {
+      // Jump over log - speed boost
+      return { type: "jump_over", speedBoost: 1.05 };
+    } else {
+      // Hit log - trigger jump automatically
+      return { type: "auto_jump", triggerJump: true, speedReduction: 0.9 };
+    }
+  }
+
+  return { type: "none" };
+};
+
+const triggerLogJump = (world: WorldState, log: Log): void => {
+  world.jumpState = {
+    active: true,
+    startTime: performance.now(),
+    duration: 0.4,
+    peakHeight: 2,
+  };
+
+  // Spawn jump particles
+  for (let i = 0; i < 6; i++) {
+    world.particles.push({
+      x: world.player.x,
+      y: 0,
+      vx: (Math.random() - 0.5) * 2,
+      vy: -Math.random() * 3,
+      life: 0.4,
+      sprite: "dust.svg",
+      size: 3 + Math.random() * 3,
+    });
+  }
+};
+```
+
+### 18.4 Marsh Scenario Effects
+
+```typescript
+interface MarshEffects {
+  oilSlicks: OilSlick[];
+  submergedSections: SubmergedSection[];
+  dragCoefficient: number;
+}
+
+interface SubmergedSection {
+  segment: number;
+  offset: number;
+  width: number;
+  depth: number; // 0-1
+  boatDrift: number; // Lateral drift when in water
+}
+
+const updateMarshPhysics = (
+  player: PlayerState,
+  segment: Segment,
+  config: GameConfig,
+  dt: number,
+): void => {
+  // Check for submerged sections
+  const submerged = segment.submergedSections?.find(
+    (s) => Math.abs(player.x - s.offset) < s.width / 2,
+  );
+
+  if (submerged) {
+    // Heavy drag
+    player.speed *= 0.97;
+    // Boat-like drift
+    player.x += submerged.boatDrift * dt;
+    // Slow acceleration
+    config.acceleration *= 0.6;
+  }
+
+  // Check for oil slicks
+  const onOil = segment.oilSlicks?.some(
+    (oil) => Math.abs(player.x - oil.offset) < 0.3,
+  );
+
+  if (onOil) {
+    config.grip *= 0.3;
+    // Random slide direction
+    player.x += (Math.random() - 0.5) * 0.02;
+  }
+};
+```
+
+### 18.5 Mountains Scenario Effects
+
+```typescript
+interface MountainsEffects {
+  cliffEdges: boolean; // No safe off-road
+  narrowRoad: boolean; // Reduced overtaking space
+  gradients: Gradient[];
+}
+
+interface Gradient {
+  segment: number;
+  steepness: number; // -1 to 1
+  speedModifier: number;
+}
+
+const updateMountainsPhysics = (
+  player: PlayerState,
+  segment: Segment,
+  config: GameConfig,
+): void => {
+  // No safe off-road - instant penalty
+  if (Math.abs(player.x) > 0.85) {
+    player.speed *= 0.7; // Heavy speed reduction
+    player.x = Math.sign(player.x) * 0.85; // Push back
+  }
+
+  // Gradient effects
+  if (segment.gradient) {
+    if (segment.gradient > 0) {
+      // Uphill - slower
+      config.maxSpeed *= 1 - segment.gradient * 0.3;
+    } else {
+      // Downhill - faster but harder to brake
+      config.maxSpeed *= 1 - segment.gradient * 0.2;
+      config.brakeForce *= 0.8;
+    }
+  }
+};
+```
+
+### 18.6 Snow Scenario Effects
+
+```typescript
+interface SnowEffects {
+  icePatches: IcePatch[];
+  snowDrifts: SnowDrift[];
+  visibilityReduction: number;
+  particleDensity: number;
+}
+
+interface IcePatch {
+  segment: number;
+  offset: number;
+  width: number;
+  slipMultiplier: number; // How much extra sliding
+}
+
+const updateSnowPhysics = (
+  player: PlayerState,
+  segment: Segment,
+  input: InputState,
+  config: GameConfig,
+  dt: number,
+): void => {
+  // Base snow physics
+  config.grip *= 0.6;
+  config.brakeForce *= 0.5;
+
+  // Check ice patches
+  const onIce = segment.icePatches?.some(
+    (ice) => Math.abs(player.x - ice.offset) < ice.width / 2,
+  );
+
+  if (onIce) {
+    // Even less grip on ice
+    config.grip *= 0.3;
+    // Enhanced sliding
+    if (input.left || input.right) {
+      player.x += (input.left ? -1 : 1) * 0.03 * dt * 60;
+    }
+  }
+
+  // Snow drifts at edges
+  if (Math.abs(player.x) > 0.7) {
+    player.speed *= 0.95; // Slow in snow banks
+  }
+};
+```
+
+### 18.7 Roadworks Scenario Effects
+
+```typescript
+interface RoadworksEffects {
+  cones: Cone[];
+  barriers: Barrier[];
+  roadPlates: RoadPlate[];
+  potholes: Pothole[];
+}
+
+interface Cone {
+  segment: number;
+  offset: number;
+  hitbox: number;
+  wobbleOnHit: boolean;
+}
+
+interface RoadPlate {
+  segment: number;
+  offset: number;
+  width: number;
+  bumpEffect: number; // Small bounce when crossing
+}
+
+const updateRoadworksObstacles = (
+  player: PlayerState,
+  segment: Segment,
+): ObstacleResult => {
+  // Check cone collisions
+  for (const cone of segment.cones) {
+    if (Math.abs(player.x - cone.offset) < cone.hitbox) {
+      return {
+        type: "cone",
+        speedReduction: 0.05,
+        wobble: true,
+        wobbleDirection: Math.sign(player.x - cone.offset),
+      };
+    }
+  }
+
+  // Check road plates - small bump
+  for (const plate of segment.roadPlates) {
+    if (Math.abs(player.x - plate.offset) < plate.width / 2) {
+      return { type: "plate", bump: plate.bumpEffect };
+    }
+  }
+
+  // Check potholes
+  for (const pothole of segment.potholes) {
+    if (Math.abs(player.x - pothole.offset) < pothole.width / 2) {
+      return { type: "pothole", speedReduction: 0.15, duration: 0.2 };
+    }
+  }
+
+  return { type: "none" };
+};
+```
+
+### 18.8 Storm Scenario Effects
+
+```typescript
+interface StormEffects {
+  rain: RainConfig;
+  lightning: LightningConfig;
+  wetRoad: WetRoadConfig;
+  visibilityReduction: number;
+}
+
+interface WetRoadConfig {
+  gripReduction: number;
+  brakingDistanceIncrease: number;
+  hydroplaningChance: number;
+}
+
+const updateStormPhysics = (
+  player: PlayerState,
+  segment: Segment,
+  config: GameConfig,
+  dt: number,
+): void => {
+  // Wet road grip reduction
+  config.grip *= 0.85;
+  config.brakeForce *= 0.9;
+
+  // Hydroplaning at high speed
+  const speedPercent = player.speed / config.maxSpeed;
+  if (speedPercent > 0.8 && Math.random() < 0.01) {
+    // Momentary loss of control
+    player.x += (Math.random() - 0.5) * 0.1;
+  }
+
+  // Visibility reduction handled in renderer
+};
+
+const updateLightningFlash = (
+  world: WorldState,
+  ctx: CanvasRenderingContext2D,
+): void => {
+  if (world.lightningActive) {
+    // Screen flash
+    ctx.fillStyle = `rgba(255, 255, 255, ${0.3 * (1 - world.lightningTimer / 150)})`;
+    ctx.fillRect(0, 0, world.config.width, world.config.height);
+  }
+};
+```
+
+### 18.9 Wind Scenario Effects
+
+```typescript
+interface WindEffects {
+  baseForce: number;
+  gustInterval: number;
+  gustDuration: number;
+  maxGustForce: number;
+  tumbleweeds: boolean;
+}
+
+const updateWindPhysics = (
+  player: PlayerState,
+  windState: WindState,
+  speedPercent: number,
+  dt: number,
+): void => {
+  // Wind only affects moving cars
+  if (speedPercent < 0.1) return;
+
+  // Constant base push
+  player.x +=
+    windState.currentDirection * windState.currentForce * dt * speedPercent;
+
+  // During gusts, stronger effect
+  if (windState.gusting) {
+    player.x +=
+      windState.currentDirection *
+      windState.currentForce *
+      0.5 *
+      dt *
+      speedPercent;
+
+    // Require constant corrections
+    // Visual indicator of wind direction
+  }
+};
+
+const updateTumbleweed = (
+  weed: Tumbleweed,
+  windDirection: number,
+  player: PlayerState,
+  dt: number,
+): void => {
+  weed.x += weed.speed * weed.direction * dt;
+  weed.rotation += weed.speed * 3 * dt;
+
+  // Collision with player - push slightly
+  if (Math.abs(player.x - weed.x) < 0.15) {
+    player.x += weed.direction * 0.02;
+    player.speed *= 0.995;
+  }
+};
+```
+
+---
+
+## 19. Obstacle System Architecture
+
+### 19.1 Core Obstacle Types
+
+```typescript
+type ObstacleType =
+  | "mud_pool"
+  | "water_puddle"
+  | "log"
+  | "rock"
+  | "shock_tower"
+  | "magnetic_zone"
+  | "laser_beam"
+  | "traffic_cone"
+  | "barrier"
+  | "road_plate"
+  | "pothole"
+  | "oil_slick"
+  | "ice_patch"
+  | "snow_drift";
+
+interface Obstacle {
+  type: ObstacleType;
+  segment: number;
+  offset: number;
+  width: number;
+  active: boolean;
+  effect: ObstacleEffect;
+}
+
+interface ObstacleEffect {
+  speedReduction?: number;
+  gripReduction?: number;
+  duration?: number;
+  triggerJump?: boolean;
+  visualEffect?: string;
+  soundEffect?: string;
+}
+```
+
+### 19.2 Obstacle Manager
+
+```typescript
+class ObstacleManager {
+  private obstacles: Map<number, Obstacle[]> = new Map();
+
+  addObstacle(segment: number, obstacle: Obstacle): void {
+    if (!this.obstacles.has(segment)) {
+      this.obstacles.set(segment, []);
+    }
+    this.obstacles.get(segment)!.push(obstacle);
+  }
+
+  getObstaclesForSegment(segment: number): Obstacle[] {
+    return this.obstacles.get(segment) ?? [];
+  }
+
+  checkCollisions(player: PlayerState, segment: number): CollisionResult[] {
+    const obstacles = this.getObstaclesForSegment(segment);
+    const results: CollisionResult[] = [];
+
+    for (const obstacle of obstacles) {
+      if (Math.abs(player.x - obstacle.offset) < obstacle.width / 2) {
+        results.push({
+          obstacle,
+          effect: obstacle.effect,
+        });
+      }
+    }
+
+    return results;
+  }
+
+  generateObstaclesForTheme(
+    theme: LevelTheme,
+    segments: Segment[],
+    density: number,
+  ): void {
+    const obstacleTypes = theme.obstacles ?? [];
+
+    for (let i = 0; i < segments.length; i++) {
+      if (Math.random() < density) {
+        const type =
+          obstacleTypes[Math.floor(Math.random() * obstacleTypes.length)];
+        this.addObstacle(i, this.createObstacle(type, i));
+      }
+    }
+  }
+
+  createObstacle(type: ObstacleType, segment: number): Obstacle {
+    const configs: Record<ObstacleType, Partial<Obstacle>> = {
+      mud_pool: {
+        width: 0.4,
+        effect: { speedReduction: 0.15, gripReduction: 0.5, duration: 1.0 },
+      },
+      log: {
+        width: 0.3,
+        effect: { triggerJump: true, speedReduction: 0.1 },
+      },
+      shock_tower: {
+        width: 0.15,
+        effect: { speedReduction: 0.3, duration: 0.5, visualEffect: "shock" },
+      },
+      // ... other configs
+    };
+
+    return {
+      type,
+      segment,
+      offset: (Math.random() - 0.5) * 1.6,
+      active: true,
+      ...configs[type],
+    } as Obstacle;
+  }
+}
+```
+
+### 19.3 Obstacle Generation by Scenario
+
+```typescript
+const OBSTACLE_DENSITY: Record<string, number> = {
+  rally: 0.08,
+  futuristic: 0.05,
+  forest: 0.06,
+  marsh: 0.07,
+  mountains: 0.03,
+  snow: 0.05,
+  roadworks: 0.12,
+  storm: 0.02,
+  desert: 0.03,
+  fog: 0.02,
+  motorway: 0.01,
+  wind: 0.02,
+  night: 0.01,
+};
+
+const generateScenarioObstacles = (
+  theme: LevelTheme,
+  segments: Segment[],
+  difficulty: "easy" | "medium" | "hard",
+): ObstacleManager => {
+  const manager = new ObstacleManager();
+
+  const baseDensity = OBSTACLE_DENSITY[theme.id] ?? 0.03;
+  const difficultyMultiplier = {
+    easy: 0.6,
+    medium: 1.0,
+    hard: 1.5,
+  };
+
+  const density = baseDensity * difficultyMultiplier[difficulty];
+
+  manager.generateObstaclesForTheme(theme, segments, density);
+
+  return manager;
+};
+```
+
+---
+
+## 20. Sprite Loader Updates
+
+### 20.1 Extended Sprite Map
+
+```typescript
+export const SPRITE_SVG_MAP: Record<string, string> = {
+  // Existing sprites
+  PALM_TREE: "palm-tree.svg",
+  TREE1: "tree-deciduous.svg",
+  // ... existing entries
+
+  // New car sprites
+  CAR_ESPRIT_ROAD: "car-esprit-road.svg",
+  CAR_ESPRIT_S4: "car-esprit-s4.svg",
+  CAR_M200: "car-m200.svg",
+
+  // New obstacle sprites
+  OBSTACLE_MUD_POOL: "obstacle-mud-pool.svg",
+  OBSTACLE_WATER_PUDDLE: "obstacle-water-puddle.svg",
+  OBSTACLE_LOG: "obstacle-log.svg",
+  OBSTACLE_ROCK: "obstacle-rock.svg",
+  OBSTACLE_SHOCK_TOWER: "obstacle-shock-tower.svg",
+  OBSTACLE_MAGNETIC_ZONE: "obstacle-magnetic-zone.svg",
+  OBSTACLE_LASER_BEAM: "obstacle-laser-beam.svg",
+
+  // New background sprites
+  BACKGROUND_RALLY: "background-rally.svg",
+  BACKGROUND_FOREST: "background-forest.svg",
+  BACKGROUND_FUTURE: "background-future.svg",
+  // ... other backgrounds
+};
+```
+
+### 20.2 Preload Updates
+
+```typescript
+export const preloadGameSprites = async (): Promise<void> => {
+  const baseScales = [0.5, 1, 1.5, 2, 3];
+  const largeScales = [0.5, 1, 1.5, 2, 3, 4];
+  const particleScales = [0.5, 1, 1.5, 2];
+  const backgroundScales = [1, 2];
+
+  const sprites = [
+    // Existing sprites...
+
+    // New cars
+    { path: "car-esprit-road.svg", scales: largeScales },
+    { path: "car-esprit-s4.svg", scales: largeScales },
+    { path: "car-m200.svg", scales: largeScales },
+
+    // New obstacles
+    { path: "obstacle-mud-pool.svg", scales: baseScales },
+    { path: "obstacle-water-puddle.svg", scales: baseScales },
+    { path: "obstacle-log.svg", scales: baseScales },
+    { path: "obstacle-rock.svg", scales: baseScales },
+    { path: "obstacle-shock-tower.svg", scales: baseScales },
+    { path: "obstacle-magnetic-zone.svg", scales: baseScales },
+    { path: "obstacle-laser-beam.svg", scales: baseScales },
+
+    // New backgrounds
+    { path: "background-rally.svg", scales: backgroundScales },
+    { path: "background-forest.svg", scales: backgroundScales },
+    // ... other backgrounds
+  ];
+
+  await Promise.all(
+    sprites.map((s) => globalSpriteCache.preload(s.path, s.scales)),
+  );
+};
+```
+
+---
+
+## 21. Updated Implementation Priority
+
+| Priority | Feature                   | Complexity | Impact   | Dependencies     |
+| -------- | ------------------------- | ---------- | -------- | ---------------- |
+| 1        | Car Selection             | Low        | High     | None             |
+| 2        | SVG Assets - Cars         | Low        | High     | None             |
+| 3        | SVG Assets - Backgrounds  | Medium     | High     | None             |
+| 4        | SVG Assets - Obstacles    | Medium     | Medium   | None             |
+| 5        | Gear System               | Medium     | High     | None             |
+| 6        | RECS Code Generation      | Medium     | High     | None             |
+| 7        | Obstacle System           | Medium     | High     | SVG Assets       |
+| 8        | Scenario Gameplay Effects | High       | Critical | Obstacle System  |
+| 9        | Championship Mode         | High       | Critical | Car Selection    |
+| 10       | Level Sequences           | Medium     | Critical | Scenario Effects |
+| 11       | Fuel/Pit Stops            | Medium     | Medium   | None             |
+| 12       | Turbo Zones               | Low        | Medium   | None             |
+| 13       | Jump Zones                | Medium     | Medium   | None             |
+| 14       | HUD Enhancements          | Low        | High     | None             |
+| 15       | Collision Effects         | Medium     | Medium   | None             |
+| 16       | Racing AI                 | High       | High     | None             |
+| 17       | Audio Enhancements        | Low        | Medium   | None             |
+| 18       | Save/Load                 | Low        | Medium   | None             |
