@@ -323,38 +323,193 @@ export const resetRoad = (
   rumbleLength: number,
   playerZ: number,
 ): number => {
+  return resetRoadForTheme("night", segmentLength, rumbleLength, playerZ);
+};
+
+/**
+ * Generate a distinct, shorter track layout for each theme.
+ * Target: ~150-220 base segments, finishable in ~2 min (3 laps) at normal speed.
+ */
+export const resetRoadForTheme = (
+  themeId: string,
+  segmentLength: number,
+  rumbleLength: number,
+  playerZ: number,
+): number => {
   segments = [];
 
-  addStraight(ROAD.LENGTH.SHORT, segmentLength, rumbleLength);
-  addLowRollingHills(segmentLength, rumbleLength);
-  addSCurves(segmentLength, rumbleLength);
-  addCurve(
-    ROAD.LENGTH.MEDIUM,
-    ROAD.CURVE.MEDIUM,
-    ROAD.HILL.LOW,
-    segmentLength,
-    rumbleLength,
-  );
-  addBumps(segmentLength, rumbleLength);
-  addCurve(
-    ROAD.LENGTH.LONG,
-    ROAD.CURVE.MEDIUM,
-    ROAD.HILL.MEDIUM,
-    segmentLength,
-    rumbleLength,
-  );
-  addStraight(ROAD.LENGTH.MEDIUM, segmentLength, rumbleLength);
-  addHill(ROAD.LENGTH.MEDIUM, ROAD.HILL.HIGH, segmentLength, rumbleLength);
-  addCurve(
-    ROAD.LENGTH.MEDIUM,
-    -ROAD.CURVE.MEDIUM,
-    ROAD.HILL.NONE,
-    segmentLength,
-    rumbleLength,
-  );
+  const S = ROAD.LENGTH.SHORT;   // 25
+  const M = ROAD.LENGTH.MEDIUM;  // 50
+  const L = ROAD.LENGTH.LONG;    // 100
+  const CE = ROAD.CURVE.EASY;
+  const CM = ROAD.CURVE.MEDIUM;
+  const CH = ROAD.CURVE.HARD;
+  const HL = ROAD.HILL.LOW;
+  const HM = ROAD.HILL.MEDIUM;
+  const HH = ROAD.HILL.HIGH;
+
+  // Build one of 13 distinct track layouts based on theme
+  switch (themeId) {
+    case "night":
+      // Fast sweeping highway — lots of long curves, gentle hills
+      addStraight(S, segmentLength, rumbleLength);
+      addCurve(M, CE, HL, segmentLength, rumbleLength);
+      addStraight(S, segmentLength, rumbleLength);
+      addCurve(M, -CE, 0, segmentLength, rumbleLength);
+      addCurve(S, CM, HM, segmentLength, rumbleLength);
+      addStraight(M, segmentLength, rumbleLength);
+      addCurve(S, -CM, HL, segmentLength, rumbleLength);
+      addStraight(S, segmentLength, rumbleLength);
+      break;
+
+    case "fog":
+      // Slow, cautious — short sightlines & tight corners
+      addStraight(S, segmentLength, rumbleLength);
+      addCurve(S, CM, 0, segmentLength, rumbleLength);
+      addCurve(S, -CH, HL, segmentLength, rumbleLength);
+      addStraight(S, segmentLength, rumbleLength);
+      addCurve(S, CH, HM, segmentLength, rumbleLength);
+      addBumps(segmentLength, rumbleLength);
+      addCurve(S, -CM, 0, segmentLength, rumbleLength);
+      break;
+
+    case "snow":
+      // Twisty alpine village — S-curves with moderate hills
+      addStraight(S, segmentLength, rumbleLength);
+      addSCurves(segmentLength, rumbleLength);
+      addHill(S, HL, segmentLength, rumbleLength);
+      addCurve(S, CM, 0, segmentLength, rumbleLength);
+      addBumps(segmentLength, rumbleLength);
+      addCurve(S, -CM, HM, segmentLength, rumbleLength);
+      addStraight(S, segmentLength, rumbleLength);
+      break;
+
+    case "storm":
+      // Chaotic rain-soaked highway — medium curves, rolling bumps
+      addStraight(S, segmentLength, rumbleLength);
+      addCurve(S, CE, 0, segmentLength, rumbleLength);
+      addBumps(segmentLength, rumbleLength);
+      addCurve(M, -CM, HL, segmentLength, rumbleLength);
+      addBumps(segmentLength, rumbleLength);
+      addCurve(S, CE, HM, segmentLength, rumbleLength);
+      addStraight(S, segmentLength, rumbleLength);
+      break;
+
+    case "desert":
+      // Long open road, gentle curves, a few dunes
+      addStraight(M, segmentLength, rumbleLength);
+      addCurve(S, CE, HL, segmentLength, rumbleLength);
+      addStraight(M, segmentLength, rumbleLength);
+      addHill(S, HM, segmentLength, rumbleLength);
+      addStraight(S, segmentLength, rumbleLength);
+      addCurve(S, -CE, HL, segmentLength, rumbleLength);
+      addStraight(S, segmentLength, rumbleLength);
+      break;
+
+    case "future":
+      // Technical circuit — chicanes, sharp curves, turbo straights
+      addStraight(S, segmentLength, rumbleLength);
+      addCurve(S, CH, 0, segmentLength, rumbleLength);
+      addCurve(S, -CH, 0, segmentLength, rumbleLength);
+      addStraight(S, segmentLength, rumbleLength);
+      addCurve(S, CM, HL, segmentLength, rumbleLength);
+      addStraight(S, segmentLength, rumbleLength);
+      addCurve(S, -CM, 0, segmentLength, rumbleLength);
+      addCurve(S, CE, HM, segmentLength, rumbleLength);
+      break;
+
+    case "marsh":
+      // Winding swamp road — many medium curves, slippery feel
+      addCurve(S, CM, HL, segmentLength, rumbleLength);
+      addCurve(S, -CM, HL, segmentLength, rumbleLength);
+      addBumps(segmentLength, rumbleLength);
+      addCurve(S, CM, 0, segmentLength, rumbleLength);
+      addStraight(S, segmentLength, rumbleLength);
+      addCurve(S, -CH, HM, segmentLength, rumbleLength);
+      addStraight(S, segmentLength, rumbleLength);
+      break;
+
+    case "mountains":
+      // Steep switchback — lots of extreme curves, high hills
+      addStraight(S, segmentLength, rumbleLength);
+      addCurve(S, CH, HH, segmentLength, rumbleLength);
+      addCurve(S, -CH, HM, segmentLength, rumbleLength);
+      addStraight(S, segmentLength, rumbleLength);
+      addHill(S, HH, segmentLength, rumbleLength);
+      addCurve(S, CM, HL, segmentLength, rumbleLength);
+      addCurve(S, -CM, 0, segmentLength, rumbleLength);
+      break;
+
+    case "lakes":
+      // Scenic lakeside — gently rolling, medium curves
+      addStraight(S, segmentLength, rumbleLength);
+      addLowRollingHills(segmentLength, rumbleLength);
+      addCurve(S, CM, HL, segmentLength, rumbleLength);
+      addStraight(S, segmentLength, rumbleLength);
+      addCurve(S, -CM, HM, segmentLength, rumbleLength);
+      addLowRollingHills(segmentLength, rumbleLength);
+      break;
+
+    case "country":
+      // Countryside lanes — rolling hills, gentle curves
+      addStraight(S, segmentLength, rumbleLength);
+      addLowRollingHills(segmentLength, rumbleLength);
+      addCurve(S, CE, HL, segmentLength, rumbleLength);
+      addHill(S, HM, segmentLength, rumbleLength);
+      addStraight(S, segmentLength, rumbleLength);
+      addCurve(S, -CE, 0, segmentLength, rumbleLength);
+      addLowRollingHills(segmentLength, rumbleLength);
+      break;
+
+    case "city":
+      // Urban grid — sharp 90° feel, mostly flat
+      addStraight(M, segmentLength, rumbleLength);
+      addCurve(S, CH, 0, segmentLength, rumbleLength);
+      addStraight(M, segmentLength, rumbleLength);
+      addCurve(S, -CH, 0, segmentLength, rumbleLength);
+      addStraight(S, segmentLength, rumbleLength);
+      addCurve(S, CM, HL, segmentLength, rumbleLength);
+      addStraight(S, segmentLength, rumbleLength);
+      break;
+
+    case "roadworks":
+      // Construction maze — bumpy, twisty, slow
+      addStraight(S, segmentLength, rumbleLength);
+      addBumps(segmentLength, rumbleLength);
+      addCurve(S, CM, 0, segmentLength, rumbleLength);
+      addBumps(segmentLength, rumbleLength);
+      addCurve(S, -CM, HL, segmentLength, rumbleLength);
+      addStraight(S, segmentLength, rumbleLength);
+      addBumps(segmentLength, rumbleLength);
+      break;
+
+    case "windy":
+      // Open plains — long straights punctuated by big curves
+      addStraight(M, segmentLength, rumbleLength);
+      addCurve(S, CE, 0, segmentLength, rumbleLength);
+      addStraight(M, segmentLength, rumbleLength);
+      addCurve(S, -CE, HL, segmentLength, rumbleLength);
+      addStraight(S, segmentLength, rumbleLength);
+      addHill(S, HL, segmentLength, rumbleLength);
+      addStraight(S, segmentLength, rumbleLength);
+      break;
+
+    default:
+      // Original layout (fallback)
+      addStraight(S, segmentLength, rumbleLength);
+      addLowRollingHills(segmentLength, rumbleLength);
+      addSCurves(segmentLength, rumbleLength);
+      addCurve(M, CM, HL, segmentLength, rumbleLength);
+      addBumps(segmentLength, rumbleLength);
+      addCurve(S, -CM, HM, segmentLength, rumbleLength);
+      addStraight(S, segmentLength, rumbleLength);
+      break;
+  }
+
   addDownhillToEnd(segmentLength, rumbleLength);
 
-  resetSprites();
+  // Add per-theme sprites (scenery variety)
+  addThemeSprites(themeId);
 
   const playerSegment = findSegment(playerZ, segmentLength);
   segments[playerSegment.index + 2]!.color = COLORS.START;
@@ -380,3 +535,81 @@ export const resetRoad = (
 
   return segments.length * segmentLength;
 };
+
+/**
+ * Add scenery sprites characteristic to each theme.
+ * Each theme gets a distinct visual identity on the roadside.
+ */
+const addThemeSprites = (themeId: string): void => {
+  const len = segments.length;
+
+  // Always: start billboards
+  addSprite(20, SPRITES.BILLBOARD07, -1);
+  addSprite(40, SPRITES.BILLBOARD06, 1);
+
+  switch (themeId) {
+    case "night":
+    case "city":
+      // Urban: columns, billboards, few trees
+      for (let n = 50; n < len - 20; n += 8) {
+        addSprite(n, SPRITES.COLUMN, 1.1);
+        if (n % 24 === 0) addSprite(n, Util.randomChoice(SPRITE_GROUPS.BILLBOARDS), -1.2);
+      }
+      break;
+
+    case "desert":
+    case "windy":
+      // Open: dead trees, boulders, sparse
+      for (let n = 40; n < len - 10; n += 6) {
+        addSprite(n, SPRITES.DEAD_TREE1, Util.randomChoice([1, -1]) * (1.5 + Math.random()));
+        if (n % 30 === 0) addSprite(n, SPRITES.BOULDER3, Util.randomChoice([1, -1]) * 1.5);
+      }
+      break;
+
+    case "snow":
+    case "mountains":
+      // Alpine: dense trees, boulders
+      for (let n = 30; n < len - 10; n += 4) {
+        addSprite(n, SPRITES.TREE1, Util.randomChoice([1, -1]) * (1.5 + Math.random()));
+        if (n % 10 === 0) addSprite(n, SPRITES.BOULDER2, Util.randomChoice([1, -1]) * 2);
+        if (n % 15 === 0) addSprite(n, SPRITES.TREE2, Util.randomChoice([1, -1]) * (2 + Math.random()));
+      }
+      break;
+
+    case "future":
+      // Sci-fi: columns + billboards only
+      for (let n = 30; n < len - 10; n += 10) {
+        addSprite(n, SPRITES.COLUMN, 1.1);
+        addSprite(n, SPRITES.COLUMN, -1.1);
+        if (n % 30 === 0) addSprite(n, Util.randomChoice(SPRITE_GROUPS.BILLBOARDS), 1.3);
+      }
+      break;
+
+    case "marsh":
+    case "lakes":
+    case "country":
+      // Green: dense mixed plants
+      for (let n = 30; n < len - 10; n += 3) {
+        addSprite(n, Util.randomChoice(SPRITE_GROUPS.PLANTS), Util.randomChoice([1, -1]) * (1.5 + Math.random() * 2));
+        if (n % 20 === 0) addSprite(n, SPRITES.BILLBOARD02, -1.3);
+      }
+      break;
+
+    case "roadworks":
+      // Construction: billboards, boulders every few segments
+      for (let n = 20; n < len - 5; n += 5) {
+        addSprite(n, Util.randomChoice(SPRITE_GROUPS.BILLBOARDS), Util.randomChoice([1, -1]) * 1.2);
+        if (n % 15 === 0) addSprite(n, SPRITES.BOULDER3, Util.randomChoice([1, -1]) * 1.4);
+      }
+      break;
+
+    default:
+      // Mixed: palm trees + billboards
+      for (let n = 20; n < len - 10; n += 5) {
+        addSprite(n, SPRITES.PALM_TREE, Util.randomChoice([1, -1]) * (1.5 + Math.random()));
+        if (n % 25 === 0) addSprite(n, Util.randomChoice(SPRITE_GROUPS.BILLBOARDS), -1.3);
+      }
+      break;
+  }
+};
+

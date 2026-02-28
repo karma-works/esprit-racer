@@ -95,13 +95,25 @@ export const checkOpponentCollision = (world: WorldState, dt: number): void => {
 
 /**
  * Update race opponent positions & speeds each frame (dt in seconds).
- * Simple speed-matching AI with rubber-banding.
+ * In the final lap, opponents slow down progressively to let the player catch up.
+ * @param currentLap 1-based lap counter (1, 2, 3).
  */
-export const updateRaceOpponents = (world: WorldState, dt: number): void => {
+export const updateRaceOpponents = (world: WorldState, dt: number, currentLap: number = 1): void => {
     const { maxSpeed } = world.config;
+    const totalLaps = 3;
 
     for (const opp of world.raceOpponents) {
-        const targetSpeed = maxSpeed * opp.skill;
+        // Lap-based skill factor: full throttle in laps 1-2, noticeably slower in lap 3
+        let lapFactor: number;
+        if (currentLap >= totalLaps) {
+            // Final lap: each opponent's reduction is slightly different (0.55–0.72)
+            // They tire and make mistakes, giving the player the chance to overtake
+            lapFactor = 0.55 + (opp.id / 9) * 0.17;
+        } else {
+            lapFactor = 1.0; // Full speed in laps 1 and 2
+        }
+
+        const targetSpeed = maxSpeed * opp.skill * lapFactor;
 
         if (opp.speed < targetSpeed) {
             opp.speed += maxSpeed * 0.3 * dt;
@@ -110,12 +122,14 @@ export const updateRaceOpponents = (world: WorldState, dt: number): void => {
         }
         opp.speed = Math.max(0, Math.min(opp.speed, maxSpeed * 1.05));
 
-        // Rubber-band: if far behind the player, gently boost
-        const gap = world.player.position - opp.position;
-        if (gap > 5000) {
-            opp.speed *= 1.04;
-        } else if (gap < -5000) {
-            opp.speed *= 0.96;
+        // Rubber-band: if far behind the player, gently boost (only in laps 1-2)
+        if (currentLap < totalLaps) {
+            const gap = world.player.position - opp.position;
+            if (gap > 5000) {
+                opp.speed *= 1.04;
+            } else if (gap < -5000) {
+                opp.speed *= 0.96;
+            }
         }
 
         opp.position += opp.speed * dt;

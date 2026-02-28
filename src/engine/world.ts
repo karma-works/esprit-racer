@@ -305,6 +305,113 @@ export const updateSlidePhysics = (world: WorldState, dt: number): void => {
   world.slideVelocity = Util.limit(world.slideVelocity, -0.3, 0.3);
 };
 
+/**
+ * Per-segment surface effects driven by the active theme.
+ * Uses the segment index as a deterministic seed so effects are reproducible.
+ */
+export const updateSurfaceEffects = (world: WorldState, dt: number): void => {
+  const theme = world.currentTheme;
+  if (!theme) return;
+
+  const { player, config } = world;
+  const { segmentLength } = config;
+
+  // Current segment index (deterministic per location)
+  const segIdx = Math.floor((player.position % world.trackLength) / segmentLength);
+
+  // Simple reproducible per-segment pseudo-random value (0–1) using a hash
+  const segHash = ((segIdx * 2654435761) >>> 0) / 0xffffffff;
+
+  switch (theme.id) {
+    // ── Snow & Storm: Ice patches ───────────────────────────────────────────
+    case "snow":
+    case "storm": {
+      // Every ~4th segment has an ice patch
+      const isIce = segHash < 0.25;
+      if (isIce && Math.abs(player.x) < 0.85) {
+        // Extra slide: amplify current lateral momentum
+        world.slideVelocity += (player.x > 0 ? 0.012 : -0.012) * dt * 20;
+      }
+      break;
+    }
+
+    // ── Marsh: Oil slicks every ~6 segments ────────────────────────────────
+    case "marsh": {
+      const isSlick = segHash > 0.82;
+      if (isSlick && Math.abs(player.x) < 0.7) {
+        player.speed *= Math.pow(0.97, dt * 60);
+        world.slideVelocity += (Math.random() - 0.5) * 0.015 * dt * 40;
+      }
+      break;
+    }
+
+    // ── Desert: Loose sand on road edges ──────────────────────────────────
+    case "desert": {
+      const inSand = Math.abs(player.x) > 0.6 && Math.abs(player.x) < 1.0;
+      if (inSand) {
+        // Gentle speed reduction without going off-road
+        player.speed *= Math.pow(0.985, dt * 60);
+        // Drift toward road centre
+        player.x -= player.x * 0.01 * dt * 20;
+      }
+      break;
+    }
+
+    // ── Future: Turbo (speed boost) and penalty pads ──────────────────────
+    case "future": {
+      // Turbo pads near centre every ~10 segments
+      const isTurboPad = segHash > 0.90 && Math.abs(player.x) < 0.35;
+      const isPenaltyPad = segHash < 0.05 && Math.abs(player.x) < 0.35;
+      if (isTurboPad) {
+        player.speed = Math.min(player.speed * (1 + 0.5 * dt), config.maxSpeed * 1.3);
+        if (world.onCollision) world.onCollision(0.2); // subtle screen flash
+      } else if (isPenaltyPad) {
+        player.speed *= Math.pow(0.88, dt * 60);
+      }
+      break;
+    }
+
+    // ── Roadworks: Rough patches that shake the camera ────────────────────
+    case "roadworks": {
+      const isBump = segHash > 0.75 && segHash < 0.85;
+      if (isBump && player.speed > config.maxSpeed * 0.4) {
+        if (world.onCollision) world.onCollision(0.15 * (player.speed / config.maxSpeed));
+      }
+      break;
+    }
+
+    // ── Lakes: Slippery bridge sections ───────────────────────────────────
+    case "lakes": {
+      const isBridge = segHash > 0.60 && segHash < 0.70;
+      if (isBridge) {
+        world.slideVelocity *= 1.03; // amplify existing drift
+      }
+      break;
+    }
+
+    // ── Country: Puddles slow you down ────────────────────────────────────
+    case "country": {
+      const isPuddle = segHash > 0.70 && segHash < 0.78;
+      if (isPuddle && Math.abs(player.x) < 0.5) {
+        player.speed *= Math.pow(0.995, dt * 60);
+      }
+      break;
+    }
+
+    // ── Mountains: Narrow passes push player back to centre ───────────────
+    case "mountains": {
+      const isNarrow = segHash > 0.55 && segHash < 0.65;
+      if (isNarrow && Math.abs(player.x) > 0.65) {
+        // Wall effect: push toward road centre
+        const pushStr = 0.04 * dt * (Math.abs(player.x) - 0.65);
+        player.x -= Math.sign(player.x) * pushStr;
+        if (world.onCollision) world.onCollision(0.1);
+      }
+      break;
+    }
+  }
+};
+
 export const createDefaultInput = (): InputState => ({
   left: false,
   right: false,

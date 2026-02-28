@@ -395,26 +395,45 @@ export const renderPauseOverlay = (
   ctx: CanvasRenderingContext2D,
   canvasWidth: number,
   canvasHeight: number,
+  selection: 0 | 1 = 0,  // 0 = RESUME, 1 = MAIN MENU
 ): void => {
-  ctx.fillStyle = "rgba(0, 0, 0, 0.7)";
+  ctx.fillStyle = "rgba(0, 0, 0, 0.75)";
   ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
+  // Title
   ctx.font = 'bold 48px "Courier New", monospace';
   ctx.fillStyle = "#ffffff";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
-  ctx.fillText("PAUSED", canvasWidth / 2, canvasHeight / 2 - 40);
+  ctx.fillText("PAUSED", canvasWidth / 2, canvasHeight / 2 - 80);
 
-  ctx.font = '24px "Courier New", monospace';
-  ctx.fillStyle = "#888888";
-  ctx.fillText("Press P to resume", canvasWidth / 2, canvasHeight / 2 + 20);
+  const menuItemY = [canvasHeight / 2, canvasHeight / 2 + 60];
+  const labels = ["▶  RESUME", "⌂  MAIN MENU"];
 
-  ctx.fillStyle = "#666666";
-  ctx.fillText(
-    "Press F for fullscreen",
-    canvasWidth / 2,
-    canvasHeight / 2 + 55,
-  );
+  for (let i = 0; i < 2; i++) {
+    const y = menuItemY[i]!;
+    const isSelected = selection === i;
+
+    if (isSelected) {
+      // Highlight box
+      ctx.fillStyle = "rgba(204, 39, 45, 0.3)";
+      ctx.fillRect(canvasWidth / 2 - 160, y - 22, 320, 44);
+      ctx.strokeStyle = "#cc272d";
+      ctx.lineWidth = 2;
+      ctx.strokeRect(canvasWidth / 2 - 160, y - 22, 320, 44);
+    }
+
+    ctx.font = `${isSelected ? "bold" : ""} 28px "Courier New", monospace`;
+    ctx.fillStyle = isSelected ? "#ffffff" : "#888888";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(labels[i]!, canvasWidth / 2, y);
+  }
+
+  // Hint text
+  ctx.font = '16px "Courier New", monospace';
+  ctx.fillStyle = "#555555";
+  ctx.fillText("↑ ↓ navigate   SPACE/ENTER confirm", canvasWidth / 2, canvasHeight / 2 + 130);
 };
 
 export const renderCountdown = (

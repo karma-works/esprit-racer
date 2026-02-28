@@ -14,6 +14,7 @@ import {
   updateTumbleweeds,
   updateLightning,
   updateSlidePhysics,
+  updateSurfaceEffects,
 } from "./engine/world";
 import * as Render from "./engine/renderer/canvas";
 import * as SvgRender from "./engine/renderer/sprite";
@@ -154,6 +155,7 @@ let isFullscreen = false;
 const TRAFFIC_CAR_COUNT = 20;
 let selectedThemeId: string = "night";
 let pendingRecsParams: RecsParams | null = null;
+let pauseMenuSelection: 0 | 1 = 0; // 0=RESUME, 1=MAIN MENU
 
 const getSelectedTheme = (): LevelTheme => {
   return THEMES[selectedThemeId] ?? THEMES["night"]!;
@@ -681,7 +683,7 @@ const renderRacing = () => {
   }
 
   if (gameState.isPaused) {
-    renderPauseOverlay(ctx, width, height);
+    renderPauseOverlay(ctx, width, height, pauseMenuSelection);
   }
 };
 
@@ -1151,7 +1153,7 @@ const updateGame = (dt: number) => {
     const prevLap = world.currentLapTime;
     update(world, dt);
     if (gameState.gameMode === "race") {
-      updateRaceOpponents(world, dt);
+      updateRaceOpponents(world, dt, gameState.lap);
       checkOpponentCollision(world, dt);
     }
     const speedPercent = world.player.speed / world.config.maxSpeed;
@@ -1161,6 +1163,7 @@ const updateGame = (dt: number) => {
     updateTumbleweeds(world, dt);
     updateLightning(world, dt);
     updateSlidePhysics(world, dt);
+    updateSurfaceEffects(world, dt);
     updateEngineSound(speedPercent);
 
     const checkpointResult = checkCheckpoint(
@@ -1477,12 +1480,31 @@ const handleMenuKeyDown = async (keyCode: number) => {
   } else if (gameState.screen === "racing") {
     if (keyCode === KEY.P || keyCode === 27) {
       if (gameState.isPaused) {
+        pauseMenuSelection = 0;
         gameState = resumeGame(gameState);
       } else {
+        pauseMenuSelection = 0;
         gameState = pauseGame(gameState);
       }
-    }
-    if (keyCode === KEY.F || keyCode === 122) {
+    } else if (gameState.isPaused) {
+      // Navigate pause menu with Up/Down
+      if (keyCode === 38) {
+        pauseMenuSelection = 0;
+      } else if (keyCode === 40) {
+        pauseMenuSelection = 1;
+      } else if (keyCode === KEY.SPACE || keyCode === 13) {
+        if (pauseMenuSelection === 1) {
+          // Go to main menu
+          pauseMenuSelection = 0;
+          gameState = returnToMenu(gameState);
+          stopEngineSound();
+          startMenuMusic();
+        } else {
+          pauseMenuSelection = 0;
+          gameState = resumeGame(gameState);
+        }
+      }
+    } else if (keyCode === KEY.F || keyCode === 122) {
       toggleFullscreen();
     }
   }

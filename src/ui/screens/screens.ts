@@ -279,8 +279,8 @@ export class MainMenuScreen implements UIScreen {
   private playerCount: 1 | 2 = 1;
   private gameMode: "time" | "race" | "championship" = "time";
 
-  private player1Name: string = "PLAYER 1";
-  private player2Name: string = "PLAYER 2";
+  private player1Name: string = "TARO";
+  private player2Name: string = "OPYCHUS";
   private editingPlayer: 0 | 1 | 2 = 0;
 
   constructor(
@@ -371,7 +371,7 @@ export class MainMenuScreen implements UIScreen {
     const player1Zone = this.zones.find((z) => z.action === "player1");
     if (player1Zone) {
       const cursor1 = this.editingPlayer === 1 && Math.floor(Date.now() / 500) % 2 === 0 ? "_" : "";
-      const displayName1 = this.player1Name || "PLAYER 1";
+      const displayName1 = this.player1Name || "TARO";
       drawCenteredText(
         ctx,
         displayName1 + cursor1,
@@ -394,7 +394,7 @@ export class MainMenuScreen implements UIScreen {
     const player2Zone = this.zones.find((z) => z.action === "player2");
     if (player2Zone) {
       const cursor2 = this.editingPlayer === 2 && Math.floor(Date.now() / 500) % 2 === 0 ? "_" : "";
-      const displayName2 = this.player2Name || "PLAYER 2";
+      const displayName2 = this.player2Name || "OPYCHUS";
       drawCenteredText(
         ctx,
         displayName2 + cursor2,
