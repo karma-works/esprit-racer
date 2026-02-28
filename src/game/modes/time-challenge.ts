@@ -27,6 +27,7 @@ export interface TimeChallengeState {
   lastCheckpointSegment: number;
   isPaused: boolean;
   isGameOver: boolean;
+  isWin: boolean;
   bestTime: number | null;
   bestScore: number | null;
   timeBonusFlash: number;
@@ -75,6 +76,7 @@ export const createTimeChallengeState = (
     lastCheckpointSegment: -1,
     isPaused: false,
     isGameOver: false,
+    isWin: false,
     bestTime: null,
     bestScore: null,
     timeBonusFlash: 0,
@@ -108,6 +110,7 @@ export const updateTimer = (
       ...state,
       currentTime: 0,
       isGameOver: true,
+      isWin: false,
       screen: "results",
       timeBonusFlash: 0,
     };
@@ -178,6 +181,7 @@ export const completeLap = (
       return {
         ...state,
         isGameOver: true,
+        isWin: true,
         screen: "results",
         score: state.score,
         bestScore: state.bestScore,
@@ -194,6 +198,7 @@ export const completeLap = (
     return {
       ...state,
       isGameOver: true,
+      isWin: true,
       screen: "results",
       score: finalScore,
       bestScore: isNewBest ? finalScore : state.bestScore,
@@ -235,6 +240,7 @@ export const startRace = (state: TimeChallengeState): TimeChallengeState => ({
   lastCheckpointSegment: 0,
   isPaused: false,
   isGameOver: false,
+  isWin: false,
   timeBonusFlash: 0,
 });
 

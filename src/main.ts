@@ -1182,6 +1182,20 @@ const updateGame = (dt: number) => {
       world.lastLapTime !== null
     ) {
       gameState = completeLap(gameState, world);
+
+      if (gameState.isWin) {
+        const themesList = Object.keys(THEMES);
+        const currentIndex = themesList.indexOf(selectedThemeId);
+        if (currentIndex !== -1 && currentIndex < themesList.length - 1) {
+          const nextThemeId = themesList[currentIndex + 1]!;
+          const carriedScore = gameState.score;
+          // Start the next scenario, then restore the accumulated score
+          startGame(nextThemeId).then(() => {
+            gameState = { ...gameState, score: carriedScore };
+          }).catch(console.error);
+          return;
+        }
+      }
     }
   } else {
     // Multiplayer mode - update each player
