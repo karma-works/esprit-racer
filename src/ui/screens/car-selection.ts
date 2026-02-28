@@ -74,7 +74,7 @@ export class CarSelectionScreen implements UIScreen {
 
         // Draw Large Car
         // The car sprites in assets are usually 128-256px. We scale them up big.
-        const largeScale = 3.5;
+        const largeScale = 1.75;
         const sprite = globalSpriteCache.get(car.sprite, largeScale * scale);
         if (sprite) {
             ctx.drawImage(

@@ -260,16 +260,16 @@ const MAIN_MENU_ZONES: Array<{
     },
   ];
 
+// These are the menu zones that can be navigated via keyboard.
+// 'code', 'define', 'control', 'course' are display-only and not navigable.
 const NAVIGABLE_ZONES = [
   "start",
   "game",
-  "course",
-  "control",
   "players",
   "sound",
   "constructor",
-  "code",
-  "define",
+  "player1",
+  "player2",
 ];
 
 export class MainMenuScreen implements UIScreen {
@@ -354,6 +354,64 @@ export class MainMenuScreen implements UIScreen {
     const selectedZone = this.zones[this.selectedIndex];
     if (selectedZone) {
       drawSelectionBox(ctx, selectedZone);
+    }
+    // Dim disabled/decorative zones
+    const DISABLED_ZONES = ["code", "define", "control", "course", "gears-p1", "gears-p2", "accel-p1", "accel-p2"];
+    for (const zone of this.zones) {
+      if (DISABLED_ZONES.includes(zone.action)) {
+        ctx.save();
+        ctx.globalAlpha = 0.55;
+        ctx.fillStyle = "#000000";
+        ctx.fillRect(zone.x, zone.y, zone.width, zone.height);
+        ctx.restore();
+      }
+    }
+
+    // Draw player names in their dedicated Player 1 / Player 2 top boxes
+    const player1Zone = this.zones.find((z) => z.action === "player1");
+    if (player1Zone) {
+      const cursor1 = this.editingPlayer === 1 && Math.floor(Date.now() / 500) % 2 === 0 ? "_" : "";
+      const displayName1 = this.player1Name || "PLAYER 1";
+      drawCenteredText(
+        ctx,
+        displayName1 + cursor1,
+        player1Zone.x + player1Zone.width / 2,
+        player1Zone.y + player1Zone.height / 2 + 15 * scale,
+        {
+          font: `bold ${13 * scale}px monospace`,
+          color: this.editingPlayer === 1 ? "#ffffff" : "#cccccc",
+        },
+      );
+      if (this.editingPlayer === 1) {
+        ctx.save();
+        ctx.strokeStyle = "#ffcc00";
+        ctx.lineWidth = 2 * scale;
+        ctx.strokeRect(player1Zone.x + 2, player1Zone.y + 2, player1Zone.width - 4, player1Zone.height - 4);
+        ctx.restore();
+      }
+    }
+
+    const player2Zone = this.zones.find((z) => z.action === "player2");
+    if (player2Zone) {
+      const cursor2 = this.editingPlayer === 2 && Math.floor(Date.now() / 500) % 2 === 0 ? "_" : "";
+      const displayName2 = this.player2Name || "PLAYER 2";
+      drawCenteredText(
+        ctx,
+        displayName2 + cursor2,
+        player2Zone.x + player2Zone.width / 2,
+        player2Zone.y + player2Zone.height / 2 + 15 * scale,
+        {
+          font: `bold ${13 * scale}px monospace`,
+          color: this.editingPlayer === 2 ? "#ffffff" : "#cccccc",
+        },
+      );
+      if (this.editingPlayer === 2) {
+        ctx.save();
+        ctx.strokeStyle = "#ffcc00";
+        ctx.lineWidth = 2 * scale;
+        ctx.strokeRect(player2Zone.x + 2, player2Zone.y + 2, player2Zone.width - 4, player2Zone.height - 4);
+        ctx.restore();
+      }
     }
 
     const playersZone = this.zones.find((z) => z.action === "players");
@@ -521,6 +579,17 @@ export class MainMenuScreen implements UIScreen {
           return null;
         }
 
+        // Player 1 box clicked: start editing player 1 name
+        if (zone.action === "player1") {
+          this.editingPlayer = 1;
+          return null;
+        }
+        // Player 2 box clicked: start editing player 2 name
+        if (zone.action === "player2") {
+          this.editingPlayer = 2;
+          return null;
+        }
+
         this.editingPlayer = 0;
 
         if (zone.action === "game") {
@@ -581,6 +650,18 @@ export class MainMenuScreen implements UIScreen {
       }
       if (currentZone.action === "game") {
         this.toggleGameMode();
+        return null;
+      }
+      if (currentZone.action === "player1") {
+        this.editingPlayer = 1;
+        return null;
+      }
+      if (currentZone.action === "player2") {
+        if (this.playerCount === 2) {
+          this.editingPlayer = 2;
+        } else {
+          this.editingPlayer = 1;
+        }
         return null;
       }
       return currentZone.action;

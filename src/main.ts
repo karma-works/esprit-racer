@@ -56,7 +56,12 @@ import {
   updateRaceOpponents,
   getRacePosition,
   getVisibleOpponents,
+  checkOpponentCollision,
 } from "./game/modes/race-opponents";
+import {
+  generateRecsTrack,
+  type RecsParams,
+} from "./engine/recs-generator";
 import {
   createMultiplayerRaceState,
   type MultiplayerRaceState,
@@ -148,6 +153,7 @@ let countdownTimer = 0;
 let isFullscreen = false;
 const TRAFFIC_CAR_COUNT = 20;
 let selectedThemeId: string = "night";
+let pendingRecsParams: RecsParams | null = null;
 
 const getSelectedTheme = (): LevelTheme => {
   return THEMES[selectedThemeId] ?? THEMES["night"]!;
@@ -1146,6 +1152,7 @@ const updateGame = (dt: number) => {
     update(world, dt);
     if (gameState.gameMode === "race") {
       updateRaceOpponents(world, dt);
+      checkOpponentCollision(world, dt);
     }
     const speedPercent = world.player.speed / world.config.maxSpeed;
     updateWind(world, dt, speedPercent);
@@ -1286,6 +1293,16 @@ const startGame = async (themeId?: string) => {
   const theme = getSelectedTheme();
   setTheme(world, theme);
 
+  // If launched from RECS builder, regenerate the track with RECS parameters
+  if (pendingRecsParams) {
+    const segLen = world.config.segmentLength;
+    const rumbleLen = world.config.rumbleLength;
+    const pZ = world.player.z;
+    world.trackLength = generateRecsTrack(pendingRecsParams, segLen, rumbleLen, pZ);
+    world.segments = (await import("./engine/segments")).getSegments();
+    pendingRecsParams = null; // consume it
+  }
+
   if (championshipState) {
     world.player.position -= championshipState.gridPosition * 500; // rough start
 
@@ -1385,6 +1402,11 @@ const handleMenuKeyDown = async (keyCode: number) => {
     const action = screen?.handleKeyDown?.(keyCode);
 
     if (action === "start_game") {
+      // Capture RECS config and convert to RecsParams before navigating to music selection
+      const cfg = recsScreen?.getConfig();
+      if (cfg) {
+        pendingRecsParams = { ...cfg };
+      }
       const themeId = recsScreen?.getSelectedThemeId() ?? "night";
       await startGame(themeId);
     } else if (action === "back") {

@@ -48,6 +48,6 @@
     
     <rect x="55" y="22" width="10" height="3" rx="1" fill="#00FFFF" opacity="0.9"/>
     
-    <text x="60" y="55" font-family="sans-serif" font-size="6" fill="#FFE4B5" text-anchor="middle" font-weight="bold">M200</text>
+    
   </g>
 </svg>
