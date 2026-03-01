@@ -293,13 +293,7 @@
      y="60"
      class="title"
      id="text17">PLAYER 1</text>
-  <text
-     x="120"
-     y="95"
-     class="val"
-     text-anchor="middle"
-     filter="drop-shadow(2px 2px 0px #000)"
-     id="text18">TARO</text>
+  <!-- Player name rendered dynamically by game code -->
   <!-- Start -->
   <rect
      x="230"
@@ -371,13 +365,7 @@
      y="60"
      class="title"
      id="text21">PLAYER 2</text>
-  <text
-     x="680"
-     y="95"
-     class="val"
-     text-anchor="middle"
-     filter="drop-shadow(2px 2px 0px #000)"
-     id="text22">OPYCHUS</text>
+  <!-- Player 2 name rendered dynamically by game code -->
   <!-- ==================== MIDDLE SECTION ==================== -->
   <!-- P1 Gears -->
   <g
