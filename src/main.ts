@@ -1299,6 +1299,9 @@ const startGame = async (themeId?: string) => {
   const mainMenuScreen = screens.get("main-menu") as MainMenuScreen | undefined;
   const names = mainMenuScreen ? [mainMenuScreen.getPlayer1Name(), mainMenuScreen.getPlayer2Name()] : [];
   world = createWorld(playerCount, names);
+  world.config.width = canvas.width;
+  world.config.height = canvas.height;
+  resolution = canvas.height / 480;
   world.onCollision = playCollisionSound;
 
   const musicScreen = screens.get("music-select") as
